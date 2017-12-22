@@ -15,29 +15,4 @@ describe('Blas', function() {
     console.log(C);
   });
 
-  it('test', function() {
-
-    class Test {
-      constructor(data) {
-        let self = this;
-        this.data = data;
-        this.foo = 'bar';
-
-        return new Proxy(this, {
-          get(target, prop) {
-            if (Number(prop) == prop && !(prop in target)) {
-              return self.data[prop];
-            }
-            return target[prop];
-          }
-        });
-      }
-    }
-
-    var test = new Test([1,2,3]);
-    console.log(test[0]); // should log 1
-    console.log(test.foo); // should log 'bar'
-    console.log(test);
-  });
-
 });
