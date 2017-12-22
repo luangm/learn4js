@@ -6,6 +6,7 @@
  * An parallel optimization for execution could be split the inputs into multiple sub tensors and let worker run on each.
  */
 import TensorUtils from "../util/TensorUtils";
+import SpecialOp from "../op/special/SpecialOp";
 
 const singleton = Symbol();
 
@@ -26,7 +27,11 @@ export default class Executor {
    * This function loops through the Tensor with consideration of buffer index
    */
   exec(op) {
-    this.execAtDim(op, 0);
+    if (op instanceof SpecialOp) {
+      op.exec();
+    } else {
+      this.execAtDim(op, 0);
+    }
   }
 
   /**

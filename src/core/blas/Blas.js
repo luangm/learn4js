@@ -15,92 +15,62 @@ export default class Blas {
     if (!transB) {
       if (!transA) {
         // C = alpha * A * B + beta * C
-        for (let j = 0; j < n; j++) {
-          if (beta === 0) {
-            for (let i = 0; i < m; i++) {
-              C[i][j] = 0;
+        // C[i,j] = Sum(A[i,l] * B[l,j])
+        let cIndex = 0;
+        for (let i = 0; i < m; i++) {
+          for (let j = 0; j < n; j++) {
+            let temp = 0;
+            let aIndex = i * k;
+            let bIndex = j;
+            for (let l = 0; l < k; l++) {
+              temp += A[aIndex] * B[bIndex];
+              aIndex++;
+              bIndex += n;
             }
-          } else if (beta !== 1) {
-            for (let i = 0; i < m; i++) {
-              C[i][j] = beta * C[i][j];
-            }
-          }
-          for (let l = 0; l < k; l++) {
-            let temp = alpha * B[l][j];
-            for (let i = 0; i < m; i++) {
-              C[i][j] += temp * A[i][l];
-            }
+            C[cIndex] = alpha * temp + beta * C[cIndex];
+            cIndex++;
           }
         }
       } else {
         // C = alpha * A^T * B + beta * C
-        for (let j = 0; j < n; j++) {
-          for (let i = 0; i < m; i++) {
+        for (let i = 0; i < m; i++) {
+          for (let j = 0; j < n; j++) {
             let temp = 0;
             for (let l = 0; l < k; l++) {
-              temp += A[l][i] * B[l][j];
+              temp += A[l * m + i] * B[l * k + j];
             }
-            C[i][j] = alpha * temp + (beta !== 0 ? beta * C[i][j] : 0);
+            let index = i * m + j;
+            C[index] = alpha * temp + (beta !== 0 ? beta * C[index] : 0);
           }
         }
       }
     } else {
       if (!transA) {
         // C = alpha * A * B^T + beta * C
-        for (let j = 0; j < n; j++) {
-          if (beta === 0) {
-            for (let i = 0; i < m; i++) {
-              C[i][j] = 0;
+        for (let i = 0; i < m; i++) {
+          for (let j = 0; j < n; j++) {
+            let temp = 0;
+            for (let l = 0; l < k; l++) {
+              temp += A[i * m + l] * B[j * k + l];
             }
-          } else if (beta !== 1) {
-            for (let i = 0; i < m; i++) {
-              C[i][j] *= beta;
-            }
-          }
-          for (let l = 0; l < k; l++) {
-            let temp = alpha * B[j][l];
-            for (let i = 0; i < m; i++) {
-              C[i][j] += temp * A[i][l];
-            }
+            let index = i * m + j;
+            C[index] = alpha * temp + (beta !== 0 ? beta * C[index] : 0);
           }
         }
       } else {
         // C = alpha * A^T * B^T + beta * C
-        for (let j = 0; j < n; j++) {
-          for (let i = 0; i < m; i++) {
+        for (let i = 0; i < m; i++) {
+          for (let j = 0; j < n; j++) {
             let temp = 0;
             for (let l = 0; l < k; l++) {
-              temp += A[l][i] * B[j][l];
+              temp += A[l * m + i] * B[j * k + l];
             }
-            C[i][j] = alpha * temp + (beta !== 0 ? beta * C[i][j] : 0);
+            let index = i * m + j;
+            C[index] = alpha * temp + (beta !== 0 ? beta * C[index] : 0);
           }
         }
       }
     }
-  }
-
-  gemm2(m, n, k, alpha, a, lda, b, ldb, beta, c, ldc) {
-
-    var outputDims = new Dimensions(n, m);
-    var outputBuffer = new Buffer(outputDims, c);
-
-    for (var i = 0; i < m; i++) {
-      for (var j = 0; j < n; j++) {
-        var total = 0.0;
-        for (var l = 0; l < k; l++) {
-          var aIndex = ((lda * l) + i);
-          var aValue = a[aIndex];
-          var bIndex = ((ldb * j) + l);
-          var bValue = b[bIndex];
-          total += (aValue * bValue);
-        }
-        var cIndex = ((ldc * j) + i);
-        var oldCValue = c[cIndex];
-        c[cIndex] = ((alpha * total) + (beta * oldCValue));
-      }
-    }
-
-    return outputBuffer;
   }
 
 }

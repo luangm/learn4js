@@ -1,6 +1,7 @@
 import Shape from "./Shape";
 import Executor from "./executor/Executor";
 import AddOp from "./op/pairwise/AddOp";
+import MatMulOp from "./op/special/MatMulOp";
 
 /**
  * A Tensor is the basic data storage for N-Dimensional array.
@@ -23,6 +24,10 @@ export default class Tensor {
     return this._data;
   }
 
+  get isMatrix() {
+    return this.rank === 2 && this.shape[0] !== 1 && this.shape[1] !== 1;
+  }
+
   get length() {
     return this._shape.length;
   }
@@ -37,10 +42,6 @@ export default class Tensor {
 
   get strides() {
     return this._shape.strides;
-  }
-
-  get isMatrix() {
-    return this.rank === 2 && this.shape[0] !== 1 && this.shape[1] !== 1;
   }
 
   /**
@@ -65,6 +66,13 @@ export default class Tensor {
   get(indices) {
     let offset = this._shape.getOffset(indices);
     return this._data[offset];
+  }
+
+  mmul(other) {
+    // TODO: Checks
+    let result = new Tensor([this.shape[0], other.shape[1]]);
+    Executor.instance.exec(new MatMulOp(this, other, result));
+    return result;
   }
 
   set(indices, value) {
