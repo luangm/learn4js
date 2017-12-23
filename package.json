@@ -1,7 +1,7 @@
 {
   "name": "learn4js",
   "version": "0.1.0",
-  "description": "Machine Learning library for JavaScript",
+  "description": "Machine Learning framework for JavaScript",
   "main": "dist/index.js",
   "scripts": {
     "start": "webpack-dev-server --content-base dev/",
@@ -10,6 +10,10 @@
   "author": {
     "name": "Guangmiao Luan",
     "email": "luangm@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/luangm/learn4js.git"
   },
   "license": "MIT",
   "devDependencies": {
