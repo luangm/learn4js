@@ -1,5 +1,6 @@
 var webpack = require('webpack');
 var path = require('path');
+var UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 module.exports = {
   entry: {
@@ -9,7 +10,7 @@ module.exports = {
   output: {
     path: path.join(__dirname, '/dist'),
     filename: '[name].js',
-    publicPath: "/dist/",
+    publicPath: '/dist/',
     libraryTarget: 'umd'
   },
 
@@ -25,5 +26,11 @@ module.exports = {
         use: ["babel-loader"]
       }
     ]
-  }
+  },
+
+  // plugins: [
+  //   new UglifyJsPlugin({
+  //     sourceMap: true
+  //   })
+  // ]
 };

@@ -3,15 +3,20 @@ import Session from "../src/session/Session";
 
 describe('Graph', function() {
 
-  it('create graph with add', function() {
-    let a = Learn4js.constant({data: [1, 2, 3, 4, 5, 6], shape: [2, 3]});
-    let b = Learn4js.constant({data: [2, 3, 4, 5, 6, 7], shape: [2, 3]});
-    let add = Learn4js.add({left: a, right: b});
+  it('graph', function() {
+    let a = Learn4js.constant({data: [.1, .2, .3, .4, .5, .6], shape: [2, 3]});
+    let b = Learn4js.constant({data: [.1, .2, .3, .4, .2, .3, .4, .5, .3, .4, .5, .6], shape: [3, 4]});
+    let y = Learn4js.constant({data: [1, 0, 1, 0, 0, 1, 0, 1], shape: [2, 4]});
+
+    let matmul = Learn4js.matmul({left: a, right: b});
+    let sigmoid = Learn4js.sigmoid({base: matmul});
+    let sub = Learn4js.subtract({left: y, right: sigmoid});
+    let square = Learn4js.square({base: sub});
+    // let reduceSum = Learn4js.reduceSum({base: square});
 
     let sess = new Session(Learn4js.activeGraph);
-    let result = sess.run(add);
-    console.log(result); // should be a tensor
-    console.log(Learn4js.activeGraph);
+    let result = sess.run(square);
+    console.log(result);
   });
 
 });

@@ -60,7 +60,10 @@ export default class Executor {
         // console.log(indices);
         let offset = TensorUtils.computeOffset(indices, shape, strides);
         let a = op.input._data[offset];
-        let b = op.other._data[offset];
+        let b = null;
+        if (op.other) {
+          b = op.other._data[offset];
+        }
         op.result._data[offset] = op.body(a, b);
       }
 

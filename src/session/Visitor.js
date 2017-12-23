@@ -12,4 +12,23 @@ export default class Visitor {
     // Nothing
   }
 
+  visitMatMul(node, params) {
+    node.left.accept(this, params);
+    node.right.accept(this, params);
+  }
+
+  visitSigmoid(node, params) {
+    node.base.accept(this, params);
+  }
+
+  visitSubtract(node, params) {
+    node.left.accept(this, params);
+    node.right.accept(this, params);
+  }
+
+  visitSquare(node, params) {
+    node.base.accept(this, params);
+  }
+
+
 }

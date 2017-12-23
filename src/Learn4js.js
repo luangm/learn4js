@@ -1,6 +1,10 @@
 import ComputeGraph from "./structure/ComputeGraph";
 import Constant from "./structure/node/Constant";
 import Add from "./structure/node/Add";
+import MatMul from "./structure/node/MatMul";
+import Sigmoid from "./structure/node/Sigmoid";
+import Subtract from "./structure/node/Subtract";
+import Square from "./structure/node/Square";
 
 /**
  * This is main Utility class for this library.
@@ -23,14 +27,38 @@ class Learn4js {
     this._activeGraph = value;
   }
 
+  add({name, left, right}) {
+    let node = new Add({name, left, right});
+    this._activeGraph.add(node);
+    return node;
+  }
+
   constant({name, data, shape}) {
     let node = new Constant({name, data, shape});
     this._activeGraph.add(node);
     return node;
   }
 
-  add({name, left, right}) {
-    let node = new Add({name, left, right});
+  matmul({name, left, right}) {
+    let node = new MatMul({name, left, right});
+    this._activeGraph.add(node);
+    return node;
+  }
+
+  sigmoid({name, base}) {
+    let node = new Sigmoid({name, base});
+    this._activeGraph.add(node);
+    return node;
+  }
+
+  square({name, base}) {
+    let node = new Square({name, base});
+    this._activeGraph.add(node);
+    return node;
+  }
+
+  subtract({name, left, right}) {
+    let node = new Subtract({name, left, right});
     this._activeGraph.add(node);
     return node;
   }
