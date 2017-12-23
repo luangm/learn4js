@@ -1,6 +1,6 @@
 {
   "name": "learn4js",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "description": "Machine Learning framework for JavaScript",
   "main": "dist/index.js",
   "scripts": {
