@@ -15,7 +15,7 @@ describe('Blas', function() {
 
     let blas = new Blas();
     blas.gemm(false, false, 2, 2, 3, 1, A, null, B, null, 0, C, null);
-    console.log(C);
+    // console.log(C);
   });
 
 });

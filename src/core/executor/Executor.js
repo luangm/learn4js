@@ -28,6 +28,7 @@ export default class Executor {
    */
   exec(op) {
     if (op instanceof SpecialOp) {
+      // Special Ops bypasses executor
       op.exec();
     } else {
       this.execAtDim(op, 0);
