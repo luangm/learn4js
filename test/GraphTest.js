@@ -12,11 +12,17 @@ describe('Graph', function() {
     let sigmoid = Learn4js.sigmoid({base: matmul});
     let sub = Learn4js.subtract({left: y, right: sigmoid});
     let square = Learn4js.square({base: sub});
-    // let reduceSum = Learn4js.reduceSum({base: square});
+    let reduceSum = Learn4js.reduceSum({base: square});
 
     let sess = new Session(Learn4js.activeGraph);
-    let result = sess.run(square);
-    console.log(result);
+    console.log("a", sess.run(a));
+    console.log("b", sess.run(b));
+    console.log("matmul", sess.run(matmul));
+    console.log("sigmoid", sess.run(sigmoid));
+    console.log("sub", sess.run(sub));
+    console.log("square", sess.run(square));
+    console.log("reduceSum", sess.run(reduceSum));
+
   });
 
 });

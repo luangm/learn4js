@@ -7,6 +7,7 @@
  */
 import TensorUtils from "../util/TensorUtils";
 import SpecialOp from "../op/special/SpecialOp";
+import ReductionOp from "../op/reduction/ReductionOp";
 
 const singleton = Symbol();
 
@@ -30,15 +31,56 @@ export default class Executor {
     if (op instanceof SpecialOp) {
       // Special Ops bypasses executor
       op.exec();
+    } else if (op instanceof ReductionOp) {
+
+      let accum = this._accumAtDim(op, 0);
+      op.result.data[0] = op.getResult(accum);
+
     } else {
-      this.execAtDim(op, 0);
+      this._execAtDim(op, 0);
     }
   }
 
   /**
    * Starts the execution from a certain dimension
    */
-  execAtDim(op, dim, indices) {
+  _accumAtDim(op, dim, indices) {
+    let rank = op.input.rank;
+    if (dim >= rank) {
+      return;
+    }
+
+    let shape = op.input.shape;
+    let strides = op.input.strides;
+
+    if (!indices) {
+      indices = [];
+      for (let i = 0; i < rank; i++) {
+        indices.push(0);
+      }
+    }
+
+    let accum = 0;
+
+    for (let i = 0; i < shape[dim]; i++) {
+      indices[dim] = i;
+      if (dim === rank - 1) {
+        let offset = TensorUtils.computeOffset(indices, shape, strides);
+        let a = op.input.data[offset];
+        accum = op.update(accum, a);
+      } else {
+        let subResult = this._accumAtDim(op, dim + 1, indices);
+        accum += subResult;
+      }
+    }
+
+    return accum;
+  }
+
+  /**
+   * Starts the execution from a certain dimension
+   */
+  _execAtDim(op, dim, indices) {
     let rank = op.input.rank;
     if (dim >= rank) {
       return;
@@ -59,16 +101,15 @@ export default class Executor {
       if (dim === rank - 1) {
         // console.log(indices);
         let offset = TensorUtils.computeOffset(indices, shape, strides);
-        let a = op.input._data[offset];
+        let a = op.input.data[offset];
         let b = null;
         if (op.other) {
-          b = op.other._data[offset];
+          b = op.other.data[offset];
         }
-        op.result._data[offset] = op.body(a, b);
+        op.result.data[offset] = op.body(a, b);
       }
 
-      this.execAtDim(op, dim + 1, indices);
+      this._execAtDim(op, dim + 1, indices);
     }
   }
-
 }

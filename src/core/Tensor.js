@@ -3,6 +3,7 @@ import Executor from "./executor/Executor";
 import AddOp from "./op/pairwise/AddOp";
 import MatMulOp from "./op/special/MatMulOp";
 import SubtractOp from "./op/pairwise/SubtractOp";
+import SumOp from "./op/reduction/SumOp";
 
 /**
  * A Tensor is the basic data storage for N-Dimensional array.
@@ -59,6 +60,12 @@ export default class Tensor {
     // TODO: Dimension Checks
     let result = new Tensor(this.shape);
     Executor.instance.exec(new SubtractOp(this, other, result));
+    return result;
+  }
+
+  sum() {
+    let result = new Tensor([1,1]);
+    Executor.instance.exec(new SumOp(this, null, result));
     return result;
   }
 

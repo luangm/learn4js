@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "Machine Learning framework for JavaScript",
   "main": "dist/index.js",
+  "rollup": "dist/index.umd.js",
   "scripts": {
     "start": "webpack-dev-server --content-base dev/",
     "test": "mocha --require babel-register"
@@ -20,6 +21,7 @@
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
     "babel-plugin-add-module-exports": "^0.2.1",
+    "babel-plugin-external-helpers": "^6.22.0",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-plugin-transform-decorators-legacy": "^1.3.4",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
@@ -27,6 +29,11 @@
     "babel-preset-env": "^1.6.1",
     "babel-register": "^6.26.0",
     "mocha": "^4.0.1",
+    "rollup": "^0.50.0",
+    "rollup-plugin-babel": "^3.0.3",
+    "rollup-plugin-commonjs": "^8.2.6",
+    "rollup-plugin-node-resolve": "^3.0.0",
+    "rollup-plugin-uglify": "^2.0.1",
     "uglifyjs-webpack-plugin": "^1.1.4",
     "webpack": "^3.8.1",
     "webpack-dev-server": "^2.9.4"

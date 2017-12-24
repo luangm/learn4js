@@ -3,11 +3,13 @@ import TensorMath from "../../core/TensorMath";
 
 export default class EvaluationVisitor extends Visitor {
 
-  // The map that keeps track of the value of nodes.
-  valueMap = {};
-
   constructor() {
     super();
+    this.valueMap = {};
+  }
+
+  getValue(node) {
+    return this.valueMap[node.id];
   }
 
   visitAdd(node, params) {
@@ -16,14 +18,6 @@ export default class EvaluationVisitor extends Visitor {
     let left = this.valueMap[node.left.id];
     let right = this.valueMap[node.right.id];
     this.valueMap[node.id] = left.add(right);
-  }
-
-  visitSubtract(node, params) {
-    super.visitSubtract(node, params);
-
-    let left = this.valueMap[node.left.id];
-    let right = this.valueMap[node.right.id];
-    this.valueMap[node.id] = left.subtract(right);
   }
 
   visitConstant(node, params) {
@@ -37,6 +31,13 @@ export default class EvaluationVisitor extends Visitor {
     let left = this.valueMap[node.left.id];
     let right = this.valueMap[node.right.id];
     this.valueMap[node.id] = left.mmul(right);
+  }
+
+  visitReduceSum(node, params) {
+    super.visitReduceSum(node, params);
+
+    let base = this.valueMap[node.base.id];
+    this.valueMap[node.id] = base.sum();
   }
 
   visitSigmoid(node, params) {
@@ -53,7 +54,11 @@ export default class EvaluationVisitor extends Visitor {
     this.valueMap[node.id] = TensorMath.square(base);
   }
 
-  getValue(node) {
-    return this.valueMap[node.id];
+  visitSubtract(node, params) {
+    super.visitSubtract(node, params);
+
+    let left = this.valueMap[node.left.id];
+    let right = this.valueMap[node.right.id];
+    this.valueMap[node.id] = left.subtract(right);
   }
 }

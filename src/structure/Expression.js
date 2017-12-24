@@ -5,7 +5,7 @@ import ExpressionState from "./constant/ExpressionState";
 
 export default class Expression {
 
-  static ID_COUNTER = 0;
+
 
   constructor(name) {
     this._name = name;
@@ -48,3 +48,5 @@ export default class Expression {
     return this.name + '[' + this.id + ']';
   }
 }
+
+Expression.ID_COUNTER = 0;

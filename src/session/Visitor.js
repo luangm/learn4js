@@ -31,4 +31,8 @@ export default class Visitor {
   }
 
 
+  visitReduceSum(node, params) {
+    node.base.accept(this, params);
+  }
+
 }

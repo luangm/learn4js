@@ -5,6 +5,7 @@ import MatMul from "./structure/node/MatMul";
 import Sigmoid from "./structure/node/Sigmoid";
 import Subtract from "./structure/node/Subtract";
 import Square from "./structure/node/Square";
+import ReduceSum from "./structure/node/ReduceSum";
 
 /**
  * This is main Utility class for this library.
@@ -41,6 +42,12 @@ class Learn4js {
 
   matmul({name, left, right}) {
     let node = new MatMul({name, left, right});
+    this._activeGraph.add(node);
+    return node;
+  }
+
+  reduceSum({name, base}) {
+    let node = new ReduceSum({name, base});
     this._activeGraph.add(node);
     return node;
   }
