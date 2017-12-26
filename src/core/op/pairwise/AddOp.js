@@ -6,6 +6,10 @@ export default class AddOp extends PairwiseOp {
     super(input, other, result);
   }
 
+  get type() {
+    return 'add';
+  }
+
   body(a, b) {
     return a + b;
   }

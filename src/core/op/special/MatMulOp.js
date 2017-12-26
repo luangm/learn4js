@@ -7,6 +7,10 @@ export default class MatMulOp extends SpecialOp {
     super(input, other, result);
   }
 
+  get type() {
+    return 'matmul';
+  }
+
   exec() {
     let blas = new Blas();
 

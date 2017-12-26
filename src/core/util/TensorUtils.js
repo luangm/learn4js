@@ -1,3 +1,5 @@
+import Tensor from "../Tensor";
+
 export default class TensorUtils {
 
   static getLength(shape) {
@@ -68,7 +70,7 @@ export default class TensorUtils {
     return true;
   }
 
-  static boardcastTensor(tensor, shape) {
+  static broadcastTensor(tensor, shape) {
 
     if (TensorUtils.shapeEquals(tensor.shape, shape)) {
       return tensor;
@@ -78,24 +80,44 @@ export default class TensorUtils {
     // if (this.isScalar())
     //   return Nd4j.createUninitialized(shape).assign(this.getDouble(0));
 
+    let compatible = this.shapeIsCompatible(tensor.shape, shape);
 
+    if (!compatible) {
+      throw new Error('Incompatible broadcast from ' + tensor.shape + ' to ' + shape);
+    }
+
+    let retShape = TensorUtils.broadcastShapes(tensor.shape, shape);
+    let result = new Tensor(retShape);
+    let idx = 0;
+    for (let i = 0; i < result.length; i++) {
+      result.data[i] = tensor.data[idx++];
+      if (idx >= tensor.length) {
+        idx = 0;
+      }
+    }
+
+    return result;
   }
 
   static shapeIsCompatible(a, b) {
-    // let compatible = true;
-    // int count = shape.length - 1;
-    // int thisCount = Shape.rank(javaShapeInformation) - 1;
-    // for (int i = shape.length - 1; i > 0; i--) {
-    //   if (count < 0 || thisCount < 0)
-    //     break;
-    //   if (shape[count] != shape()[thisCount] && shape[count] != 1 && shape()[thisCount] != 1) {
-    //     compatible = false;
-    //     break;
-    //   }
-    //
-    //   count--;
-    //   thisCount--;
-    // }
+    let rank = Math.max(a.length, b.length);
+    let aIndex = a.length - 1;
+    let bIndex = b.length - 1;
+
+    for (let i = 0; i < rank; i++) {
+      if (aIndex < 0 || bIndex < 0) {
+        break;
+      }
+
+      let left = a[aIndex--];
+      let right = b[bIndex--];
+
+      if (left !== 1 && right !== 1 && left !== right) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   static broadcastShapes(a, b) {

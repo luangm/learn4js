@@ -1,9 +1,9 @@
-import UnaryExpression from "./UnaryExpression";
+import ReductionExpression from "./ReductionExpression";
 
-export default class ReduceSum extends UnaryExpression {
+export default class ReduceSum extends ReductionExpression {
 
-  constructor({name, base}) {
-    super({name, base});
+  constructor({name, base, reduceDim = 0}) {
+    super({name, base, reduceDim});
   }
 
   accept(visitor, params) {

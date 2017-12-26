@@ -7,6 +7,7 @@ export default class MatMul extends BinaryExpression {
     this._transposeLeft = transposeLeft || false;
     this._transposeRight = transposeRight || false;
 
+    // TODO: Multi-Dimension Support
     this._shape = [0, 0];
     this._shape[0] = transposeLeft ? left.shape[1] : left.shape[0];
     this._shape[1] = transposeRight ? right.shape[0] : right.shape[1];

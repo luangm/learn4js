@@ -6,6 +6,10 @@ export default class SumOp extends ReductionOp {
     super(input, other, result);
   }
 
+  get type() {
+    return 'sum';
+  }
+
   body(a, b) {
     return a;
   }

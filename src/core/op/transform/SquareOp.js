@@ -9,6 +9,10 @@ export default class SquareOp extends TransformOp {
     super(input, other, result);
   }
 
+  get type() {
+    return 'square';
+  }
+
   body(a, b) {
     return a * a;
   }

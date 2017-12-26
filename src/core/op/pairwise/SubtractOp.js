@@ -6,6 +6,10 @@ export default class SubtractOp extends PairwiseOp {
     super(input, other, result);
   }
 
+  get type() {
+    return 'subtract';
+  }
+
   body(a, b) {
     return a - b;
   }

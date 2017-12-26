@@ -10,6 +10,10 @@ export default class SetOp extends TransformOp {
     super(input, other, result);
   }
 
+  get type() {
+    return 'set';
+  }
+
   body(a, b) {
     return b;
   }

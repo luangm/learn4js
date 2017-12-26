@@ -25,18 +25,22 @@ export default class ReverseGradientVisitor extends Visitor {
   }
 
   visitAdd(node, params) {
-    super.visitAdd(node, params);
     console.log("RAD.visitAdd");
+    let grad = this._getGradientOrDefault(node, params);
+    this._graph.addGradient(node, grad);
+
+    node.left.accept(this, params);
+    node.right.accept(this, params);
   }
 
   visitConstant(node, params) {
-    // console.log("RAD.visitConst");
+    console.log("RAD.visitConst");
     let grad = this._getGradientOrDefault(node, params);
     this._graph.addGradient(node, grad);
   }
 
   visitMatMul(node, params) {
-    // console.log("RAD.visitMatMul");
+    console.log("RAD.visitMatMul");
     let grad = this._getGradientOrDefault(node, params);
     this._graph.addGradient(node, grad);
 

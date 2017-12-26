@@ -94,4 +94,8 @@ export default class Tensor {
     let offset = this._shape.getOffset(indices);
     this._data[offset] = value;
   }
+
+  broadcast() {
+
+  }
 }

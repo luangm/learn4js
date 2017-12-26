@@ -11,4 +11,8 @@ export default class UnaryExpression extends Expression {
     return this._base;
   }
 
+  get shape() {
+    return this.base.shape;
+  }
+
 }

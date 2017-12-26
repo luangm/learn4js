@@ -8,6 +8,7 @@ import Square from "./structure/node/Square";
 import ReduceSum from "./structure/node/ReduceSum";
 import ReverseGradientVisitor from "./visitor/ReverseGradientVisitor";
 import Fill from "./structure/node/Fill";
+import Negate from "./structure/node/Negate";
 
 /**
  * This is main Utility class for this library.
@@ -69,6 +70,12 @@ class Learn4js {
 
   matmul({name, left, right}) {
     let node = new MatMul({name, left, right});
+    this.activeGraph.add(node);
+    return node;
+  }
+
+  negate({name, base}) {
+    let node = new Negate({name, base});
     this.activeGraph.add(node);
     return node;
   }

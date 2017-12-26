@@ -38,8 +38,10 @@ describe('Tensor.broadcast', function() {
     let b = [2, 2];
     expect(function(){
       let result = TensorUtils.broadcastShapes(a, b);
-      console.log(result);
+      // console.log(result);
     }).throw();
 
   });
+
+
 });

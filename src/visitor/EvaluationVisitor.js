@@ -43,6 +43,13 @@ export default class EvaluationVisitor extends Visitor {
     this.valueMap[node.id] = left.mmul(right);
   }
 
+  visitNegate(node, params) {
+    super.visitNegate(node, params);
+
+    let base = this.valueMap[node.base.id];
+    this.valueMap[node.id] = TensorMath.negate(base);
+  }
+
   visitReduceSum(node, params) {
     super.visitReduceSum(node, params);
 

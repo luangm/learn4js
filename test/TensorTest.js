@@ -12,11 +12,26 @@ describe('Tensor', function() {
     // console.log(result);
   });
 
+  // FAIL
+  it('should broadcast', function() {
+    let left = new Tensor([1, 2, 3, 4], [4, 1]);
+    let result = TensorUtils.broadcastTensor(left, [4, 3]);
+
+
+    // console.log(result.get([0, 1, 1]));
+    // let result = left.broadcast([2,2]);
+    // console.log(result);
+    // assert.deepEqual([].slice.call(result.data), [4, 5, 6, 5, 6, 7]);
+  });
+
+  // TODO: BUG
   it('add should broadcast', function() {
     let left = new Tensor([1, 2, 3], [1, 3]);
     let right = new Tensor([3, 4], [2, 1]);
     let result = TensorMath.add(left, right);
     // console.log(result);
+    // assert.deepEqual(result.shape, [2,3]);
+    // assert.deepEqual([].slice.call(result.data), [4, 5, 6, 5, 6, 7]);
   });
 
   it('addi', function() {
