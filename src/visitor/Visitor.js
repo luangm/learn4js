@@ -16,6 +16,16 @@ export default class Visitor {
     // nothing
   }
 
+  visitMultiply(node, params) {
+    node.left.accept(this, params);
+    node.right.accept(this, params);
+  }
+
+  visitDivide(node, params) {
+    node.left.accept(this, params);
+    node.right.accept(this, params);
+  }
+
   visitMatMul(node, params) {
     node.left.accept(this, params);
     node.right.accept(this, params);

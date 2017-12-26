@@ -1,9 +1,8 @@
 import Shape from "./Shape";
 import Executor from "./executor/Executor";
 import AddOp from "./op/pairwise/AddOp";
-import MatMulOp from "./op/special/MatMulOp";
-import SubtractOp from "./op/pairwise/SubtractOp";
 import SumOp from "./op/reduction/SumOp";
+import TensorMath from "./TensorMath";
 
 /**
  * A Tensor is the basic data storage for N-Dimensional array.
@@ -50,23 +49,7 @@ export default class Tensor {
    * Perform add operation, and returns a new tensor.
    */
   add(other) {
-    // TODO: Dimension Checks
-    let result = new Tensor(this.shape);
-    Executor.instance.exec(new AddOp(this, other, result));
-    return result;
-  }
-
-  subtract(other) {
-    // TODO: Dimension Checks
-    let result = new Tensor(this.shape);
-    Executor.instance.exec(new SubtractOp(this, other, result));
-    return result;
-  }
-
-  sum() {
-    let result = new Tensor([1,1]);
-    Executor.instance.exec(new SumOp(this, null, result));
-    return result;
+    return TensorMath.add(this, other);
   }
 
   /**
@@ -78,16 +61,25 @@ export default class Tensor {
     return this;
   }
 
+  broadcast() {
+
+  }
+
+  divide(other) {
+    return TensorMath.divide(this, other);
+  }
+
   get(indices) {
     let offset = this._shape.getOffset(indices);
     return this._data[offset];
   }
 
-  mmul(other) {
-    // TODO: Checks
-    let result = new Tensor([this.shape[0], other.shape[1]]);
-    Executor.instance.exec(new MatMulOp(this, other, result));
-    return result;
+  matmul(other) {
+    return TensorMath.matmul(this, other);
+  }
+
+  multiply(other) {
+    return TensorMath.multiply(this, other);
   }
 
   set(indices, value) {
@@ -95,7 +87,13 @@ export default class Tensor {
     this._data[offset] = value;
   }
 
-  broadcast() {
+  subtract(other) {
+    return TensorMath.subtract(this, other);
+  }
 
+  sum() {
+    let result = new Tensor([1, 1]);
+    Executor.instance.exec(new SumOp(this, null, result));
+    return result;
   }
 }

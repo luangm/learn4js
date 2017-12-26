@@ -15,15 +15,20 @@ export default class EvaluationVisitor extends Visitor {
 
   visitAdd(node, params) {
     super.visitAdd(node, params);
-
     let left = this.valueMap[node.left.id];
     let right = this.valueMap[node.right.id];
-
     this.valueMap[node.id] = TensorMath.add(left, right);
   }
 
   visitConstant(node, params) {
     this.valueMap[node.id] = node.value;
+  }
+
+  visitDivide(node, params) {
+    super.visitDivide(node, params);
+    let left = this.valueMap[node.left.id];
+    let right = this.valueMap[node.right.id];
+    this.valueMap[node.id] = TensorMath.divide(left, right);
   }
 
   visitFill(node, params) {
@@ -40,7 +45,14 @@ export default class EvaluationVisitor extends Visitor {
 
     let left = this.valueMap[node.left.id];
     let right = this.valueMap[node.right.id];
-    this.valueMap[node.id] = left.mmul(right);
+    this.valueMap[node.id] = TensorMath.matmul(left, right);
+  }
+
+  visitMultiply(node, params) {
+    super.visitMultiply(node, params);
+    let left = this.valueMap[node.left.id];
+    let right = this.valueMap[node.right.id];
+    this.valueMap[node.id] = TensorMath.multiply(left, right);
   }
 
   visitNegate(node, params) {
@@ -49,6 +61,7 @@ export default class EvaluationVisitor extends Visitor {
     let base = this.valueMap[node.base.id];
     this.valueMap[node.id] = TensorMath.negate(base);
   }
+
 
   visitReduceSum(node, params) {
     super.visitReduceSum(node, params);

@@ -44,7 +44,28 @@ describe('Tensor', function() {
   it('mmul', function() {
     let tensor = new Tensor([1, 2, 3, 4, 5, 6], [2, 3]);
     let tensor2 = new Tensor([2, 3, 4, 5, 6, 7], [3, 2]);
-    let result = tensor.mmul(tensor2);
+    let result = tensor.matmul(tensor2);
+    // console.log(result);
+  });
+
+  it('multiply', function() {
+    let tensor = new Tensor([1, 2, 3, 4, 5, 6], [2, 3]);
+    let tensor2 = new Tensor([2, 3, 4, 5, 6, 7], [2, 3]);
+    let result = tensor.multiply(tensor2);
+    // console.log(result);
+  });
+
+  it('divide', function() {
+    let tensor = new Tensor([1, 2, 3, 4, 5, 6], [2, 3]);
+    let tensor2 = new Tensor([2, 3, 4, 5, 6, 7], [2, 3]);
+    let result = tensor.divide(tensor2);
+    // console.log(result);
+  });
+
+  it('subtract', function() {
+    let tensor = new Tensor([1, 2, 3, 4, 5, 6], [2, 3]);
+    let tensor2 = new Tensor([2, 3, 4, 5, 6, 7], [2, 3]);
+    let result = tensor.subtract(tensor2);
     // console.log(result);
   });
 });
