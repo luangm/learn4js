@@ -82,7 +82,7 @@ export default class Executor {
    * Starts the execution from a certain dimension
    */
   _execAtDim(op, dim, indices) {
-    let rank = op.input.rank;
+    let rank = op.result.rank;
     if (dim >= rank) {
       return;
     }

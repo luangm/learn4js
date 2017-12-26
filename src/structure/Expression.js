@@ -1,8 +1,8 @@
+import ExpressionState from "./constant/ExpressionState";
+
 /**
  * Default class for expression
  */
-import ExpressionState from "./constant/ExpressionState";
-
 export default class Expression {
 
   constructor(name) {
@@ -19,10 +19,6 @@ export default class Expression {
     return this._name;
   }
 
-  get shape() {
-    throw new Error('Should not be called from base Expression');
-  }
-
   /**
    * Change the name of the node.
    * Note: Calling this AFTER it has been attached to a graph will result in Error,
@@ -34,16 +30,16 @@ export default class Expression {
     this._name = value;
   }
 
+  get shape() {
+    throw new Error('Should not be called from base Expression');
+  }
+
   get state() {
     return this._state;
   }
 
   set state(value) {
     this._state = value;
-  }
-
-  getGradient(node) {
-
   }
 
   accept(visitor, params) {

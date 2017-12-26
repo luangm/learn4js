@@ -6,7 +6,7 @@ import Sigmoid from "./structure/node/Sigmoid";
 import Subtract from "./structure/node/Subtract";
 import Square from "./structure/node/Square";
 import ReduceSum from "./structure/node/ReduceSum";
-import ReverseGradientVisitor from "./session/visitor/ReverseGradientVisitor";
+import ReverseGradientVisitor from "./visitor/ReverseGradientVisitor";
 import Fill from "./structure/node/Fill";
 
 /**

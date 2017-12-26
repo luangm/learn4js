@@ -9,7 +9,7 @@ describe('Graph', function() {
     let y = Learn4js.constant({name: 'Y', data: [1, 0, 1, 0, 0, 1, 0, 1], shape: [2, 4]});
     let matmul = Learn4js.matmul({name: 'matmul', left: a, right: b});
     let gradients = Learn4js.gradients(matmul, [a, b]);
-    console.log(gradients);
+    // console.log(gradients);
     let sess = new Session(Learn4js.activeGraph);
 
     

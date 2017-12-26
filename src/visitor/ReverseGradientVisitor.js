@@ -1,7 +1,7 @@
-import Visitor from "../Visitor";
-import Fill from "../../structure/node/Fill";
-import ExpressionFactory from "../../structure/factory/ExpressionFactory";
-import GradientGraph from "../../structure/GradientGraph";
+import Visitor from "./Visitor";
+import Fill from "../structure/node/Fill";
+import ExpressionFactory from "../structure/factory/ExpressionFactory";
+import GradientGraph from "../structure/GradientGraph";
 
 /**
  * The Reverse Gradient Visitor visit a ComputeGraph from a single node (Source),
@@ -30,13 +30,13 @@ export default class ReverseGradientVisitor extends Visitor {
   }
 
   visitConstant(node, params) {
-    console.log("RAD.visitConst");
+    // console.log("RAD.visitConst");
     let grad = this._getGradientOrDefault(node, params);
     this._graph.addGradient(node, grad);
   }
 
   visitMatMul(node, params) {
-    console.log("RAD.visitMatMul");
+    // console.log("RAD.visitMatMul");
     let grad = this._getGradientOrDefault(node, params);
     this._graph.addGradient(node, grad);
 

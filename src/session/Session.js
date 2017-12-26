@@ -1,4 +1,4 @@
-import EvaluationVisitor from "./visitor/EvaluationVisitor";
+import EvaluationVisitor from "../visitor/EvaluationVisitor";
 
 /**
  * Session object

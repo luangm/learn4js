@@ -1,6 +1,6 @@
-import Visitor from "../Visitor";
-import TensorMath from "../../core/TensorMath";
-import Tensor from "../../core/Tensor";
+import Visitor from "./Visitor";
+import TensorMath from "../core/TensorMath";
+import Tensor from "../core/Tensor";
 
 export default class EvaluationVisitor extends Visitor {
 
@@ -18,7 +18,8 @@ export default class EvaluationVisitor extends Visitor {
 
     let left = this.valueMap[node.left.id];
     let right = this.valueMap[node.right.id];
-    this.valueMap[node.id] = left.add(right);
+
+    this.valueMap[node.id] = TensorMath.add(left, right);
   }
 
   visitConstant(node, params) {
