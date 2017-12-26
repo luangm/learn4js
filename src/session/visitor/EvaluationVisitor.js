@@ -1,5 +1,6 @@
 import Visitor from "../Visitor";
 import TensorMath from "../../core/TensorMath";
+import Tensor from "../../core/Tensor";
 
 export default class EvaluationVisitor extends Visitor {
 
@@ -24,6 +25,14 @@ export default class EvaluationVisitor extends Visitor {
     this.valueMap[node.id] = node.value;
   }
 
+  visitFill(node, params) {
+    super.visitFill(node, params);
+    if (!this.valueMap[node.id]) {
+      let tensor = new Tensor(node.shape);
+      tensor = TensorMath.set(tensor, node.scalar);
+      this.valueMap[node.id] = tensor;
+    }
+  }
 
   visitMatMul(node, params) {
     super.visitMatMul(node, params);

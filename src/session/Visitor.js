@@ -35,4 +35,8 @@ export default class Visitor {
     node.base.accept(this, params);
   }
 
+  visitFill(node, params) {
+    // nothing
+  }
+
 }

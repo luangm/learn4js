@@ -5,8 +5,6 @@ import ExpressionState from "./constant/ExpressionState";
 
 export default class Expression {
 
-
-
   constructor(name) {
     this._name = name;
     this._state = ExpressionState.DETACHED;
@@ -19,6 +17,10 @@ export default class Expression {
 
   get name() {
     return this._name;
+  }
+
+  get shape() {
+    throw new Error('Should not be called from base Expression');
   }
 
   /**
@@ -38,6 +40,10 @@ export default class Expression {
 
   set state(value) {
     this._state = value;
+  }
+
+  getGradient(node) {
+
   }
 
   accept(visitor, params) {

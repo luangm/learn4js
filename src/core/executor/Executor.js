@@ -8,6 +8,7 @@
 import TensorUtils from "../util/TensorUtils";
 import SpecialOp from "../op/special/SpecialOp";
 import ReductionOp from "../op/reduction/ReductionOp";
+import Tensor from "../Tensor";
 
 const singleton = Symbol();
 
@@ -104,7 +105,11 @@ export default class Executor {
         let a = op.input.data[offset];
         let b = null;
         if (op.other) {
-          b = op.other.data[offset];
+          if (op.other instanceof Tensor) {
+            b = op.other.data[offset];
+          } else {
+            b = op.other; // TODO: hack, should do broadcast here
+          }
         }
         op.result.data[offset] = op.body(a, b);
       }

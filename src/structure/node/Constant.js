@@ -9,6 +9,10 @@ export default class Constant extends Expression {
     this._value = new Tensor(data, shape);
   }
 
+  get shape() {
+    return this.value.shape;
+  }
+
   get value() {
     return this._value;
   }
