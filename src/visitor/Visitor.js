@@ -43,6 +43,10 @@ export default class Visitor {
     node.base.accept(this, params);
   }
 
+  visitSigmoidGrad(node, params) {
+    node.base.accept(this, params);
+  }
+
   visitSquare(node, params) {
     node.base.accept(this, params);
   }

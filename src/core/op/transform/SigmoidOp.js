@@ -14,8 +14,7 @@ export default class SigmoidOp extends TransformOp {
   }
 
   body(a, b) {
-    let ex = Math.exp(a);
-    return ex / (ex + 1);
+    return 1 / (1 + Math.exp(-a));
   }
 
 }

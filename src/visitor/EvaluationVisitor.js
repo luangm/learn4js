@@ -77,6 +77,13 @@ export default class EvaluationVisitor extends Visitor {
     this.valueMap[node.id] = TensorMath.sigmoid(base);
   }
 
+  visitSigmoidGrad(node, params) {
+    super.visitSigmoidGrad(node, params);
+
+    let base = this.valueMap[node.base.id];
+    this.valueMap[node.id] = TensorMath.sigmoidGrad(base);
+  }
+
   visitSquare(node, params) {
     super.visitSquare(node, params);
 

@@ -74,8 +74,17 @@ export default class ReverseGradientVisitor extends Visitor {
   }
 
   visitSigmoid(node, params) {
-    super.visitSigmoid(node, params);
-    console.log("RAD.visitSigmoid");
+    // console.log("RAD.visitSigmoid");
+    let grad = this._getGradientOrDefault(node, params);
+    this._graph.addGradient(node, grad);
+
+    let gradName = node.name + "/grad_" + node.base.name;
+    let sigGradName = gradName + "/sigGrad";
+
+    let sigGrad = ExpressionFactory.createSigmoidGrad({name: sigGradName, base: node.base});
+    let result = ExpressionFactory.createMultiply({name: gradName, left: grad, right: sigGrad});
+
+    node.base.accept(this, result);
   }
 
   visitSquare(node, params) {
