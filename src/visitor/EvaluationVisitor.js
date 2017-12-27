@@ -34,7 +34,7 @@ export default class EvaluationVisitor extends Visitor {
   visitFill(node, params) {
     super.visitFill(node, params);
     if (!this.valueMap[node.id]) {
-      let tensor = new Tensor(node.shape);
+      let tensor = new Tensor({shape:node.shape});
       tensor = TensorMath.set(tensor, node.scalar);
       this.valueMap[node.id] = tensor;
     }

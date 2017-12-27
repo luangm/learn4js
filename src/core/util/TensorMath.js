@@ -16,27 +16,27 @@ export default class TensorMath {
 
   static add(left, right) {
     let resultShape = TensorUtils.broadcastShapes(left.shape, right.shape);
-    let result = new Tensor(resultShape);
+    let result = new Tensor({shape: resultShape});
     Executor.instance.exec(new AddOp(left, right, result));
     return result;
   }
 
   static divide(left, right) {
     let resultShape = TensorUtils.broadcastShapes(left.shape, right.shape);
-    let result = new Tensor(resultShape);
+    let result = new Tensor({shape: resultShape});
     Executor.instance.exec(new DivideOp(left, right, result));
     return result;
   }
 
   static matmul(left, right) {
-    let result = new Tensor([left.shape[0], right.shape[1]]);
+    let result = new Tensor({shape: [left.shape[0], right.shape[1]]});
     Executor.instance.exec(new MatMulOp(left, right, result));
     return result;
   }
 
   static multiply(left, right) {
     let resultShape = TensorUtils.broadcastShapes(left.shape, right.shape);
-    let result = new Tensor(resultShape);
+    let result = new Tensor({shape: resultShape});
     let newLeft = left.broadcast(resultShape);
     let newRight = right.broadcast(resultShape);
     Executor.instance.exec(new MultiplyOp(newLeft, newRight, result));
@@ -44,7 +44,7 @@ export default class TensorMath {
   }
 
   static negate(base) {
-    let result = new Tensor(base.shape);
+    let result = new Tensor({shape: base.shape});
     Executor.instance.exec(new NegateOp(base, null, result));
     return result;
   }
@@ -55,26 +55,26 @@ export default class TensorMath {
   }
 
   static sigmoid(base) {
-    let result = new Tensor(base.shape);
+    let result = new Tensor({shape: base.shape});
     Executor.instance.exec(new SigmoidOp(base, null, result));
     return result;
   }
 
   static sigmoidGrad(base) {
-    let result = new Tensor(base.shape);
+    let result = new Tensor({shape: base.shape});
     Executor.instance.exec(new SigmoidGradOp(base, null, result));
     return result;
   }
 
   static square(base) {
-    let result = new Tensor(base.shape);
+    let result = new Tensor({shape: base.shape});
     Executor.instance.exec(new SquareOp(base, null, result));
     return result;
   }
 
   static subtract(left, right) {
     let resultShape = TensorUtils.broadcastShapes(left.shape, right.shape);
-    let result = new Tensor(resultShape);
+    let result = new Tensor({shape: resultShape});
     Executor.instance.exec(new SubtractOp(left, right, result));
     return result;
   }

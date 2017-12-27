@@ -9,16 +9,17 @@ import TensorUtils from "./util/TensorUtils";
  * A Tensor is the basic data storage for N-Dimensional array.
  * The tensor is implemented with ArrayBuffer as storage.
  * The data is assumed to be float32 type
+ * The tensor stored is assumed to be continuous, no jagged array.
  */
 export default class Tensor {
 
-  constructor(data, shape) {
-    if (arguments.length === 1) {
-      this._shape = new Shape(data);
-      this._data = new Float64Array(this._shape.length);
+  constructor({data, shape}) {
+    if (data) {
+      this._data = new Float64Array(data);
+      this._shape = new Shape(shape);
     } else {
       this._shape = new Shape(shape);
-      this._data = new Float64Array(data);
+      this._data = new Float64Array(this._shape.length);
     }
   }
 
@@ -46,16 +47,10 @@ export default class Tensor {
     return this._shape.strides;
   }
 
-  /**
-   * Perform add operation, and returns a new tensor.
-   */
   add(other) {
     return TensorMath.add(this, other);
   }
 
-  /**
-   * Add inplace. returns self
-   */
   addi(other) {
     // TODO: Dimension Checks
     Executor.instance.exec(new AddOp(this, other, this));
@@ -83,6 +78,10 @@ export default class Tensor {
     return TensorMath.multiply(this, other);
   }
 
+  reshape(shape) {
+    return TensorUtils.reshape(this, shape);
+  }
+
   set(indices, value) {
     let offset = this._shape.getOffset(indices);
     this._data[offset] = value;
@@ -93,7 +92,7 @@ export default class Tensor {
   }
 
   sum() {
-    let result = new Tensor([1, 1]);
+    let result = new Tensor({shape: [1, 1]});
     Executor.instance.exec(new SumOp(this, null, result));
     return result;
   }
