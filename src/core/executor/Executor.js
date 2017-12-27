@@ -42,6 +42,43 @@ export default class Executor {
     }
   }
 
+  execAtDim(op, dim) {
+    if (op instanceof ReductionOp) {
+      this._accum(op, 0, dim, new Array(op.input.rank))
+    }
+  }
+
+  _accum(op, currentDim, targetDim, indices) {
+    let input = op.input;
+    let result = op.result;
+
+    if (currentDim === input.rank) {
+      let accum = 0;
+      for (let i = 0; i < input.shape[targetDim]; i++) {
+        indices[targetDim] = i;
+        let offset = TensorUtils.computeOffset(indices, input.shape, input.strides);
+        let val = input.data[offset];
+        accum = op.update(accum, val);
+      }
+
+      indices[targetDim] = 0;
+      let offset = TensorUtils.computeOffset(indices, result.shape, result.strides);
+      result.data[offset] = accum;
+      return;
+    }
+
+    // When encounter the target dim, set the result indices[dim] = 0
+    if (currentDim === targetDim) {
+      indices[currentDim] = 0;
+      this._accum(op, currentDim + 1, targetDim, indices);
+    } else {
+      for (let i = 0; i < input.shape[currentDim]; i++) {
+        indices[currentDim] = i;
+        this._accum(op, currentDim + 1, targetDim, indices);
+      }
+    }
+  }
+
   /**
    * Starts the execution from a certain dimension
    */
