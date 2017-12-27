@@ -1,7 +1,5 @@
-import {Tensor} from '../src/index.js';
-import TensorMath from "../src/core/TensorMath";
 import TensorUtils from "../src/core/util/TensorUtils";
-import {assert,expect} from 'chai';
+import {assert, expect} from 'chai';
 
 describe('Tensor.broadcast', function() {
 
@@ -16,7 +14,7 @@ describe('Tensor.broadcast', function() {
     let a = [2, 3, 1];
     let b = [2, 1, 1, 4];
     let result = TensorUtils.broadcastShapes(a, b);
-    assert.deepEqual(result, [2, 2, 3 , 4]);
+    assert.deepEqual(result, [2, 2, 3, 4]);
   });
 
   it('two arrays of same size 2', function() {
@@ -36,7 +34,7 @@ describe('Tensor.broadcast', function() {
   it('should show error', function() {
     let a = [2, 3];
     let b = [2, 2];
-    expect(function(){
+    expect(function() {
       let result = TensorUtils.broadcastShapes(a, b);
       // console.log(result);
     }).throw();

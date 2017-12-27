@@ -1,5 +1,5 @@
 import Visitor from "./Visitor";
-import TensorMath from "../core/TensorMath";
+import TensorMath from "../core/util/TensorMath";
 import Tensor from "../core/Tensor";
 
 export default class EvaluationVisitor extends Visitor {

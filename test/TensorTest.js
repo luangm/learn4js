@@ -1,6 +1,5 @@
 import {Tensor} from '../src/index.js';
-import TensorMath from "../src/core/TensorMath";
-import TensorUtils from "../src/core/util/TensorUtils";
+import TensorMath from "../src/core/util/TensorMath";
 import {assert} from 'chai';
 
 describe('Tensor', function() {
@@ -15,7 +14,7 @@ describe('Tensor', function() {
   // FAIL
   it('should broadcast', function() {
     let left = new Tensor([1, 2, 3, 4], [4, 1]);
-    let result = TensorUtils.broadcastTensor(left, [4, 3]);
+    let result = left.broadcast([4, 3]);
 
 
     // console.log(result.get([0, 1, 1]));

@@ -1,15 +1,15 @@
-import Tensor from "./Tensor";
-import Executor from "./executor/Executor";
-import SigmoidOp from "./op/transform/SigmoidOp";
-import SquareOp from "./op/transform/SquareOp";
-import SetOp from "./op/transform/SetOp";
-import TensorUtils from "./util/TensorUtils";
-import AddOp from "./op/pairwise/AddOp";
-import NegateOp from "./op/transform/NegateOp";
-import MultiplyOp from "./op/pairwise/MultiplyOp";
-import DivideOp from "./op/pairwise/DivideOp";
-import MatMulOp from "./op/special/MatMulOp";
-import SubtractOp from "./op/pairwise/SubtractOp";
+import Tensor from "../Tensor";
+import Executor from "../executor/Executor";
+import SigmoidOp from "../op/transform/SigmoidOp";
+import SquareOp from "../op/transform/SquareOp";
+import SetOp from "../op/transform/SetOp";
+import TensorUtils from "../util/TensorUtils";
+import AddOp from "../op/pairwise/AddOp";
+import NegateOp from "../op/transform/NegateOp";
+import MultiplyOp from "../op/pairwise/MultiplyOp";
+import DivideOp from "../op/pairwise/DivideOp";
+import MatMulOp from "../op/special/MatMulOp";
+import SubtractOp from "../op/pairwise/SubtractOp";
 
 export default class TensorMath {
 
@@ -26,7 +26,6 @@ export default class TensorMath {
   }
 
   static set(base, scalar) {
-    console.log(base, scalar);
     Executor.instance.exec(new SetOp(base, scalar, base));
     return base;
   }
@@ -54,7 +53,9 @@ export default class TensorMath {
   static multiply(left, right) {
     let resultShape = TensorUtils.broadcastShapes(left.shape, right.shape);
     let result = new Tensor(resultShape);
-    Executor.instance.exec(new MultiplyOp(left, right, result));
+    let newLeft = left.broadcast(resultShape);
+    let newRight = right.broadcast(resultShape);
+    Executor.instance.exec(new MultiplyOp(newLeft, newRight, result));
     return result;
   }
 

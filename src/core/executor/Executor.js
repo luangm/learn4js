@@ -1,10 +1,3 @@
-/**
- * Executor class is used to execute Ops
- *
- * The executor implementation may be changed to use multiple threads / workers
- *
- * An parallel optimization for execution could be split the inputs into multiple sub tensors and let worker run on each.
- */
 import TensorUtils from "../util/TensorUtils";
 import SpecialOp from "../op/special/SpecialOp";
 import ReductionOp from "../op/reduction/ReductionOp";
@@ -12,6 +5,13 @@ import Tensor from "../Tensor";
 
 const singleton = Symbol();
 
+/**
+ * Executor class is used to execute Ops
+ *
+ * The executor implementation may be changed to use multiple threads / workers
+ *
+ * An parallel optimization for execution could be split the inputs into multiple sub tensors and let worker run on each.
+ */
 export default class Executor {
 
   static get instance() {

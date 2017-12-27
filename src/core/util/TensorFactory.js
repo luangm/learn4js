@@ -1,5 +1,5 @@
 
-import Tensor from "./Tensor";
+import Tensor from "../Tensor";
 
 export default {
   ones(shape) {

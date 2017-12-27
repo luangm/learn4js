@@ -1,6 +1,7 @@
 var webpack = require('webpack');
 var path = require('path');
 var UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+var BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = {
   entry: {
@@ -28,7 +29,8 @@ module.exports = {
     ]
   },
 
-  // plugins: [
-  //   new UglifyJsPlugin()
-  // ]
+  plugins: [
+    // new UglifyJsPlugin(),
+    // new BundleAnalyzerPlugin()
+  ]
 };

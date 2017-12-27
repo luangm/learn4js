@@ -1,10 +1,18 @@
 import MatMul from "../node/MatMul";
+import Negate from "../node/Negate";
+import Multiply from "../node/Multiply";
 
-class ExpressionFactory {
+export default class ExpressionFactory {
 
-  createMatMul({name, left, right, transposeLeft, transposeRight}) {
+  static createMatMul({name, left, right, transposeLeft, transposeRight}) {
     return new MatMul({name, left, right, transposeLeft, transposeRight});
   }
-}
 
-export default new ExpressionFactory();
+  static createNegate({name, base}) {
+    return new Negate({name, base});
+  }
+
+  static createMultiply({name, left, right}) {
+    return new Multiply({name, left, right});
+  }
+}

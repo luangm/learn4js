@@ -21,3 +21,5 @@ export default class Constant extends Expression {
     visitor.visitConstant(this, params);
   }
 }
+
+Constant.TWO = new Constant({name: 'TWO', data: [2], shape: [1,1]});

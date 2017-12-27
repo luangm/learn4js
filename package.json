@@ -37,6 +37,7 @@
     "rollup-plugin-uglify": "^2.0.1",
     "uglifyjs-webpack-plugin": "^1.1.4",
     "webpack": "^3.8.1",
+    "webpack-bundle-analyzer": "^2.9.1",
     "webpack-dev-server": "^2.9.4"
   },
   "dependencies": {}

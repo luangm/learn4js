@@ -2,6 +2,7 @@ import Visitor from "./Visitor";
 import Fill from "../structure/node/Fill";
 import ExpressionFactory from "../structure/factory/ExpressionFactory";
 import GradientGraph from "../structure/GradientGraph";
+import Constant from "../structure/node/Constant";
 
 /**
  * The Reverse Gradient Visitor visit a ComputeGraph from a single node (Source),
@@ -25,22 +26,22 @@ export default class ReverseGradientVisitor extends Visitor {
   }
 
   visitAdd(node, params) {
-    console.log("RAD.visitAdd");
+    // console.log("RAD.visitAdd");
     let grad = this._getGradientOrDefault(node, params);
     this._graph.addGradient(node, grad);
 
-    node.left.accept(this, params);
-    node.right.accept(this, params);
+    node.left.accept(this, grad);
+    node.right.accept(this, grad);
   }
 
   visitConstant(node, params) {
-    console.log("RAD.visitConst");
+    // console.log("RAD.visitConst");
     let grad = this._getGradientOrDefault(node, params);
     this._graph.addGradient(node, grad);
   }
 
   visitMatMul(node, params) {
-    console.log("RAD.visitMatMul");
+    // console.log("RAD.visitMatMul");
     let grad = this._getGradientOrDefault(node, params);
     this._graph.addGradient(node, grad);
 
@@ -78,13 +79,29 @@ export default class ReverseGradientVisitor extends Visitor {
   }
 
   visitSquare(node, params) {
-    super.visitSquare(node, params);
-    console.log("RAD.visitSquare");
+    // console.log("RAD.visitSquare");
+    let grad = this._getGradientOrDefault(node, params);
+    this._graph.addGradient(node, grad);
+
+    let gradName = node.name + "/grad_" + node.base.name;
+    let mulName = gradName + '/mul2';
+
+    let mul = ExpressionFactory.createMultiply({name: mulName, left: node.base, right: Constant.TWO});
+    let result = ExpressionFactory.createMultiply({name: gradName, left: grad, right: mul});
+
+    node.base.accept(this, result);
   }
 
   visitSubtract(node, params) {
-    super.visitSubtract(node, params);
     console.log("RAD.visitSubtract");
+    let grad = this._getGradientOrDefault(node, params);
+    this._graph.addGradient(node, grad);
+
+    let rightGradName = node.name + "/grad_" + node.right.name;
+    let rightGrad = ExpressionFactory.createNegate({name: rightGradName, base: grad});
+
+    node.left.accept(this, grad);
+    node.right.accept(this, rightGrad);
   }
 
   /**

@@ -1,7 +1,7 @@
 import BinaryExpression from "./BinaryExpression";
 import TensorUtils from "../../core/util/TensorUtils";
 
-export default class Multiply extends BinaryExpression {
+export default class Divide extends BinaryExpression {
 
   constructor({name, left, right}) {
     super({name, left, right});

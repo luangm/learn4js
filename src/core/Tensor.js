@@ -2,7 +2,8 @@ import Shape from "./Shape";
 import Executor from "./executor/Executor";
 import AddOp from "./op/pairwise/AddOp";
 import SumOp from "./op/reduction/SumOp";
-import TensorMath from "./TensorMath";
+import TensorMath from "./util/TensorMath";
+import TensorUtils from "./util/TensorUtils";
 
 /**
  * A Tensor is the basic data storage for N-Dimensional array.
@@ -61,8 +62,8 @@ export default class Tensor {
     return this;
   }
 
-  broadcast() {
-
+  broadcast(shape) {
+    return TensorUtils.broadcastTensor(this, shape);
   }
 
   divide(other) {
