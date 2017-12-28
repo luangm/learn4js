@@ -17,6 +17,8 @@ export default class TensorMath {
   static add(left, right) {
     let resultShape = TensorUtils.broadcastShapes(left.shape, right.shape);
     let result = new Tensor({shape: resultShape});
+    left = left.broadcast(resultShape);
+    right = right.broadcast(resultShape);
     Executor.instance.exec(new AddOp(left, right, result));
     return result;
   }

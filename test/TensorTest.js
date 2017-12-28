@@ -8,7 +8,7 @@ describe('Tensor', function() {
     let tensor = new Tensor({data: [1, 2, 3, 4, 5, 6], shape: [2, 3]});
     let tensor2 = new Tensor({data: [2, 3, 4, 5, 6, 7], shape: [2, 3]});
     let result = tensor.add(tensor2);
-    // console.log(result);
+    assert.deepEqual([].slice.call(result.data), [3, 5, 7, 9, 11, 13]);
   });
 
   // FAIL
@@ -71,6 +71,6 @@ describe('Tensor', function() {
   it('reshape1', function() {
     let a = new Tensor({data: [1, 2, 3, 4, 5, 6, 7, 8, 9], shape: [1, 9]});
     let result = a.reshape([3, 3]);
-    console.log(result);
+    // console.log(result);
   });
 });

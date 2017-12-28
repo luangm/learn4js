@@ -60,7 +60,7 @@ describe('Tensor.broadcast', function() {
 
   it('reduce3', function() {
     let a = new Tensor({data: [1, 2, 3, 4, 5, 6, 7, 8], shape: [2, 2, 2]});
-    console.log(a);
+    // console.log(a);
     let result = new Tensor({shape: [2, 2, 1]});
     let op = new SumOp(a, null, result);
     Executor.instance.execAtDim(op, 2);
@@ -77,4 +77,25 @@ describe('Tensor.broadcast', function() {
     // console.log(result3);
   });
 
+
+  it('tensor broadcast', function() {
+    let a = new Tensor({data: [1, 2], shape: [1, 2]});
+    let result = a.broadcast([3, 2]);
+    assert.deepEqual([].slice.call(result.data), [1, 2, 1, 2, 1, 2]);
+
+    let b = new Tensor({data: [1, 2], shape: [2, 1]});
+    let result2 = b.broadcast([2, 3]);
+    assert.deepEqual([].slice.call(result2.data), [1, 1, 1, 2, 2, 2]);
+  });
+
+  it('tensor broadcast different dims', function() {
+    let a = new Tensor({data: [1, 2], shape: [1, 2]});
+    let result = a.broadcast([2, 3, 2]);
+    // console.log(result);
+    assert.deepEqual([].slice.call(result.data), [1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2]);
+
+    let b = new Tensor({data: [1, 2], shape: [2, 1]});
+    let result2 = b.broadcast([2, 2, 3]);
+    assert.deepEqual([].slice.call(result2.data), [1, 1, 1, 2, 2, 2, 1, 1, 1, 2, 2, 2]);
+  });
 });

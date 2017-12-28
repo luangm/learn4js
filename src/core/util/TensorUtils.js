@@ -57,11 +57,39 @@ export default class TensorUtils {
 
     let retShape = TensorUtils.broadcastShapes(tensor.shape, shape);
     let result = new Tensor({shape: retShape});
-    let idx = 0;
-    for (let i = 0; i < result.length; i++) {
-      result.data[i] = tensor.data[idx++];
-      if (idx >= tensor.length) {
-        idx = 0;
+    let broadcastDims = [];
+
+    // pad front
+    let front = retShape.length - tensor.shape.length;
+    for (let i = 0; i < retShape.length; i++) {
+      if (i < front || (tensor.shape[i - front] === 1 && retShape[i] !== 1)) {
+        broadcastDims.push(1);
+      } else {
+        broadcastDims.push(0);
+      }
+    }
+
+    let indices = new Array(retShape.length).fill(0);
+    broadcastAtDim(0, indices);
+
+    function broadcastAtDim(dim, targetIndices) {
+      if (dim === targetIndices.length) {
+        let sourceIndices = targetIndices.slice(front);
+        for (let i = targetIndices.length - 1; i >= front; i--) {
+          if (broadcastDims[i] === 1) {
+            sourceIndices[i - front] = 0;
+          }
+        }
+        let sourceOffset = TensorUtils.computeOffset(sourceIndices, tensor.shape, tensor.strides);
+        let targetOffset = TensorUtils.computeOffset(targetIndices, result.shape, result.strides);
+        // console.log(sourceOffset, tensor.data[sourceOffset], targetOffset);
+        result.data[targetOffset] = tensor.data[sourceOffset];
+        return;
+      }
+
+      for (let i = 0; i < retShape[dim]; i++) {
+        targetIndices[dim] = i;
+        broadcastAtDim(dim + 1, targetIndices);
       }
     }
 
