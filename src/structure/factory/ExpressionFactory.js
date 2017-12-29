@@ -2,6 +2,7 @@ import MatMul from "../node/MatMul";
 import Negate from "../node/Negate";
 import Multiply from "../node/Multiply";
 import SigmoidGrad from "../node/SigmoidGrad";
+import ReduceSum from "../node/ReduceSum";
 
 export default class ExpressionFactory {
 
@@ -19,5 +20,12 @@ export default class ExpressionFactory {
 
   static createSigmoidGrad({name, base}) {
     return new SigmoidGrad({name, base});
+  }
+
+  static createReduceSum({name, base, reduceDim}) {
+    if (reduceDim >= 0) {
+      return new ReduceSum({name, base, reduceDim});
+    }
+    return base;
   }
 }

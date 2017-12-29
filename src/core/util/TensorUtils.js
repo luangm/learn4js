@@ -2,6 +2,7 @@ import Tensor from "../Tensor";
 
 export default class TensorUtils {
 
+
   static broadcastShapes(a, b) {
     let rank = a.length;
     let result = Array.from(a);
@@ -117,6 +118,23 @@ export default class TensorUtils {
       mul *= dim;
     }
     return mul;
+  }
+
+  static getReductionIndices(a, b) {
+    let resultShape = TensorUtils.broadcastShapes(a, b);
+    let left = -1;
+    let right = -1;
+    for (let i = 0; i < a.length; i++) {
+      if (a[i] === 1 && a[i] !== resultShape[i]) {
+        left = i;
+      }
+
+      if (b[i] === 1 && b[i] !== resultShape[i]) {
+        right = i;
+      }
+    }
+
+    return {left, right}
   }
 
   static getStrides(shape) {

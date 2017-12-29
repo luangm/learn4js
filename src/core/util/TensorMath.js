@@ -11,6 +11,7 @@ import DivideOp from "../op/pairwise/DivideOp";
 import MatMulOp from "../op/special/MatMulOp";
 import SubtractOp from "../op/pairwise/SubtractOp";
 import SigmoidGradOp from "../op/transform/SigmoidGradOp";
+import SumOp from "../op/reduction/SumOp";
 
 export default class TensorMath {
 
@@ -30,9 +31,14 @@ export default class TensorMath {
     return result;
   }
 
-  static matmul(left, right) {
-    let result = new Tensor({shape: [left.shape[0], right.shape[1]]});
-    Executor.instance.exec(new MatMulOp(left, right, result));
+  static matmul(left, right, transposeA = false, transposeB = false) {
+
+    let shape = [0, 0];
+    shape[0] = transposeA ? left.shape[1] : left.shape[0];
+    shape[1] = transposeB ? right.shape[0] : right.shape[1];
+
+    let result = new Tensor({shape});
+    Executor.instance.exec(new MatMulOp(left, right, result, transposeA, transposeB));
     return result;
   }
 
@@ -48,6 +54,19 @@ export default class TensorMath {
   static negate(base) {
     let result = new Tensor({shape: base.shape});
     Executor.instance.exec(new NegateOp(base, null, result));
+    return result;
+  }
+
+  static reduceSum(base, dim) {
+    if (dim === -1) {
+      return base.sum();
+    }
+
+    let resultShape = base.shape.slice();
+    resultShape[dim] = 1;
+    let result = new Tensor({shape: resultShape});
+    let op = new SumOp(base, null, result);
+    Executor.instance.execAtDim(op, dim);
     return result;
   }
 

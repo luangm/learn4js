@@ -17,6 +17,10 @@ export default class Constant extends Expression {
     return this._value;
   }
 
+  set value(val) {
+    this._value = val;
+  }
+
   accept(visitor, params) {
     visitor.visitConstant(this, params);
   }

@@ -20,6 +20,14 @@ export default class EvaluationVisitor extends Visitor {
     this.valueMap[node.id] = TensorMath.add(left, right);
   }
 
+  visitAssign(node, params) {
+    super.visitAssign(node, params);
+    let value = this.valueMap[node.value.id];
+    node.target.value = value;
+    this.valueMap[node.id] = value;
+    this.valueMap[node.target.id] = value;
+  }
+
   visitConstant(node, params) {
     this.valueMap[node.id] = node.value;
   }
@@ -34,7 +42,7 @@ export default class EvaluationVisitor extends Visitor {
   visitFill(node, params) {
     super.visitFill(node, params);
     if (!this.valueMap[node.id]) {
-      let tensor = new Tensor({shape:node.shape});
+      let tensor = new Tensor({shape: node.shape});
       tensor = TensorMath.set(tensor, node.scalar);
       this.valueMap[node.id] = tensor;
     }
@@ -42,10 +50,9 @@ export default class EvaluationVisitor extends Visitor {
 
   visitMatMul(node, params) {
     super.visitMatMul(node, params);
-
     let left = this.valueMap[node.left.id];
     let right = this.valueMap[node.right.id];
-    this.valueMap[node.id] = TensorMath.matmul(left, right);
+    this.valueMap[node.id] = TensorMath.matmul(left, right, node.transposeLeft, node.transposeRight);
   }
 
   visitMultiply(node, params) {
@@ -57,43 +64,36 @@ export default class EvaluationVisitor extends Visitor {
 
   visitNegate(node, params) {
     super.visitNegate(node, params);
-
     let base = this.valueMap[node.base.id];
     this.valueMap[node.id] = TensorMath.negate(base);
   }
 
-
   visitReduceSum(node, params) {
     super.visitReduceSum(node, params);
-
     let base = this.valueMap[node.base.id];
-    this.valueMap[node.id] = base.sum();
+    this.valueMap[node.id] = TensorMath.reduceSum(base, node.reduceDim);
   }
 
   visitSigmoid(node, params) {
     super.visitSigmoid(node, params);
-
     let base = this.valueMap[node.base.id];
     this.valueMap[node.id] = TensorMath.sigmoid(base);
   }
 
   visitSigmoidGrad(node, params) {
     super.visitSigmoidGrad(node, params);
-
     let base = this.valueMap[node.base.id];
     this.valueMap[node.id] = TensorMath.sigmoidGrad(base);
   }
 
   visitSquare(node, params) {
     super.visitSquare(node, params);
-
     let base = this.valueMap[node.base.id];
     this.valueMap[node.id] = TensorMath.square(base);
   }
 
   visitSubtract(node, params) {
     super.visitSubtract(node, params);
-
     let left = this.valueMap[node.left.id];
     let right = this.valueMap[node.right.id];
     this.valueMap[node.id] = left.subtract(right);

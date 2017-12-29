@@ -56,4 +56,8 @@ export default class Visitor {
     node.right.accept(this, params);
   }
 
+  visitAssign(node, params) {
+    node.value.accept(this, params);
+  }
+
 }

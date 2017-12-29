@@ -9,6 +9,8 @@ import ReduceSum from "./structure/node/ReduceSum";
 import ReverseGradientVisitor from "./visitor/ReverseGradientVisitor";
 import Fill from "./structure/node/Fill";
 import Negate from "./structure/node/Negate";
+import Multiply from "./structure/node/Multiply";
+import Assign from "./structure/node/Assign";
 
 /**
  * This is main Utility class for this library.
@@ -74,6 +76,12 @@ class Learn4js {
     return node;
   }
 
+  multiply({name, left, right}) {
+    let node = new Multiply({name, left, right});
+    this.activeGraph.add(node);
+    return node;
+  }
+
   negate({name, base}) {
     let node = new Negate({name, base});
     this.activeGraph.add(node);
@@ -100,6 +108,12 @@ class Learn4js {
 
   subtract({name, left, right}) {
     let node = new Subtract({name, left, right});
+    this.activeGraph.add(node);
+    return node;
+  }
+
+  assign({name, target, value}) {
+    let node = new Assign({name, target, value});
     this.activeGraph.add(node);
     return node;
   }

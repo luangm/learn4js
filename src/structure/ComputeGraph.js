@@ -37,7 +37,7 @@ export default class ComputeGraph {
       node.name = 'Node' + node.id;
     }
 
-    if (this._nodes[node.id]) {
+    if (this._nodes[node.id] && this._nodes[node.id] !== node) {
       throw new Error('The name of the node is already defined. name=' + node.name);
     }
   }
