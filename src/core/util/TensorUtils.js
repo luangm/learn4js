@@ -150,6 +150,52 @@ export default class TensorUtils {
     return strides
   }
 
+  // image is a tensor of [channels, rows, cols]
+  static im2col(image, kernel, {padWidth = 0, padHeight = 0, strideWidth = 1, strideHeight = 1, dilationWidth = 1, dilationHeight = 1} = {}) {
+    let channels = image.shape[0];
+    let height = image.shape[1]; // rows
+    let width = image.shape[2]; // cols
+    let kernelHeight = kernel.shape[0]; // rows
+    let kernelWidth = kernel.shape[1]; // cols
+
+    let outputHeight = (height + 2 * padHeight - dilationHeight * (kernelHeight - 1) - 1) / strideHeight + 1;
+    let outputWidth = (width + 2 * padHeight - dilationWidth * (kernelWidth - 1) - 1) / strideWidth + 1;
+    console.log(outputWidth, outputHeight);
+
+    let result = new Tensor({shape: [kernelHeight * kernelWidth, outputHeight * outputWidth]});
+
+    let resultIndex = 0;
+
+    for (let c = 0; c < channels; c++) {
+      for (let kRow = 0; kRow < kernelHeight; kRow++) {
+        for (let kCol = 0; kCol < kernelWidth; kCol++) {
+
+          let inputRow = kRow * dilationHeight - padHeight;
+          for (let oR = 0; oR < outputHeight; oR++) {
+            if (inputRow >= 0 && inputRow < height) {
+              let inputCol = kCol * dilationWidth - padWidth;
+              for (let oC = 0; oC < outputWidth; oC++) {
+                if (inputCol >= 0 && inputCol < width) {
+                  result.data[resultIndex++] = image.data[inputRow * width + inputCol];
+                } else {
+                  result.data[resultIndex++] = 0;
+                }
+                inputCol += strideWidth;
+              }
+            } else {
+              for (let oC = 0; oC < outputWidth; oC++) {
+                result.data[resultIndex++] = 0;
+              }
+            }
+            inputRow += strideHeight;
+          }
+        }
+      }
+    }
+
+    return result;
+  }
+
   static reshape(tensor, newShape) {
     if (TensorUtils.shapeEquals(tensor.shape, newShape)) {
       return tensor;

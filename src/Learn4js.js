@@ -11,6 +11,8 @@ import Fill from "./structure/node/Fill";
 import Negate from "./structure/node/Negate";
 import Multiply from "./structure/node/Multiply";
 import Assign from "./structure/node/Assign";
+import Parameter from "./structure/node/Parameter";
+import Variable from "./structure/node/Variable";
 
 /**
  * This is main Utility class for this library.
@@ -30,11 +32,17 @@ class Learn4js {
   }
 
   set activeGraph(value) {
-    this.activeGraph = value;
+    this._activeGraph = value;
   }
 
   add({name, left, right}) {
     let node = new Add({name, left, right});
+    this.activeGraph.add(node);
+    return node;
+  }
+
+  assign({name, target, value}) {
+    let node = new Assign({name, target, value});
     this.activeGraph.add(node);
     return node;
   }
@@ -88,6 +96,12 @@ class Learn4js {
     return node;
   }
 
+  parameter({name, data, shape}) {
+    let node = new Parameter({name, data, shape});
+    this.activeGraph.add(node);
+    return node;
+  }
+
   reduceSum({name, base}) {
     let node = new ReduceSum({name, base});
     this.activeGraph.add(node);
@@ -112,8 +126,8 @@ class Learn4js {
     return node;
   }
 
-  assign({name, target, value}) {
-    let node = new Assign({name, target, value});
+  variable({name, data, shape}) {
+    let node = new Variable({name, data, shape});
     this.activeGraph.add(node);
     return node;
   }

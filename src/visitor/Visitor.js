@@ -8,17 +8,12 @@ export default class Visitor {
     node.right.accept(this, params);
   }
 
+  visitAssign(node, params) {
+    node.value.accept(this, params);
+  }
+
   visitConstant(node, params) {
     // Nothing
-  }
-
-  visitFill(node, params) {
-    // nothing
-  }
-
-  visitMultiply(node, params) {
-    node.left.accept(this, params);
-    node.right.accept(this, params);
   }
 
   visitDivide(node, params) {
@@ -26,13 +21,30 @@ export default class Visitor {
     node.right.accept(this, params);
   }
 
+  visitFill(node, params) {
+    // nothing
+  }
+
   visitMatMul(node, params) {
+    node.left.accept(this, params);
+    node.right.accept(this, params);
+  }
+
+  visitMultiply(node, params) {
     node.left.accept(this, params);
     node.right.accept(this, params);
   }
 
   visitNegate(node, params) {
     node.base.accept(this, params);
+  }
+
+  visitParameter(node, params) {
+    // nothing
+  }
+
+  visitVariable(node, params) {
+    // nothing
   }
 
   visitReduceSum(node, params) {
@@ -54,10 +66,6 @@ export default class Visitor {
   visitSubtract(node, params) {
     node.left.accept(this, params);
     node.right.accept(this, params);
-  }
-
-  visitAssign(node, params) {
-    node.value.accept(this, params);
   }
 
 }

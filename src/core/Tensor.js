@@ -4,6 +4,7 @@ import AddOp from "./op/pairwise/AddOp";
 import SumOp from "./op/reduction/SumOp";
 import TensorMath from "./util/TensorMath";
 import TensorUtils from "./util/TensorUtils";
+import TensorFactory from "./util/TensorFactory";
 
 /**
  * A Tensor is the basic data storage for N-Dimensional array.
@@ -47,6 +48,18 @@ export default class Tensor {
     return this._shape.strides;
   }
 
+  static ones(shape) {
+    return TensorFactory.ones(shape);
+  }
+
+  static rand(shape) {
+    return TensorFactory.rand(shape);
+  }
+
+  static zeros(shape) {
+    return TensorFactory.zeros(shape);
+  }
+
   add(other) {
     return TensorMath.add(this, other);
   }
@@ -63,6 +76,10 @@ export default class Tensor {
 
   divide(other) {
     return TensorMath.divide(this, other);
+  }
+
+  fill(scalar) {
+    return TensorMath.set(this, scalar);
   }
 
   get(indices) {

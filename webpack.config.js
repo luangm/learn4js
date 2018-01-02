@@ -5,7 +5,8 @@ var BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlug
 
 module.exports = {
   entry: {
-    index: './src/index.js'
+    index: './src/index.js',
+    dev: './dev/index.js',
   },
 
   output: {
@@ -30,7 +31,7 @@ module.exports = {
   },
 
   plugins: [
-    new UglifyJsPlugin(),
+    // new UglifyJsPlugin(),
     // new BundleAnalyzerPlugin()
   ]
 };

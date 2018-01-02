@@ -68,6 +68,10 @@ export default class EvaluationVisitor extends Visitor {
     this.valueMap[node.id] = TensorMath.negate(base);
   }
 
+  visitParameter(node, params) {
+    this.valueMap[node.id] = node.value;
+  }
+
   visitReduceSum(node, params) {
     super.visitReduceSum(node, params);
     let base = this.valueMap[node.base.id];
@@ -97,5 +101,9 @@ export default class EvaluationVisitor extends Visitor {
     let left = this.valueMap[node.left.id];
     let right = this.valueMap[node.right.id];
     this.valueMap[node.id] = left.subtract(right);
+  }
+
+  visitVariable(node, params) {
+    this.valueMap[node.id] = node.value;
   }
 }

@@ -43,8 +43,26 @@ export default class ReverseGradientVisitor extends Visitor {
     node.right.accept(this, rightGrad);
   }
 
+  visitMultiply(node, params) {
+    let grad = this._getGradientOrDefault(node, params);
+    this.graph.addGradient(node, grad);
+
+    let pair = TensorUtils.getReductionIndices(node.left.shape, node.right.shape);
+
+    let leftGradName = node.name + "/grad_" + node.left.name;
+    let rightGradName = node.name + "/grad_" + node.right.name;
+
+    let leftMul = ExpressionFactory.createMultiply({name: leftGradName, left: grad, right: node.right});
+    let rightMul = ExpressionFactory.createMultiply({name: rightGradName, left: node.left, right: grad});
+
+    let leftGrad = ExpressionFactory.createReduceSum({name: leftGradName, base: leftMul, reduceDim: pair.left});
+    let rightGrad = ExpressionFactory.createReduceSum({name: rightGradName, base: rightMul, reduceDim: pair.right});
+
+    node.left.accept(this, leftGrad);
+    node.right.accept(this, rightGrad);
+  }
+
   visitConstant(node, params) {
-    // console.log("RAD.visitConst");
     let grad = this._getGradientOrDefault(node, params);
     this.graph.addGradient(node, grad);
   }
@@ -77,8 +95,12 @@ export default class ReverseGradientVisitor extends Visitor {
     node.right.accept(this, rightGrad);
   }
 
+  visitParameter(node, params) {
+    let grad = this._getGradientOrDefault(node, params);
+    this.graph.addGradient(node, grad);
+  }
+
   visitReduceSum(node, params) {
-    // console.log("RAD.visitReduceSum");
     let grad = this._getGradientOrDefault(node, params);
     this.graph.addGradient(node, grad);
     node.base.accept(this, grad);
@@ -121,6 +143,11 @@ export default class ReverseGradientVisitor extends Visitor {
 
     node.left.accept(this, grad);
     node.right.accept(this, rightGrad);
+  }
+
+  visitVariable(node, params) {
+    let grad = this._getGradientOrDefault(node, params);
+    this.graph.addGradient(node, grad);
   }
 
   /**
