@@ -1,18 +1,14 @@
 {
   "presets": [
     [
-      "env",
-      {
-        "modules": false
-      }
+      "env"
     ]
   ],
   "plugins": [
     "add-module-exports",
     "transform-object-rest-spread",
     "transform-decorators-legacy",
-    "transform-class-properties",
-    "external-helpers"
+    "transform-class-properties"
   ],
   "retainLines": true
 }

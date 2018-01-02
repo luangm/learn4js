@@ -6,7 +6,11 @@ export default class Constant extends Expression {
   constructor({name, data, shape}) {
     super(name);
 
-    this._value = new Tensor({data, shape});
+    if (data instanceof Tensor) {
+      this._value = data;
+    } else {
+      this._value = new Tensor({data, shape});
+    }
   }
 
   get shape() {

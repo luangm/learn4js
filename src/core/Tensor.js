@@ -60,6 +60,10 @@ export default class Tensor {
     return TensorFactory.zeros(shape);
   }
 
+  static scalar(scalar) {
+    return TensorFactory.scalar(scalar);
+  }
+
   add(other) {
     return TensorMath.add(this, other);
   }

@@ -13,6 +13,10 @@ export default class TensorFactory {
     return tensor;
   }
 
+  static scalar(scalar) {
+    return new Tensor({data: [scalar], shape: [1, 1]});
+  }
+
   static zeros(shape) {
     return new Tensor({shape});
   }
