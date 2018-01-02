@@ -1,7 +1,7 @@
 import Learn4js, {Session} from '../../src/index.js';
 import GradientDescentOptimizer from "../../src/optimizer/GradientDescentOptimizer";
 
-test('graph', function() {
+test('conv2d', function() {
   let W1 = Learn4js.parameter({name: 'W1', data: [.1, .2, .3, .4, .5, .6], shape: [2, 3]});
   let b1 = Learn4js.parameter({name: 'b1', data: [.6, .5], shape: [2, 1]});
   let x = Learn4js.variable({name: 'x', data: [0.2, 0.3, 0.3, 0.4, 0.1, 0.1], shape: [3, 2]});
@@ -19,7 +19,7 @@ test('graph', function() {
 
   let sess = new Session(Learn4js.activeGraph);
 
-  for (let i = 0; i < 100000; i++) {
+  for (let i = 0; i < 1000; i++) {
     sess.run(trainStep);
   }
 

@@ -12,6 +12,25 @@ test('zeros', function() {
 
 test('rand', function() {
   let tensor = Tensor.rand([1, 1]);
+  // console.log(tensor);
+});
+
+test('create', function() {
+  let array = [1, 2, 3, 4];
+  let tensor = Tensor.create(array);
+  let array2 = [[1,2],[3,4]];
+  let tensor2 = Tensor.create(array2);
+  let array3 = [[[1,2],[3,4],[3,4]],[[2,3],[4,5],[1,0]]];
+  let tensor3 = Tensor.create(array3);
+});
+
+test('linspace', function() {
+  let tensor = Tensor.linspace(0, 5.5, 12);
+  console.log(tensor);
+});
+
+test('linspace bad', function() {
+  let tensor = Tensor.linspace(3, 5.5, 2);
   console.log(tensor);
 });
 

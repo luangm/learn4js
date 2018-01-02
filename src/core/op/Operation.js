@@ -9,13 +9,15 @@
  * - input
  * - other (if pairwise)
  * - result
+ * - params: used for some ops for additional info
  */
 export default class Operation {
 
-  constructor(input, other, result) {
+  constructor(input, other, result, params = {}) {
     this._input = input;
     this._other = other;
     this._result = result;
+    this._params = params;
   }
 
   get input() {
@@ -24,6 +26,10 @@ export default class Operation {
 
   get other() {
     return this._other;
+  }
+
+  get params() {
+    return this._params;
   }
 
   get result() {

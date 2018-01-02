@@ -28,16 +28,15 @@ export default class Shape {
   }
 
   getOffset(indices) {
-    let rank = this._shape.length;
-    if (rank !== indices.length) {
+    if (this.rank !== indices.length) {
       throw new Error('Indices must be the same length as rank of the tensor');
     }
 
-    return TensorUtils.computeOffset(indices, this._shape, this._strides);
+    return TensorUtils.computeOffset(indices, this.shape, this.strides);
   }
 
   getSize(index) {
-    return this._shape[index];
+    return this.shape[index];
   }
 
   toString() {

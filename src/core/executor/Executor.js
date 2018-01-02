@@ -148,7 +148,7 @@ export default class Executor {
             b = op.other; // TODO: hack, should do broadcast here
           }
         }
-        op.result.data[offset] = op.body(a, b);
+        op.result.data[offset] = op.body(a, b, offset);
       }
 
       this._execAtDim(op, dim + 1, indices);

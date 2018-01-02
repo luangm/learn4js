@@ -15,12 +15,17 @@ import TensorFactory from "./util/TensorFactory";
 export default class Tensor {
 
   constructor({data, shape}) {
-    if (data) {
-      this._data = new Float64Array(data);
-      this._shape = new Shape(shape);
+    if (data instanceof Float64Array && shape instanceof Shape) {
+      this._data = data;
+      this._shape = shape;
     } else {
-      this._shape = new Shape(shape);
-      this._data = new Float64Array(this._shape.length);
+      if (data) {
+        this._data = new Float64Array(data);
+        this._shape = new Shape(shape);
+      } else {
+        this._shape = new Shape(shape);
+        this._data = new Float64Array(this._shape.length);
+      }
     }
   }
 
@@ -48,6 +53,14 @@ export default class Tensor {
     return this._shape.strides;
   }
 
+  static create(array) {
+    return TensorFactory.create(array);
+  }
+
+  static linspace(from, to, num) {
+    return TensorFactory.linspace(from, to, num);
+  }
+
   static ones(shape) {
     return TensorFactory.ones(shape);
   }
@@ -56,12 +69,12 @@ export default class Tensor {
     return TensorFactory.rand(shape);
   }
 
-  static zeros(shape) {
-    return TensorFactory.zeros(shape);
-  }
-
   static scalar(scalar) {
     return TensorFactory.scalar(scalar);
+  }
+
+  static zeros(shape) {
+    return TensorFactory.zeros(shape);
   }
 
   add(other) {
