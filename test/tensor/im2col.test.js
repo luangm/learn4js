@@ -1,10 +1,26 @@
-import Tensor from "../../src/core/Tensor";
 import TensorUtils from "../../src/core/util/TensorUtils";
+import {println, Tensor} from "../../src/index";
+import TensorMath from "../../src/core/util/TensorMath";
 
 test('im2col', function() {
-  let a = new Tensor({data: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16], shape: [1, 4, 4]});
-  let kernel = new Tensor({data: [1, 2, 3, 4], shape: [2, 2]});
+  let a = Tensor.linspace(1, 9, 9).reshape([1, 3, 3]); // C, H, W
+  let kernel = Tensor.linspace(1, 4, 4).reshape([1, 1, 2, 2]); // N C H W
 
-  let result = TensorUtils.im2col(a, kernel, {strideWidth: 2, strideHeight:2});
-  console.log(result);
+  // println(a);
+  // println(kernel);
+
+  let xCol = TensorUtils.im2col(a, kernel);
+  // println(xCol);
+
+  let kCol = kernel.reshape([1, 4]);
+  // println(kCol);
+
+  let result = TensorMath.matmul(kCol, xCol);
+  // println(result);
+
+  let reshaped = result.reshape([1, 2, 2]);
+  println(reshaped);
+
+  let conv2d = TensorMath.conv2d(a, kernel);
+  println(conv2d);
 });

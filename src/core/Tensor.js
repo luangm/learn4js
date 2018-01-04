@@ -11,7 +11,7 @@ import ShapeUtils from "./util/ShapeUtils";
 /**
  * A Tensor is the basic data storage for N-Dimensional array.
  * The tensor is implemented with ArrayBuffer as storage.
- * The data is assumed to be float64 type
+ * The data is assumed to be float32 type
  * The tensor stored is assumed to be continuous, no jagged array.
  */
 export default class Tensor {
@@ -25,12 +25,12 @@ export default class Tensor {
       this._shape = new Shape({shape});
     }
 
-    if (data instanceof Float64Array) {
+    if (data instanceof Float32Array) {
       this._data = data;
     } else if (Array.isArray(data)) {
-      this._data = new Float64Array(data);
+      this._data = new Float32Array(data);
     } else {
-      this._data = new Float64Array(this._shape.length);
+      this._data = new Float32Array(this._shape.length);
     }
   }
 

@@ -21,15 +21,15 @@ export default class TensorFormatter {
 
   _format(tensor, rank, offset = 0) {
     if (tensor.isScalar) {
-      return tensor.get([]);
+      return this._formatNumber(tensor.get([]));
     }
 
     if (tensor.isVector) {
       let result = '[';
       for (let i = 0; i < tensor.length; i++) {
-        result += tensor.get([i]);
+        result += this._formatNumber(tensor.get([i]));
         if (i < tensor.length - 1) {
-          result += ', ';
+          result += '  ';
         }
       }
       result += ']';
@@ -42,12 +42,26 @@ export default class TensorFormatter {
       let slice = tensor.slice(i);
       result += this._format(slice, rank - 1, offset);
       if (i !== tensor.slices - 1) {
-        result += ', \n';
+        result += '  \n';
         result += '\n'.repeat(rank - 2);
         result += ' '.repeat(offset);
       }
     }
     result += ']';
+    return result;
+  }
+
+  _formatNumber(number) {
+    let result = number.toLocaleString('en-US', {
+      useGrouping: false,
+      maximumFractionDigits: 3
+    });
+
+    // let index = result.indexOf('.');
+    // if (index < 0) {
+    //   result += '    ';
+    // }
+
     return result;
   }
 }

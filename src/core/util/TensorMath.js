@@ -99,4 +99,12 @@ export default class TensorMath {
     Executor.instance.exec(new SubtractOp(left, right, result));
     return result;
   }
+
+  static conv2d(image, kernel) {
+    let xCol = TensorUtils.im2col(image, kernel);
+    let kCol = kernel.reshape([1, kernel.shape[2] * kernel.shape[3]]);
+    let result = TensorMath.matmul(kCol, xCol);
+    let reshaped = result.reshape([1, 2, 2]);
+    return reshaped;
+  }
 }

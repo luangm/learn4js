@@ -137,8 +137,9 @@ export default class TensorUtils {
     let channels = image.shape[0];
     let height = image.shape[1]; // rows
     let width = image.shape[2]; // cols
-    let kernelHeight = kernel.shape[0]; // rows
-    let kernelWidth = kernel.shape[1]; // cols
+
+    let kernelHeight = kernel.shape[2]; // rows
+    let kernelWidth = kernel.shape[3]; // cols
 
     let outputHeight = (height + 2 * padHeight - dilationHeight * (kernelHeight - 1) - 1) / strideHeight + 1;
     let outputWidth = (width + 2 * padHeight - dilationWidth * (kernelWidth - 1) - 1) / strideWidth + 1;

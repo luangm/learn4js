@@ -16,7 +16,7 @@ export default class TensorFactory {
    */
   static create(array) {
     let shape = new Shape({shape: findShape(array)});
-    let buffer = new Float64Array(shape.length);
+    let buffer = new Float32Array(shape.length);
     let indices = new Array(shape.rank);
 
     flatten(array, buffer, shape, indices, 0);
