@@ -6,11 +6,12 @@ import TensorMath from "./util/TensorMath";
 import TensorUtils from "./util/TensorUtils";
 import TensorFactory from "./util/TensorFactory";
 import TensorFormatter from "./util/TensorFormatter";
+import ShapeUtils from "./util/ShapeUtils";
 
 /**
  * A Tensor is the basic data storage for N-Dimensional array.
  * The tensor is implemented with ArrayBuffer as storage.
- * The data is assumed to be float32 type
+ * The data is assumed to be float64 type
  * The tensor stored is assumed to be continuous, no jagged array.
  */
 export default class Tensor {
@@ -21,7 +22,7 @@ export default class Tensor {
     if (shape instanceof Shape) {
       this._shape = shape;
     } else {
-      this._shape = new Shape(shape);
+      this._shape = new Shape({shape});
     }
 
     if (data instanceof Float64Array) {
@@ -142,12 +143,20 @@ export default class Tensor {
   }
 
   slice(num) {
-    let offset = num * this.strides[0] + this.offset;
-    let shape = [];
+    let offset = this.offset;
+    let newShape = [];
+    let newStrides = [];
+
+    offset += num * this.strides[0];
+
     for (let i = 1; i < this.rank; i++) {
-      shape.push(this.shape[i]);
+      newShape.push(this.shape[i]);
+      newStrides.push(this.strides[i]);
     }
-    return new Tensor({data: this._data, shape, offset});
+
+    let shape = new Shape({shape: newShape, strides: newStrides, order: this._shape.order});
+    let tensor = new Tensor({data: this._data, shape, offset});
+    return tensor;
   }
 
   subtract(other) {
@@ -162,5 +171,14 @@ export default class Tensor {
 
   toString() {
     return new TensorFormatter().format(this);
+  }
+
+  transpose() {
+    let newStrides = this._shape.strides.slice().reverse();
+    let newShape = this._shape.shape.slice().reverse();
+    let newOrder = ShapeUtils.inferOrder(newShape, newStrides);
+
+    let shape = new Shape({shape: newShape, strides: newStrides, order: newOrder});
+    return new Tensor({data: this._data, shape: shape, offset: this.offset});
   }
 }

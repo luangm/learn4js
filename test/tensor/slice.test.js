@@ -2,10 +2,10 @@ import {println, Tensor} from '../../src/index.js';
 
 test('slice', function() {
   let tensor = new Tensor({data: [1, 2, 3, 4, 5, 6], shape: [1, 3]});
-  console.log(tensor);
-  console.log(tensor.get([0, 0]), tensor.get([0, 1]), tensor.get([0, 2]));
-  console.log(tensor.length);
-  console.log(tensor.slices);
+  println(tensor);
+  println(tensor.get([0, 0]), tensor.get([0, 1]), tensor.get([0, 2]));
+  println(tensor.length);
+  println(tensor.slices);
 
   let slice1 = tensor.slice(0);
   let slice2 = tensor.slice(1);

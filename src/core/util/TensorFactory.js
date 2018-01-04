@@ -15,7 +15,7 @@ export default class TensorFactory {
    * [[[1,2],[3,4],[5,6]], [[7,8],[9,10],[11,12]]], shape = [2, 3, 2], data = [1..12]
    */
   static create(array) {
-    let shape = new Shape(findShape(array));
+    let shape = new Shape({shape: findShape(array)});
     let buffer = new Float64Array(shape.length);
     let indices = new Array(shape.rank);
 
@@ -51,6 +51,12 @@ export default class TensorFactory {
     }
   }
 
+  static linspace(from, to, num) {
+    let tensor = new Tensor({shape: [num]});
+    Executor.instance.exec(new LinspaceOp(tensor, null, tensor, {from, to, num}));
+    return tensor;
+  }
+
   static ones(shape) {
     return new Tensor({shape}).fill(1);
   }
@@ -67,11 +73,5 @@ export default class TensorFactory {
 
   static zeros(shape) {
     return new Tensor({shape});
-  }
-
-  static linspace(from, to, num) {
-    let tensor = new Tensor({shape: [num]});
-    Executor.instance.exec(new LinspaceOp(tensor, null, tensor, {from, to, num}));
-    return tensor;
   }
 }

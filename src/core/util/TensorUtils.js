@@ -112,13 +112,6 @@ export default class TensorUtils {
     return offset;
   }
 
-  static getLength(shape) {
-    let mul = 1;
-    for (let dim of shape) {
-      mul *= dim;
-    }
-    return mul;
-  }
 
   static getReductionIndices(a, b) {
     let resultShape = TensorUtils.broadcastShapes(a, b);
@@ -137,18 +130,7 @@ export default class TensorUtils {
     return {left, right}
   }
 
-  static getStrides(shape) {
-    let rank = shape.length;
-    let strides = new Array(rank);
 
-    let val = 1;
-    for (let i = rank - 1; i >= 0; --i) {
-      strides[i] = val;
-      val *= shape[i];
-    }
-
-    return strides
-  }
 
   // image is a tensor of [channels, rows, cols]
   static im2col(image, kernel, {padWidth = 0, padHeight = 0, strideWidth = 1, strideHeight = 1, dilationWidth = 1, dilationHeight = 1} = {}) {

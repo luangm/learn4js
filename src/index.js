@@ -16,5 +16,9 @@ export {
 export default Learn4js;
 
 export function println(obj) {
-  console.log(obj.toString());
+  if (obj instanceof Tensor) {
+    console.log(obj.toString());
+  } else {
+    console.log(obj);
+  }
 }

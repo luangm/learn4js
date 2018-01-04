@@ -1,18 +1,24 @@
 import TensorUtils from "./util/TensorUtils";
+import ShapeUtils from "./util/ShapeUtils";
 
 /**
  * Shape encapsulates shape information
  */
 export default class Shape {
 
-  constructor(shape) {
+  constructor({shape, strides, order = 'c'}) {
     this._shape = shape;
-    this._strides = TensorUtils.getStrides(shape);
-    this._length = TensorUtils.getLength(shape);
+    this._strides = strides || ShapeUtils.getStrides(shape);
+    this._length = ShapeUtils.getLength(shape);
+    this._order = order;
   }
 
   get length() {
     return this._length;
+  }
+
+  get order() {
+    return this._order;
   }
 
   get rank() {
@@ -26,6 +32,7 @@ export default class Shape {
   get strides() {
     return this._strides;
   }
+
 
   getOffset(indices = []) {
     if (this.rank !== indices.length) {
