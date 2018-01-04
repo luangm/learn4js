@@ -19,7 +19,7 @@ test('graph', function() {
 
   let sess = new Session(Learn4js.activeGraph);
 
-  for (let i = 0; i < 100000; i++) {
+  for (let i = 0; i < 100; i++) {
     sess.run(trainStep);
   }
 

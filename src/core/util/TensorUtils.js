@@ -160,8 +160,6 @@ export default class TensorUtils {
 
     let outputHeight = (height + 2 * padHeight - dilationHeight * (kernelHeight - 1) - 1) / strideHeight + 1;
     let outputWidth = (width + 2 * padHeight - dilationWidth * (kernelWidth - 1) - 1) / strideWidth + 1;
-    console.log(outputWidth, outputHeight);
-
     let result = new Tensor({shape: [kernelHeight * kernelWidth, outputHeight * outputWidth]});
 
     let resultIndex = 0;

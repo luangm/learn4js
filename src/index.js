@@ -14,3 +14,7 @@ export {
 }
 
 export default Learn4js;
+
+export function println(obj) {
+  console.log(obj.toString());
+}

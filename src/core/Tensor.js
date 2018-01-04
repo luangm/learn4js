@@ -5,6 +5,7 @@ import SumOp from "./op/reduction/SumOp";
 import TensorMath from "./util/TensorMath";
 import TensorUtils from "./util/TensorUtils";
 import TensorFactory from "./util/TensorFactory";
+import TensorFormatter from "./util/TensorFormatter";
 
 /**
  * A Tensor is the basic data storage for N-Dimensional array.
@@ -14,18 +15,21 @@ import TensorFactory from "./util/TensorFactory";
  */
 export default class Tensor {
 
-  constructor({data, shape}) {
-    if (data instanceof Float64Array && shape instanceof Shape) {
-      this._data = data;
+  constructor({data, shape, offset = 0}) {
+    this._offset = offset;
+
+    if (shape instanceof Shape) {
       this._shape = shape;
     } else {
-      if (data) {
-        this._data = new Float64Array(data);
-        this._shape = new Shape(shape);
-      } else {
-        this._shape = new Shape(shape);
-        this._data = new Float64Array(this._shape.length);
-      }
+      this._shape = new Shape(shape);
+    }
+
+    if (data instanceof Float64Array) {
+      this._data = data;
+    } else if (Array.isArray(data)) {
+      this._data = new Float64Array(data);
+    } else {
+      this._data = new Float64Array(this._shape.length);
     }
   }
 
@@ -37,8 +41,20 @@ export default class Tensor {
     return this.rank === 2 && this.shape[0] !== 1 && this.shape[1] !== 1;
   }
 
+  get isScalar() {
+    return this.rank === 0;
+  }
+
+  get isVector() {
+    return this.rank === 1;
+  }
+
   get length() {
     return this._shape.length;
+  }
+
+  get offset() {
+    return this._offset;
   }
 
   get rank() {
@@ -47,6 +63,10 @@ export default class Tensor {
 
   get shape() {
     return this._shape.shape;
+  }
+
+  get slices() {
+    return this.shape[0];
   }
 
   get strides() {
@@ -99,8 +119,8 @@ export default class Tensor {
     return TensorMath.set(this, scalar);
   }
 
-  get(indices) {
-    let offset = this._shape.getOffset(indices);
+  get(indices = []) {
+    let offset = this._shape.getOffset(indices) + this.offset;
     return this._data[offset];
   }
 
@@ -121,6 +141,15 @@ export default class Tensor {
     this._data[offset] = value;
   }
 
+  slice(num) {
+    let offset = num * this.strides[0] + this.offset;
+    let shape = [];
+    for (let i = 1; i < this.rank; i++) {
+      shape.push(this.shape[i]);
+    }
+    return new Tensor({data: this._data, shape, offset});
+  }
+
   subtract(other) {
     return TensorMath.subtract(this, other);
   }
@@ -129,5 +158,9 @@ export default class Tensor {
     let result = new Tensor({shape: [1, 1]});
     Executor.instance.exec(new SumOp(this, null, result));
     return result;
+  }
+
+  toString() {
+    return new TensorFormatter().format(this);
   }
 }

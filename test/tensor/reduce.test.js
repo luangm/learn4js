@@ -1,7 +1,6 @@
-import TensorUtils from "../src/core/util/TensorUtils";
-import Tensor from "../src/core/Tensor";
-import Executor from "../src/core/executor/Executor";
-import SumOp from "../src/core/op/reduction/SumOp";
+import Tensor from "../../src/core/Tensor";
+import Executor from "../../src/core/executor/Executor";
+import SumOp from "../../src/core/op/reduction/SumOp";
 
 test('reduce', function() {
   let a = new Tensor({data: [1, 2, 3, 4, 5, 6], shape: [2, 3]});
