@@ -24,6 +24,15 @@ export default class TensorMath {
     return result;
   }
 
+  static addi(left, right) {
+    // let resultShape = TensorUtils.broadcastShapes(left.shape, right.shape);
+    // let result = new Tensor({shape: resultShape});
+    // left = left.broadcast(resultShape);
+    // right = right.broadcast(resultShape);
+    Executor.instance.exec(new AddOp(left, right, left));
+    return left;
+  }
+
   static divide(left, right) {
     let resultShape = TensorUtils.broadcastShapes(left.shape, right.shape);
     let result = new Tensor({shape: resultShape});

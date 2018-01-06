@@ -39,7 +39,7 @@ export default class Tensor {
   }
 
   get isMatrix() {
-    return this.rank === 2 && this.shape[0] !== 1 && this.shape[1] !== 1;
+    return this.rank === 2;
   }
 
   get isScalar() {
@@ -103,9 +103,7 @@ export default class Tensor {
   }
 
   addi(other) {
-    // TODO: Dimension Checks
-    Executor.instance.exec(new AddOp(this, other, this));
-    return this;
+    return TensorMath.addi(this, other);
   }
 
   broadcast(shape) {
@@ -177,6 +175,8 @@ export default class Tensor {
     let newStrides = this._shape.strides.slice().reverse();
     let newShape = this._shape.shape.slice().reverse();
     let newOrder = ShapeUtils.inferOrder(newShape, newStrides);
+
+    // console.log(newStrides, newShape, newOrder);
 
     let shape = new Shape({shape: newShape, strides: newStrides, order: newOrder});
     return new Tensor({data: this._data, shape: shape, offset: this.offset});
