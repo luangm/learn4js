@@ -33,6 +33,30 @@ export default class TensorMath {
     return left;
   }
 
+  static conv2d(image, kernel) {
+
+    let xCol = TensorUtils.im2col(image, kernel);
+
+    let numImages = image.shape[0];
+    let channels = image.shape[1];
+    let height = image.shape[2]; // rows
+    let width = image.shape[3]; // cols
+
+    let numKernels = kernel.shape[0];
+    let kernelChannels = kernel.shape[1];
+    let kernelHeight = kernel.shape[2]; // rows
+    let kernelWidth = kernel.shape[3]; // cols
+
+    let outputHeight = TensorUtils.computeConv2dOutSize(height, kernelHeight);
+    let outputWidth = TensorUtils.computeConv2dOutSize(width, kernelWidth);
+
+    let kCol = kernel.reshape([numKernels, kernelChannels * kernelWidth * kernelHeight]);
+    let result = TensorMath.matmul(kCol, xCol);
+    let reshaped = result.reshape([numKernels, numImages, outputHeight, outputWidth]);
+    let transposed = reshaped.transpose([1, 0, 2, 3]);
+    return transposed;
+  }
+
   static divide(left, right) {
     let resultShape = TensorUtils.broadcastShapes(left.shape, right.shape);
     let result = new Tensor({shape: resultShape});
@@ -107,13 +131,5 @@ export default class TensorMath {
     let result = new Tensor({shape: resultShape});
     Executor.instance.exec(new SubtractOp(left, right, result));
     return result;
-  }
-
-  static conv2d(image, kernel) {
-    let xCol = TensorUtils.im2col(image, kernel);
-    let kCol = kernel.reshape([1, kernel.shape[2] * kernel.shape[3]]);
-    let result = TensorMath.matmul(kCol, xCol);
-    let reshaped = result.reshape([1, 2, 2]);
-    return reshaped;
   }
 }

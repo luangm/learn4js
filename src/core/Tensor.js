@@ -7,6 +7,7 @@ import TensorUtils from "./util/TensorUtils";
 import TensorFactory from "./util/TensorFactory";
 import TensorFormatter from "./util/TensorFormatter";
 import ShapeUtils from "./util/ShapeUtils";
+import ArrayUtils from "./util/ArrayUtils";
 
 /**
  * A Tensor is the basic data storage for N-Dimensional array.
@@ -171,14 +172,36 @@ export default class Tensor {
     return new TensorFormatter().format(this);
   }
 
-  transpose() {
-    let newStrides = this._shape.strides.slice().reverse();
-    let newShape = this._shape.shape.slice().reverse();
-    let newOrder = ShapeUtils.inferOrder(newShape, newStrides);
+  transpose(newAxis) {
+
+    let rank = this.rank;
+
+    if (newAxis) {
+      if (!Array.isArray(newAxis)) {
+        throw new Error('Must specify an array');
+      }
+      if (newAxis.length !== rank) {
+        throw new Error('new Axis must be of the same size as shape');
+      }
+    }
+
+
+    let axis = newAxis || ArrayUtils.range(rank).reverse();
+    let newStrides = new Array(this.rank);
+    let newShape = new Array(this.rank);
+
+    for (let i = 0; i < this.rank; i++) {
+      newStrides[i] = this._shape.strides[axis[i]];
+      newShape[i] = this._shape.shape[axis[i]];
+    }
+
+    // let newStrides = this._shape.strides.slice().reverse();
+    // let newShape = this._shape.shape.slice().reverse();
+    // let newOrder = ShapeUtils.inferOrder(newShape, newStrides);
 
     // console.log(newStrides, newShape, newOrder);
 
-    let shape = new Shape({shape: newShape, strides: newStrides, order: newOrder});
+    let shape = new Shape({shape: newShape, strides: newStrides, order: this._shape.order});
     return new Tensor({data: this._data, shape: shape, offset: this.offset});
   }
 }
