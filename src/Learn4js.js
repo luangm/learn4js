@@ -13,6 +13,7 @@ import Multiply from "./structure/node/Multiply";
 import Assign from "./structure/node/Assign";
 import Parameter from "./structure/node/Parameter";
 import Variable from "./structure/node/Variable";
+import Session from "./session/Session";
 
 /**
  * This is main Utility class for this library.
@@ -78,6 +79,10 @@ class Learn4js {
     return gradients;
   }
 
+  graph(func) {
+    func();
+  }
+
   matmul({name, left, right}) {
     let node = new MatMul({name, left, right});
     this.activeGraph.add(node);
@@ -106,6 +111,11 @@ class Learn4js {
     let node = new ReduceSum({name, base});
     this.activeGraph.add(node);
     return node;
+  }
+
+  session(graph) {
+    let myGraph = graph || this.activeGraph;
+    return new Session(myGraph);
   }
 
   sigmoid({name, base}) {

@@ -15,10 +15,14 @@ export {
 
 export default Learn4js;
 
-export function println(obj) {
-  if (obj instanceof Tensor) {
-    console.log(obj.toString());
-  } else {
-    console.log(obj);
+export function println(...array) {
+  let result = [];
+  for (let obj of array) {
+    if (obj instanceof Tensor) {
+      result.push(obj.toString());
+    } else {
+      result.push(obj);
+    }
   }
+  console.log(...result);
 }

@@ -1,4 +1,4 @@
-import Learn4js, {Session} from '../../src/index';
+import Learn4js from '../../src/index';
 import GradientDescentOptimizer from "../../src/optimizer/GradientDescentOptimizer";
 
 test('Linear Regression', function() {
@@ -20,7 +20,7 @@ test('Linear Regression', function() {
   let optimizer = new GradientDescentOptimizer({learnRate: 0.001});
   let trainStep = optimizer.minimize(loss);
 
-  let sess = new Session(Learn4js.activeGraph);
+  let sess = Learn4js.session();
 
   for (let i = 0; i < 1000; i++) {
     sess.run(trainStep);
