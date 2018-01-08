@@ -71,6 +71,16 @@ export default class Visitor {
     node.base.accept(this, params);
   }
 
+  visitRelu(node, params) {
+    this.preVisit(node, params);
+    node.base.accept(this, params);
+  }
+
+  visitStep(node, params) {
+    this.preVisit(node, params);
+    node.base.accept(this, params);
+  }
+
   visitSigmoid(node, params) {
     this.preVisit(node, params);
     node.base.accept(this, params);

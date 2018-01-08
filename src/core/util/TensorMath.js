@@ -12,6 +12,9 @@ import MatMulOp from "../op/special/MatMulOp";
 import SubtractOp from "../op/pairwise/SubtractOp";
 import SigmoidGradOp from "../op/transform/SigmoidGradOp";
 import SumOp from "../op/reduction/SumOp";
+import MaxOp from "../op/reduction/MaxOp";
+import ReluOp from "../op/transform/ReluOp";
+import StepOp from "../op/transform/StepOp";
 
 export default class TensorMath {
 
@@ -90,6 +93,19 @@ export default class TensorMath {
     return result;
   }
 
+  static reduceMax(base, dim) {
+    if (dim === -1) {
+      return base.sum();
+    }
+
+    let resultShape = base.shape.slice();
+    resultShape[dim] = 1;
+    let result = new Tensor({shape: resultShape});
+    let op = new MaxOp(base, null, result);
+    Executor.instance.execAtDim(op, dim);
+    return result;
+  }
+
   static reduceSum(base, dim) {
     if (dim === -1) {
       return base.sum();
@@ -128,8 +144,22 @@ export default class TensorMath {
 
   static subtract(left, right) {
     let resultShape = TensorUtils.broadcastShapes(left.shape, right.shape);
+    left = left.broadcast(resultShape);
+    right = right.broadcast(resultShape);
     let result = new Tensor({shape: resultShape});
     Executor.instance.exec(new SubtractOp(left, right, result));
+    return result;
+  }
+
+  static relu(base) {
+    let result = new Tensor({shape: base.shape});
+    Executor.instance.exec(new ReluOp(base, null, result));
+    return result;
+  }
+
+  static step(base) {
+    let result = new Tensor({shape: base.shape});
+    Executor.instance.exec(new StepOp(base, null, result));
     return result;
   }
 }
