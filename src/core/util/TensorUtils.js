@@ -97,10 +97,62 @@ export default class TensorUtils {
     return result;
   }
 
+  static col2im(col, image, kernel, {padWidth = 0, padHeight = 0, strideWidth = 1, strideHeight = 1} = {}) {
+
+    let numImages = image.shape[0];
+    let channels = image.shape[1];
+    let height = image.shape[2]; // rows
+    let width = image.shape[3]; // cols
+
+    let numKernels = kernel.shape[0];
+    let kernelChannels = kernel.shape[1];
+    let kernelHeight = kernel.shape[2]; // rows
+    let kernelWidth = kernel.shape[3]; // cols
+
+    let outputHeight = TensorUtils.computeConv2dOutSize(height, kernelHeight, padHeight, strideHeight);
+    let outputWidth = TensorUtils.computeConv2dOutSize(width, kernelWidth, padWidth, strideWidth);
+
+    let result = new Tensor({shape: [channels, height, width]});
+    let dataIndex = 0;
+
+    for (let c = 0; c < kernelChannels; c++) {
+      for (let kRow = 0; kRow < kernelHeight; kRow++) {
+        for (let kCol = 0; kCol < kernelWidth; kCol++) {
+
+          for (let n = 0; n < numImages; n++) {
+
+            let inputRow = kRow - padHeight;
+            for (let oR = 0; oR < outputHeight; oR++) {
+
+              if (inputRow < 0 || inputRow >= height) {
+                dataIndex += outputWidth;
+                continue;
+              }
+
+              let inputCol = kCol - padWidth;
+              for (let oC = 0; oC < outputWidth; oC++) {
+                if (inputCol >= 0 && inputCol < width) {
+                  result.data[c * width * height + inputRow * width + inputCol] += col.data[dataIndex];
+                }
+                dataIndex++;
+                inputCol += strideWidth;
+              }
+
+              inputRow += strideHeight;
+            }
+          }
+
+        }
+      }
+    }
+
+    return result;
+  }
+
   static computeConv2dOutSize(imageSize, kernelSize, padSize = 0, stride = 1) {
     let result = (imageSize - kernelSize + 2 * padSize) / stride + 1;
     if (result !== Math.floor(result)) {
-      throw new Error('Cannot do conv2d with these values');
+      throw new Error('Cannot do conv2d with these values: imageSize: {' + imageSize + '}, kernelSize: {' + kernelSize + '}');
     }
     return result;
   }
