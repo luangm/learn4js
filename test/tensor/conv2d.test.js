@@ -27,19 +27,23 @@ test('im2col', function() {
 
 test('col2im', function() {
 
-  let image = Tensor.linspace(1, 27, 27).reshape([1, 3, 3, 3]); // N, C, H, W
-  let kernel = Tensor.linspace(1, 12, 12).reshape([1, 3, 2, 2]); // N C H W
+  let image = Tensor.linspace(1, 27, 27).reshape([3, 1, 3, 3]); // N, C, H, W
+  let kernel = Tensor.linspace(1, 12, 12).reshape([3, 1, 2, 2]); // N C H W
   let result = TensorMath.conv2d(image, kernel);
   println(result);
   println(result.shape);
 
-  let dOut = Tensor.create([[1, 1, 1, 1]]);
+
   let xCol = TensorUtils.im2col(image, kernel);
+  println(xCol);
+
+  let dOut = Tensor.ones(result.shape).reshape([3, 12]);
 
   let dKernel = TensorMath.matmul(dOut, xCol, false, true).reshape(kernel.shape);
   println(dKernel);
 
-  let kReshape = kernel.reshape([1, 12]);
+  let kReshape = kernel.reshape([3, 4]);
+  println(kReshape);
   let col = TensorMath.matmul(kReshape, dOut, true, false);
   println(col);
 

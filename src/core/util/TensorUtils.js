@@ -112,7 +112,7 @@ export default class TensorUtils {
     let outputHeight = TensorUtils.computeConv2dOutSize(height, kernelHeight, padHeight, strideHeight);
     let outputWidth = TensorUtils.computeConv2dOutSize(width, kernelWidth, padWidth, strideWidth);
 
-    let result = new Tensor({shape: [channels, height, width]});
+    let result = new Tensor({shape: [numImages, channels, height, width]});
     let dataIndex = 0;
 
     for (let c = 0; c < kernelChannels; c++) {
@@ -132,7 +132,7 @@ export default class TensorUtils {
               let inputCol = kCol - padWidth;
               for (let oC = 0; oC < outputWidth; oC++) {
                 if (inputCol >= 0 && inputCol < width) {
-                  result.data[c * width * height + inputRow * width + inputCol] += col.data[dataIndex];
+                  result.data[n * channels * width * height + c * width * height + inputRow * width + inputCol] += col.data[dataIndex];
                 }
                 dataIndex++;
                 inputCol += strideWidth;
