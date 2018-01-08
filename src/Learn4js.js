@@ -14,6 +14,9 @@ import Assign from "./structure/node/Assign";
 import Parameter from "./structure/node/Parameter";
 import Variable from "./structure/node/Variable";
 import Session from "./session/Session";
+import {println} from "./index";
+import Tensor from "./core/Tensor";
+import AstCompiler from "./core/util/AstCompiler";
 
 /**
  * This is main Utility class for this library.
@@ -80,7 +83,9 @@ class Learn4js {
   }
 
   graph(func) {
-    func();
+    let compiler = new AstCompiler();
+    let retFunc = compiler.compile(func);
+    return retFunc(this, Tensor, println);
   }
 
   matmul({name, left, right}) {
