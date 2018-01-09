@@ -31,4 +31,5 @@ Machine Learning for Javascript
 | Tangent       | Y     | Y     |
 | TangentGrad   | Y     |       |
 | Tanh          | Y     |       |
+| Conv2d        | Y     | Y     |
 

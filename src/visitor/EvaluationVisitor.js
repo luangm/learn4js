@@ -1,6 +1,7 @@
 import Visitor from "./Visitor";
 import TensorMath from "../core/util/TensorMath";
 import Tensor from "../core/Tensor";
+import TensorUtils from "../core/util/TensorUtils";
 
 export default class EvaluationVisitor extends Visitor {
 
@@ -36,6 +37,38 @@ export default class EvaluationVisitor extends Visitor {
 
   visitConstant(node, params) {
     this.valueMap[node.id] = node.value;
+  }
+
+  visitConv2d(node, params) {
+    super.visitConv2d(node, params);
+    let image = this.valueMap[node.image.id];
+    let kernel = this.valueMap[node.kernel.id];
+    this.valueMap[node.id] = TensorMath.conv2d(image, kernel);
+  }
+
+
+  visitConv2dImageGrad(node, params) {
+    super.visitConv2dImageGrad(node, params);
+    let image = this.valueMap[node.image.id];
+    let grad = this.valueMap[node.grad.id];
+    let kernel = this.valueMap[node.kernel.id];
+    this.valueMap[node.id] = TensorMath.conv2dImageGrad(image, kernel, grad);
+  }
+
+  visitConv2dKernelGrad(node, params) {
+    super.visitConv2dKernelGrad(node, params);
+    let image = this.valueMap[node.image.id];
+    let grad = this.valueMap[node.grad.id];
+    let kernel = this.valueMap[node.kernel.id];
+    this.valueMap[node.id] = TensorMath.conv2dKernelGrad(image, kernel, grad);
+  }
+
+
+  visitIm2Col(node, params) {
+    super.visitIm2Col(node, params);
+    let image = this.valueMap[node.image.id];
+    let kernel = this.valueMap[node.kernel.id];
+    this.valueMap[node.id] = TensorUtils.im2col(image, kernel);
   }
 
   visitCosine(node, params) {
@@ -96,6 +129,12 @@ export default class EvaluationVisitor extends Visitor {
     this.valueMap[node.id] = node.value;
   }
 
+  visitReciprocal(node, params) {
+    super.visitReciprocal(node, params);
+    let base = this.valueMap[node.base.id];
+    this.valueMap[node.id] = TensorMath.reciprocal(base);
+  }
+
   visitReduceSum(node, params) {
     super.visitReduceSum(node, params);
     let base = this.valueMap[node.base.id];
@@ -132,28 +171,22 @@ export default class EvaluationVisitor extends Visitor {
     this.valueMap[node.id] = TensorMath.sin(base);
   }
 
-  visitSquare(node, params) {
-    super.visitSquare(node, params);
-    let base = this.valueMap[node.base.id];
-    this.valueMap[node.id] = TensorMath.square(base);
-  }
-
   visitSqrt(node, params) {
     super.visitSqrt(node, params);
     let base = this.valueMap[node.base.id];
     this.valueMap[node.id] = TensorMath.sqrt(base);
   }
 
-  visitReciprocal(node, params) {
-    super.visitReciprocal(node, params);
-    let base = this.valueMap[node.base.id];
-    this.valueMap[node.id] = TensorMath.reciprocal(base);
-  }
-
   visitSqrtGrad(node, params) {
     super.visitSqrtGrad(node, params);
     let base = this.valueMap[node.base.id];
     this.valueMap[node.id] = TensorMath.sqrtGrad(base);
+  }
+
+  visitSquare(node, params) {
+    super.visitSquare(node, params);
+    let base = this.valueMap[node.base.id];
+    this.valueMap[node.id] = TensorMath.square(base);
   }
 
   visitStep(node, params) {

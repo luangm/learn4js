@@ -78,6 +78,23 @@ export default class TensorMath {
     return transposed;
   }
 
+  static conv2dImageGrad(image, kernel, grad) {
+    let numKernels = kernel.shape[0];
+
+    let gradReshape = grad.reshape([numKernels, grad.length / numKernels]);
+    let kReshape = kernel.reshape([numKernels, kernel.length / numKernels]);
+    let col = TensorMath.matmul(kReshape, gradReshape, true, false);
+
+    return TensorUtils.col2im(col, image, kernel).reshape(image.shape);
+  }
+
+  static conv2dKernelGrad(image, kernel, grad) {
+    let numKernels = kernel.shape[0];
+    let xCol = TensorUtils.im2col(image, kernel);
+    let gradReshape = grad.reshape([numKernels, grad.length / numKernels]);
+    return TensorMath.matmul(gradReshape, xCol, false, true).reshape(kernel.shape);
+  }
+
   static cos(base) {
     let result = new Tensor({shape: base.shape});
     Executor.instance.exec(new CosineOp(base, null, result));
@@ -126,6 +143,12 @@ export default class TensorMath {
   static negate(base) {
     let result = new Tensor({shape: base.shape});
     Executor.instance.exec(new NegateOp(base, null, result));
+    return result;
+  }
+
+  static reciprocal(base) {
+    let result = new Tensor({shape: base.shape});
+    Executor.instance.exec(new ReciprocalOp(base, null, result));
     return result;
   }
 
@@ -245,12 +268,6 @@ export default class TensorMath {
   static tanh(base) {
     let result = new Tensor({shape: base.shape});
     Executor.instance.exec(new TanhOp(base, null, result));
-    return result;
-  }
-
-  static reciprocal(base) {
-    let result = new Tensor({shape: base.shape});
-    Executor.instance.exec(new ReciprocalOp(base, null, result));
     return result;
   }
 }

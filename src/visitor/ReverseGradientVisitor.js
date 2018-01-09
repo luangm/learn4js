@@ -60,6 +60,31 @@ export default class ReverseGradientVisitor extends Visitor {
     this.graph.addGradient(node, grad);
   }
 
+  visitConv2d(node, params) {
+    let grad = this._getGradientOrDefault(node, params);
+    this.graph.addGradient(node, grad);
+
+    let imageGradName = node.name + "/grad_" + node.image.name;
+    let kernelGradName = node.name + "/grad_" + node.kernel.name;
+
+    let imageGrad = ExpressionFactory.createConv2dImageGrad({
+      name: imageGradName,
+      image: node.image,
+      kernel: node.kernel,
+      grad
+    });
+
+    let kernelGrad = ExpressionFactory.createConv2dKernelGrad({
+      name: kernelGradName,
+      image: node.image,
+      kernel: node.kernel,
+      grad
+    });
+
+    node.image.accept(this, imageGrad);
+    node.kernel.accept(this, kernelGrad);
+  }
+
   visitCosine(node, params) {
     let grad = this._getGradientOrDefault(node, params);
     this.graph.addGradient(node, grad);

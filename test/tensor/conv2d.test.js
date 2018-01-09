@@ -30,23 +30,28 @@ test('col2im', function() {
   let image = Tensor.linspace(1, 27, 27).reshape([3, 1, 3, 3]); // N, C, H, W
   let kernel = Tensor.linspace(1, 12, 12).reshape([3, 1, 2, 2]); // N C H W
   let result = TensorMath.conv2d(image, kernel);
+  let grad = Tensor.ones(result.shape);
   println(result);
   println(result.shape);
 
-
-  let xCol = TensorUtils.im2col(image, kernel);
-  println(xCol);
-
-  let dOut = Tensor.ones(result.shape).reshape([3, 12]);
-
-  let dKernel = TensorMath.matmul(dOut, xCol, false, true).reshape(kernel.shape);
-  println(dKernel);
-
-  let kReshape = kernel.reshape([3, 4]);
-  println(kReshape);
-  let col = TensorMath.matmul(kReshape, dOut, true, false);
-  println(col);
-
-  let im = TensorUtils.col2im(col, image, kernel).reshape(image.shape);
-  println(im);
+  let dK1 = TensorMath.conv2dKernelGrad(image, kernel, grad);
+  let dI1 = TensorMath.conv2dImageGrad(image, kernel, grad);
+  println(dK1);
+  println(dI1);
+  //
+  // let xCol = TensorUtils.im2col(image, kernel);
+  // println(xCol);
+  //
+  // let dOut = Tensor.ones(result.shape).reshape([3, 12]);
+  //
+  // let dKernel = TensorMath.matmul(dOut, xCol, false, true).reshape(kernel.shape);
+  // println(dKernel);
+  //
+  // let kReshape = kernel.reshape([3, 4]);
+  // println(kReshape);
+  // let col = TensorMath.matmul(kReshape, dOut, true, false);
+  // println(col);
+  //
+  // let im = TensorUtils.col2im(col, image, kernel).reshape(image.shape);
+  // println(im);
 });

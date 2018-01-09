@@ -31,7 +31,7 @@ export default class Expression {
   }
 
   get shape() {
-    throw new Error('Should not be called from base Expression');
+    throw new Error('Shape Should not be called from base Expression');
   }
 
   get state() {

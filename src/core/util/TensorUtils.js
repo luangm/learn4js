@@ -149,6 +149,23 @@ export default class TensorUtils {
     return result;
   }
 
+  static computeConv2dShape(image, kernel) {
+    let numImages = image.shape[0];
+    let channels = image.shape[1];
+    let height = image.shape[2]; // rows
+    let width = image.shape[3]; // cols
+
+    let numKernels = kernel.shape[0];
+    let kernelChannels = kernel.shape[1];
+    let kernelHeight = kernel.shape[2]; // rows
+    let kernelWidth = kernel.shape[3]; // cols
+
+    let outputHeight = TensorUtils.computeConv2dOutSize(height, kernelHeight);
+    let outputWidth = TensorUtils.computeConv2dOutSize(width, kernelWidth);
+
+    return [numImages, numKernels, outputHeight, outputWidth];
+  }
+
   static computeConv2dOutSize(imageSize, kernelSize, padSize = 0, stride = 1) {
     let result = (imageSize - kernelSize + 2 * padSize) / stride + 1;
     if (result !== Math.floor(result)) {

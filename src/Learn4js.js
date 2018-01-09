@@ -21,6 +21,7 @@ import Exponential from "./structure/node/Exponential";
 import SquareRoot from "./structure/node/SquareRoot";
 import Abs from "./structure/node/Abs";
 import Logarithm from "./structure/node/Logarithm";
+import Conv2d from "./structure/node/Conv2d";
 
 /**
  * This is main Utility class for this library.
@@ -51,6 +52,12 @@ class Learn4js {
 
   add({name, left, right}) {
     let node = new Add({name, left, right});
+    this.activeGraph.add(node);
+    return node;
+  }
+
+  conv2d({name, image, kernel}) {
+    let node = new Conv2d({name, image, kernel});
     this.activeGraph.add(node);
     return node;
   }

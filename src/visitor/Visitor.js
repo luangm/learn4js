@@ -31,6 +31,26 @@ export default class Visitor {
     // Nothing
   }
 
+  visitConv2d(node, params) {
+    this.preVisit(node, params);
+    node.image.accept(this, params);
+    node.kernel.accept(this, params);
+  }
+
+  visitConv2dImageGrad(node, params) {
+    this.preVisit(node, params);
+    node.grad.accept(this, params);
+    node.image.accept(this, params);
+    node.kernel.accept(this, params);
+  }
+
+  visitConv2dKernelGrad(node, params) {
+    this.preVisit(node, params);
+    node.grad.accept(this, params);
+    node.image.accept(this, params);
+    node.kernel.accept(this, params);
+  }
+
   visitCosine(node, params) {
     this.preVisit(node, params);
     node.base.accept(this, params);
@@ -59,6 +79,12 @@ export default class Visitor {
     }
   }
 
+  visitIm2Col(node, params) {
+    this.preVisit(node, params);
+    node.image.accept(this, params);
+    node.kernel.accept(this, params);
+  }
+
   visitLog(node, params) {
     this.preVisit(node, params);
     node.base.accept(this, params);
@@ -84,6 +110,11 @@ export default class Visitor {
   visitParameter(node, params) {
     this.preVisit(node, params);
     // nothing
+  }
+
+  visitReciprocal(node, params) {
+    this.preVisit(node, params);
+    node.base.accept(this, params);
   }
 
   visitReduceSum(node, params) {
@@ -116,22 +147,17 @@ export default class Visitor {
     node.base.accept(this, params);
   }
 
-  visitSquare(node, params) {
-    this.preVisit(node, params);
-    node.base.accept(this, params);
-  }
-
   visitSqrt(node, params) {
     this.preVisit(node, params);
     node.base.accept(this, params);
   }
 
-  visitReciprocal(node, params) {
+  visitSqrtGrad(node, params) {
     this.preVisit(node, params);
     node.base.accept(this, params);
   }
 
-  visitSqrtGrad(node, params) {
+  visitSquare(node, params) {
     this.preVisit(node, params);
     node.base.accept(this, params);
   }
