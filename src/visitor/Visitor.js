@@ -76,6 +76,21 @@ export default class Visitor {
     node.base.accept(this, params);
   }
 
+  visitExp(node, params) {
+    this.preVisit(node, params);
+    node.base.accept(this, params);
+  }
+
+  visitAbs(node, params) {
+    this.preVisit(node, params);
+    node.base.accept(this, params);
+  }
+
+  visitLog(node, params) {
+    this.preVisit(node, params);
+    node.base.accept(this, params);
+  }
+
   visitStep(node, params) {
     this.preVisit(node, params);
     node.base.accept(this, params);
@@ -92,6 +107,26 @@ export default class Visitor {
   }
 
   visitSquare(node, params) {
+    this.preVisit(node, params);
+    node.base.accept(this, params);
+  }
+
+  visitSine(node, params) {
+    this.preVisit(node, params);
+    node.base.accept(this, params);
+  }
+
+  visitCosine(node, params) {
+    this.preVisit(node, params);
+    node.base.accept(this, params);
+  }
+
+  visitSign(node, params) {
+    this.preVisit(node, params);
+    node.base.accept(this, params);
+  }
+
+  visitSquareRoot(node, params) {
     this.preVisit(node, params);
     node.base.accept(this, params);
   }

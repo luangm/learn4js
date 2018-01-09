@@ -120,6 +120,19 @@ export default class ReverseGradientVisitor extends Visitor {
     node.base.accept(this, result);
   }
 
+  visitRelu(node, params) {
+    let grad = this._getGradientOrDefault(node, params);
+    this.graph.addGradient(node, grad);
+
+    let gradName = node.name + "/grad_" + node.base.name;
+    let stepName = gradName + "/step";
+
+    let step = ExpressionFactory.createStep({name: stepName, base: node.base});
+    let result = ExpressionFactory.createMultiply({name: gradName, left: grad, right: step});
+
+    node.base.accept(this, result);
+  }
+
   visitSquare(node, params) {
     // console.log("RAD.visitSquare");
     let grad = this._getGradientOrDefault(node, params);

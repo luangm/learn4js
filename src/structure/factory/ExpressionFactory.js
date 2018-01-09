@@ -6,6 +6,7 @@ import ReduceSum from "../node/ReduceSum";
 import Subtract from "../node/Subtract";
 import Assign from "../node/Assign";
 import Group from "../node/Group";
+import Step from "../node/Step";
 
 export default class ExpressionFactory {
 
@@ -42,5 +43,9 @@ export default class ExpressionFactory {
 
   static createGroup({name, list}) {
     return new Group({name, list});
+  }
+
+  static createStep({name, base}) {
+    return new Step({name, base});
   }
 }
