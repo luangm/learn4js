@@ -10,6 +10,11 @@ export default class Visitor {
     // default empty
   }
 
+  visitAbs(node, params) {
+    this.preVisit(node, params);
+    node.base.accept(this, params);
+  }
+
   visitAdd(node, params) {
     this.preVisit(node, params);
     node.left.accept(this, params);
@@ -26,10 +31,20 @@ export default class Visitor {
     // Nothing
   }
 
+  visitCosine(node, params) {
+    this.preVisit(node, params);
+    node.base.accept(this, params);
+  }
+
   visitDivide(node, params) {
     this.preVisit(node, params);
     node.left.accept(this, params);
     node.right.accept(this, params);
+  }
+
+  visitExp(node, params) {
+    this.preVisit(node, params);
+    node.base.accept(this, params);
   }
 
   visitFill(node, params) {
@@ -42,6 +57,11 @@ export default class Visitor {
     for (let exp of node.list) {
       exp.accept(this, params);
     }
+  }
+
+  visitLog(node, params) {
+    this.preVisit(node, params);
+    node.base.accept(this, params);
   }
 
   visitMatMul(node, params) {
@@ -76,26 +96,6 @@ export default class Visitor {
     node.base.accept(this, params);
   }
 
-  visitExp(node, params) {
-    this.preVisit(node, params);
-    node.base.accept(this, params);
-  }
-
-  visitAbs(node, params) {
-    this.preVisit(node, params);
-    node.base.accept(this, params);
-  }
-
-  visitLog(node, params) {
-    this.preVisit(node, params);
-    node.base.accept(this, params);
-  }
-
-  visitStep(node, params) {
-    this.preVisit(node, params);
-    node.base.accept(this, params);
-  }
-
   visitSigmoid(node, params) {
     this.preVisit(node, params);
     node.base.accept(this, params);
@@ -106,7 +106,7 @@ export default class Visitor {
     node.base.accept(this, params);
   }
 
-  visitSquare(node, params) {
+  visitSign(node, params) {
     this.preVisit(node, params);
     node.base.accept(this, params);
   }
@@ -116,17 +116,27 @@ export default class Visitor {
     node.base.accept(this, params);
   }
 
-  visitCosine(node, params) {
+  visitSquare(node, params) {
     this.preVisit(node, params);
     node.base.accept(this, params);
   }
 
-  visitSign(node, params) {
+  visitSqrt(node, params) {
     this.preVisit(node, params);
     node.base.accept(this, params);
   }
 
-  visitSquareRoot(node, params) {
+  visitReciprocal(node, params) {
+    this.preVisit(node, params);
+    node.base.accept(this, params);
+  }
+
+  visitSqrtGrad(node, params) {
+    this.preVisit(node, params);
+    node.base.accept(this, params);
+  }
+
+  visitStep(node, params) {
     this.preVisit(node, params);
     node.base.accept(this, params);
   }
@@ -135,6 +145,21 @@ export default class Visitor {
     this.preVisit(node, params);
     node.left.accept(this, params);
     node.right.accept(this, params);
+  }
+
+  visitTangent(node, params) {
+    this.preVisit(node, params);
+    node.base.accept(this, params);
+  }
+
+  visitTangentGrad(node, params) {
+    this.preVisit(node, params);
+    node.base.accept(this, params);
+  }
+
+  visitTanh(node, params) {
+    this.preVisit(node, params);
+    node.base.accept(this, params);
   }
 
   visitVariable(node, params) {

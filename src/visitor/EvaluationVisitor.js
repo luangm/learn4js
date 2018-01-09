@@ -138,10 +138,22 @@ export default class EvaluationVisitor extends Visitor {
     this.valueMap[node.id] = TensorMath.square(base);
   }
 
-  visitSquareRoot(node, params) {
-    super.visitSquareRoot(node, params);
+  visitSqrt(node, params) {
+    super.visitSqrt(node, params);
     let base = this.valueMap[node.base.id];
     this.valueMap[node.id] = TensorMath.sqrt(base);
+  }
+
+  visitReciprocal(node, params) {
+    super.visitReciprocal(node, params);
+    let base = this.valueMap[node.base.id];
+    this.valueMap[node.id] = TensorMath.reciprocal(base);
+  }
+
+  visitSqrtGrad(node, params) {
+    super.visitSqrtGrad(node, params);
+    let base = this.valueMap[node.base.id];
+    this.valueMap[node.id] = TensorMath.sqrtGrad(base);
   }
 
   visitStep(node, params) {
@@ -155,6 +167,24 @@ export default class EvaluationVisitor extends Visitor {
     let left = this.valueMap[node.left.id];
     let right = this.valueMap[node.right.id];
     this.valueMap[node.id] = left.subtract(right);
+  }
+
+  visitTangent(node, params) {
+    super.visitTangent(node, params);
+    let base = this.valueMap[node.base.id];
+    this.valueMap[node.id] = TensorMath.tan(base);
+  }
+
+  visitTangentGrad(node, params) {
+    super.visitTangentGrad(node, params);
+    let base = this.valueMap[node.base.id];
+    this.valueMap[node.id] = TensorMath.tanGrad(base);
+  }
+
+  visitTanh(node, params) {
+    super.visitTanh(node, params);
+    let base = this.valueMap[node.base.id];
+    this.valueMap[node.id] = TensorMath.tanh(base);
   }
 
   visitVariable(node, params) {

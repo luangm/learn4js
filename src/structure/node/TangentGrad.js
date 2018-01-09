@@ -1,13 +1,13 @@
 import UnaryExpression from "./UnaryExpression";
 
-export default class SquareRoot extends UnaryExpression {
+export default class TangentGrad extends UnaryExpression {
 
   constructor({name, base}) {
     super({name, base});
   }
 
   accept(visitor, params) {
-    visitor.visitSqrt(this, params);
+    visitor.visitTangentGrad(this, params);
   }
 
 }

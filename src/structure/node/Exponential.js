@@ -1,6 +1,6 @@
 import UnaryExpression from "./UnaryExpression";
 
-export default class Exp extends UnaryExpression {
+export default class Exponential extends UnaryExpression {
 
   constructor({name, base}) {
     super({name, base});

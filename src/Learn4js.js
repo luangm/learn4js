@@ -14,6 +14,13 @@ import Assign from "./structure/node/Assign";
 import Parameter from "./structure/node/Parameter";
 import Variable from "./structure/node/Variable";
 import Session from "./session/Session";
+import Sine from "./structure/node/Sine";
+import Cosine from "./structure/node/Cosine";
+import Tangent from "./structure/node/Tangent";
+import Exponential from "./structure/node/Exponential";
+import SquareRoot from "./structure/node/SquareRoot";
+import Abs from "./structure/node/Abs";
+import Logarithm from "./structure/node/Logarithm";
 
 /**
  * This is main Utility class for this library.
@@ -36,6 +43,12 @@ class Learn4js {
     this._activeGraph = value;
   }
 
+  abs({name, base}) {
+    let node = new Abs({name, base});
+    this.activeGraph.add(node);
+    return node;
+  }
+
   add({name, left, right}) {
     let node = new Add({name, left, right});
     this.activeGraph.add(node);
@@ -50,6 +63,18 @@ class Learn4js {
 
   constant({name, data, shape}) {
     let node = new Constant({name, data, shape});
+    this.activeGraph.add(node);
+    return node;
+  }
+
+  cos({name, base}) {
+    let node = new Cosine({name, base});
+    this.activeGraph.add(node);
+    return node;
+  }
+
+  exp({name, base}) {
+    let node = new Exponential({name, base});
     this.activeGraph.add(node);
     return node;
   }
@@ -81,6 +106,12 @@ class Learn4js {
 
   graph(func) {
     func();
+  }
+
+  log({name, base}) {
+    let node = new Logarithm({name, base});
+    this.activeGraph.add(node);
+    return node;
   }
 
   matmul({name, left, right}) {
@@ -124,6 +155,18 @@ class Learn4js {
     return node;
   }
 
+  sin({name, base}) {
+    let node = new Sine({name, base});
+    this.activeGraph.add(node);
+    return node;
+  }
+
+  sqrt({name, base}) {
+    let node = new SquareRoot({name, base});
+    this.activeGraph.add(node);
+    return node;
+  }
+
   square({name, base}) {
     let node = new Square({name, base});
     this.activeGraph.add(node);
@@ -132,6 +175,12 @@ class Learn4js {
 
   subtract({name, left, right}) {
     let node = new Subtract({name, left, right});
+    this.activeGraph.add(node);
+    return node;
+  }
+
+  tan({name, base}) {
+    let node = new Tangent({name, base});
     this.activeGraph.add(node);
     return node;
   }

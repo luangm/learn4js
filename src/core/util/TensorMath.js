@@ -18,10 +18,15 @@ import StepOp from "../op/transform/StepOp";
 import ExpOp from "../op/transform/ExpOp";
 import LogOp from "../op/transform/LogOp";
 import AbsOp from "../op/transform/AbsOp";
-import SquareRootOp from "../op/transform/SquareRootOp";
 import SineOp from "../op/transform/SineOp";
 import CosineOp from "../op/transform/CosineOp";
 import SignOp from "../op/transform/SignOp";
+import TanOp from "../op/transform/TanOp";
+import TanhOp from "../op/transform/TanhOp";
+import TanGradOp from "../op/transform/TanGradOp";
+import SqrtGradOp from "../op/transform/SqrtGradOp";
+import SqrtOp from "../op/transform/SqrtOp";
+import ReciprocalOp from "../op/transform/ReciprocalOp";
 
 export default class TensorMath {
 
@@ -194,7 +199,13 @@ export default class TensorMath {
 
   static sqrt(base) {
     let result = new Tensor({shape: base.shape});
-    Executor.instance.exec(new SquareRootOp(base, null, result));
+    Executor.instance.exec(new SqrtOp(base, null, result));
+    return result;
+  }
+
+  static sqrtGrad(base) {
+    let result = new Tensor({shape: base.shape});
+    Executor.instance.exec(new SqrtGradOp(base, null, result));
     return result;
   }
 
@@ -219,4 +230,27 @@ export default class TensorMath {
     return result;
   }
 
+  static tan(base) {
+    let result = new Tensor({shape: base.shape});
+    Executor.instance.exec(new TanOp(base, null, result));
+    return result;
+  }
+
+  static tanGrad(base) {
+    let result = new Tensor({shape: base.shape});
+    Executor.instance.exec(new TanGradOp(base, null, result));
+    return result;
+  }
+
+  static tanh(base) {
+    let result = new Tensor({shape: base.shape});
+    Executor.instance.exec(new TanhOp(base, null, result));
+    return result;
+  }
+
+  static reciprocal(base) {
+    let result = new Tensor({shape: base.shape});
+    Executor.instance.exec(new ReciprocalOp(base, null, result));
+    return result;
+  }
 }
