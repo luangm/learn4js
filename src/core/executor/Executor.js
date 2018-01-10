@@ -2,6 +2,7 @@ import TensorUtils from "../util/TensorUtils";
 import SpecialOp from "../op/special/SpecialOp";
 import ReductionOp from "../op/reduction/ReductionOp";
 import Tensor from "../Tensor";
+import IndexOp from "../op/index/IndexOp";
 
 const singleton = Symbol();
 
@@ -46,6 +47,9 @@ export default class Executor {
     if (op instanceof ReductionOp) {
       this._accum(op, 0, dim, new Array(op.input.rank))
     }
+    if (op instanceof IndexOp) {
+      this._indexAccum(op, 0, dim, new Array(op.input.rank))
+    }
   }
 
   _accum(op, currentDim, targetDim, indices) {
@@ -75,6 +79,40 @@ export default class Executor {
       for (let i = 0; i < input.shape[currentDim]; i++) {
         indices[currentDim] = i;
         this._accum(op, currentDim + 1, targetDim, indices);
+      }
+    }
+  }
+
+  _indexAccum(op, currentDim, targetDim, indices) {
+    let input = op.input;
+    let result = op.result;
+
+    if (currentDim === input.rank) {
+      let accum = 0;
+      let accumIndex = -1;
+      for (let i = 0; i < input.shape[targetDim]; i++) {
+        indices[targetDim] = i;
+        let offset = TensorUtils.computeOffset(indices, input.shape, input.strides);
+        let val = input.data[offset];
+        let update = op.update(accum, val, accumIndex, i);
+        accum = update[0];
+        accumIndex = update[1];
+      }
+
+      indices[targetDim] = 0;
+      let offset = TensorUtils.computeOffset(indices, result.shape, result.strides);
+      result.data[offset] = accumIndex;
+      return;
+    }
+
+    // When encounter the target dim, set the result indices[dim] = 0
+    if (currentDim === targetDim) {
+      indices[currentDim] = 0;
+      this._indexAccum(op, currentDim + 1, targetDim, indices);
+    } else {
+      for (let i = 0; i < input.shape[currentDim]; i++) {
+        indices[currentDim] = i;
+        this._indexAccum(op, currentDim + 1, targetDim, indices);
       }
     }
   }

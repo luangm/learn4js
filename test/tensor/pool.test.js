@@ -12,3 +12,12 @@ test('maxpool', function() {
   let max = TensorMath.reduceMax(xCol, 0);
   println(max);
 });
+
+test('argmax', function() {
+  let image = Tensor.linspace(1, 6, 6).reshape([2, 3]); // N, C, H, W
+  let argmax = TensorMath.argMax(image, 0);
+  println(argmax);
+
+  let argmax1 = TensorMath.argMax(image, 1);
+  println(argmax1);
+});

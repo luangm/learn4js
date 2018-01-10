@@ -27,6 +27,7 @@ import TanGradOp from "../op/transform/TanGradOp";
 import SqrtGradOp from "../op/transform/SqrtGradOp";
 import SqrtOp from "../op/transform/SqrtOp";
 import ReciprocalOp from "../op/transform/ReciprocalOp";
+import MaxIndexOp from "../op/index/MaxIndexOp";
 
 export default class TensorMath {
 
@@ -52,6 +53,15 @@ export default class TensorMath {
     // right = right.broadcast(resultShape);
     Executor.instance.exec(new AddOp(left, right, left));
     return left;
+  }
+
+  static argMax(base, dim) {
+    let resultShape = base.shape.slice();
+    resultShape[dim] = 1;
+    let result = new Tensor({shape: resultShape});
+    let op = new MaxIndexOp(base, null, result);
+    Executor.instance.execAtDim(op, dim);
+    return result;
   }
 
   static conv2d(image, kernel) {
