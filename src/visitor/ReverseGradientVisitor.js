@@ -85,6 +85,25 @@ export default class ReverseGradientVisitor extends Visitor {
     node.kernel.accept(this, kernelGrad);
   }
 
+  visitMaxPool(node, params) {
+    let grad = this._getGradientOrDefault(node, params);
+    this.graph.addGradient(node, grad);
+
+    let gradName = node.name + "/grad_" + node.image.name;
+    console.log(gradName);
+
+    let imageGrad = ExpressionFactory.createMaxPoolGrad({
+      name: gradName,
+      image: node.image,
+      kernelShape: node.kernelShape,
+      grad,
+      strideWidth: 2,
+      strideHeight: 2
+    });
+
+    node.image.accept(this, imageGrad);
+  }
+
   visitCosine(node, params) {
     let grad = this._getGradientOrDefault(node, params);
     this.graph.addGradient(node, grad);

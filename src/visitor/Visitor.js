@@ -96,6 +96,17 @@ export default class Visitor {
     node.right.accept(this, params);
   }
 
+  visitMaxPool(node, params) {
+    this.preVisit(node, params);
+    node.image.accept(this, params);
+  }
+
+  visitMaxPoolGrad(node, params) {
+    this.preVisit(node, params);
+    node.grad.accept(this, params);
+    node.image.accept(this, params);
+  }
+
   visitMultiply(node, params) {
     this.preVisit(node, params);
     node.left.accept(this, params);

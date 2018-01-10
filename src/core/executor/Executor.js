@@ -3,6 +3,7 @@ import SpecialOp from "../op/special/SpecialOp";
 import ReductionOp from "../op/reduction/ReductionOp";
 import Tensor from "../Tensor";
 import IndexOp from "../op/index/IndexOp";
+import IndexSetOp from "../op/transform/IndexSetOp";
 
 const singleton = Symbol();
 
@@ -45,10 +46,28 @@ export default class Executor {
 
   execAtDim(op, dim) {
     if (op instanceof ReductionOp) {
-      this._accum(op, 0, dim, new Array(op.input.rank))
+      this._accum(op, 0, dim, new Array(op.input.rank));
     }
+
     if (op instanceof IndexOp) {
-      this._indexAccum(op, 0, dim, new Array(op.input.rank))
+      this._indexAccum(op, 0, dim, new Array(op.input.rank));
+    }
+
+    if (op instanceof IndexSetOp) {
+      this._set(op, 0, dim, new Array(op.input.rank));
+    }
+  }
+
+  _set(op, currentDim, targetDim, indices) {
+    let input = op.input;
+    let args = op.other;
+    let result = op.result;
+
+    for (let i = 0; i < input.length; i++) {
+      indices[targetDim] = args.get([i]);
+      indices[1] = i;
+      let val = input.data[i];
+      result.set(indices, val);
     }
   }
 

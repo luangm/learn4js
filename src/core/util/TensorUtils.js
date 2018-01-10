@@ -149,6 +149,23 @@ export default class TensorUtils {
     return result;
   }
 
+  static computeMaxPoolShape(imageShape, kernelShape, strideWidth, strideHeight) {
+    let numImages = imageShape[0];
+    let channels = imageShape[1];
+    let height = imageShape[2]; // rows
+    let width = imageShape[3]; // cols
+
+    let numKernels = kernelShape[0];
+    let kernelChannels = kernelShape[1];
+    let kernelHeight = kernelShape[2]; // rows
+    let kernelWidth = kernelShape[3]; // cols
+
+    let outputHeight = TensorUtils.computeConv2dOutSize(height, kernelHeight, 0, strideHeight);
+    let outputWidth = TensorUtils.computeConv2dOutSize(width, kernelWidth, 0, strideWidth);
+
+    return [numImages, numKernels, outputHeight, outputWidth];
+  }
+
   static computeConv2dShape(image, kernel) {
     let numImages = image.shape[0];
     let channels = image.shape[1];
@@ -207,12 +224,12 @@ export default class TensorUtils {
   }
 
   // image is a tensor of [channels, rows, cols]
-  static im2col(image, kernel, {padWidth = 0, padHeight = 0, strideWidth = 1, strideHeight = 1} = {}) {
+  static im2col(image, kernelShape, {padWidth = 0, padHeight = 0, strideWidth = 1, strideHeight = 1} = {}) {
     if (image.rank !== 4) {
       throw new Error('image\'s rank is not 4');
     }
 
-    if (kernel.rank !== 4) {
+    if (kernelShape.length !== 4) {
       throw new Error('kernel\'s rank is not 4');
     }
 
@@ -221,10 +238,10 @@ export default class TensorUtils {
     let height = image.shape[2]; // rows
     let width = image.shape[3]; // cols
 
-    let numKernels = kernel.shape[0];
-    let kernelChannels = kernel.shape[1];
-    let kernelHeight = kernel.shape[2]; // rows
-    let kernelWidth = kernel.shape[3]; // cols
+    let numKernels = kernelShape[0];
+    let kernelChannels = kernelShape[1];
+    let kernelHeight = kernelShape[2]; // rows
+    let kernelWidth = kernelShape[3]; // cols
 
     if (channels !== kernelChannels) {
       throw new Error('image channels (shape[1]) must equal kernel channels (shape[1])');

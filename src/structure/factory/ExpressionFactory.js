@@ -16,6 +16,7 @@ import Reciprocal from "../node/Reciprocal";
 import Im2Col from "../node/Im2Col";
 import Conv2dImageGrad from "../node/Conv2dImageGrad";
 import Conv2dKernelGrad from "../node/Conv2dKernelGrad";
+import MaxPoolGrad from "../node/MaxPoolGrad";
 
 export default class ExpressionFactory {
 
@@ -92,5 +93,9 @@ export default class ExpressionFactory {
 
   static createTanGrad({name, base}) {
     return new TangentGrad({name, base});
+  }
+
+  static createMaxPoolGrad({name, image, kernelShape, grad, strideWidth, strideHeight}) {
+    return new MaxPoolGrad({name, image, kernelShape, grad, strideWidth, strideHeight});
   }
 }

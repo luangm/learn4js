@@ -99,6 +99,22 @@ export default class EvaluationVisitor extends Visitor {
     }
   }
 
+  visitMaxPool(node, params) {
+    super.visitMaxPool(node, params);
+    let image = this.valueMap[node.image.id];
+    let kernelShape = node.kernelShape;
+    this.valueMap[node.id] = TensorMath.maxPool(image, kernelShape, 2, 2);
+  }
+
+  visitMaxPoolGrad(node, params) {
+    super.visitMaxPoolGrad(node, params);
+    let image = this.valueMap[node.image.id];
+    let grad = this.valueMap[node.grad.id];
+    let kernelShape = node.kernelShape;
+    let kernel = new Tensor({shape: kernelShape});
+    this.valueMap[node.id] = TensorMath.maxPoolGrad(image, kernel, grad, {strideWidth: 2, strideHeight: 2});
+  }
+
   visitLog(node, params) {
     super.visitLog(node, params);
     let base = this.valueMap[node.base.id];

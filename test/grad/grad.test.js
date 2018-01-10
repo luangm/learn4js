@@ -48,3 +48,28 @@ test('conv2d', function() {
   println(sess.run(kernelGrad));
 
 });
+
+test('maxpool', function() {
+
+  let imageTensor = Tensor.linspace(1, 32, 32).reshape([2, 1, 4, 4]); // N, C, H, W
+  let kernelShape = [1, 1, 2, 2];
+
+  let image = Learn4js.variable({name: 'image', data: imageTensor});
+
+  let maxPool = Learn4js.maxPool({name: 'maxPool', image, kernelShape});
+
+  let square = Learn4js.square({name: 'square', base: maxPool});
+
+  let gradVisitor = new ReverseGradientVisitor(square);
+  square.accept(gradVisitor);
+
+  let imageGrad = gradVisitor.graph.getGradient(image);
+
+  let sess = Learn4js.session();
+
+  println(sess.run(image));
+  println(sess.run(maxPool));
+  println(sess.run(square));
+  println(sess.run(imageGrad));
+
+});

@@ -28,6 +28,8 @@ import SqrtGradOp from "../op/transform/SqrtGradOp";
 import SqrtOp from "../op/transform/SqrtOp";
 import ReciprocalOp from "../op/transform/ReciprocalOp";
 import MaxIndexOp from "../op/index/MaxIndexOp";
+import IndexSetOp from "../op/transform/IndexSetOp";
+import {println} from "../../index";
 
 export default class TensorMath {
 
@@ -55,18 +57,29 @@ export default class TensorMath {
     return left;
   }
 
+  static argSet(source, args, shape, dim) {
+    let result = new Tensor({shape: shape});
+    let op = new IndexSetOp(source, args, result);
+    Executor.instance.execAtDim(op, dim);
+    return result;
+  }
+
   static argMax(base, dim) {
     let resultShape = base.shape.slice();
     resultShape[dim] = 1;
     let result = new Tensor({shape: resultShape});
     let op = new MaxIndexOp(base, null, result);
     Executor.instance.execAtDim(op, dim);
-    return result;
+
+    resultShape = base.shape.slice();
+    resultShape.splice(dim, 1);
+
+    return result.reshape(resultShape);
   }
 
   static conv2d(image, kernel) {
 
-    let xCol = TensorUtils.im2col(image, kernel);
+    let xCol = TensorUtils.im2col(image, kernel.shape);
 
     let numImages = image.shape[0];
     let channels = image.shape[1];
@@ -141,6 +154,27 @@ export default class TensorMath {
     return result;
   }
 
+  static maxPool(image, kernelShape, strideWidth, strideHeight) {
+
+    let numImages = image.shape[0];
+    let channels = image.shape[1];
+    let height = image.shape[2]; // rows
+    let width = image.shape[3]; // cols
+
+    let numKernels = kernelShape[0];
+    let kernelChannels = kernelShape[1];
+    let kernelHeight = kernelShape[2]; // rows
+    let kernelWidth = kernelShape[3]; // cols
+
+    let outputHeight = TensorUtils.computeConv2dOutSize(height, kernelHeight, 0, strideHeight);
+    let outputWidth = TensorUtils.computeConv2dOutSize(width, kernelWidth, 0, strideWidth);
+
+    let xCol = TensorUtils.im2col(image, kernelShape, {strideWidth, strideHeight});
+    let max = TensorMath.reduceMax(xCol, 0);
+    let result = max.reshape([numImages, channels, outputHeight, outputWidth]);
+    return result;
+  }
+
   static multiply(left, right) {
     let resultShape = TensorUtils.broadcastShapes(left.shape, right.shape);
     let result = new Tensor({shape: resultShape});
@@ -172,7 +206,11 @@ export default class TensorMath {
     let result = new Tensor({shape: resultShape});
     let op = new MaxOp(base, null, result);
     Executor.instance.execAtDim(op, dim);
-    return result;
+
+    resultShape = base.shape.slice();
+    resultShape.splice(dim, 1);
+
+    return result.reshape(resultShape);
   }
 
   static reduceSum(base, dim) {
@@ -278,6 +316,15 @@ export default class TensorMath {
   static tanh(base) {
     let result = new Tensor({shape: base.shape});
     Executor.instance.exec(new TanhOp(base, null, result));
+    return result;
+  }
+
+  static maxPoolGrad(image, kernel, grad, {strideWidth, strideHeight}) {
+    let xCol = TensorUtils.im2col(image, kernel.shape, {strideWidth, strideHeight});
+    let argmax = TensorMath.argMax(xCol, 0);
+    let gradReshape = grad.reshape([1, grad.length]);
+    let set = TensorMath.argSet(gradReshape, argmax, xCol.shape, 0);
+    let result = TensorUtils.col2im(set, image, kernel, {strideWidth, strideHeight}).reshape(image.shape);
     return result;
   }
 }

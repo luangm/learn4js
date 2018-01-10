@@ -22,6 +22,7 @@ import SquareRoot from "./structure/node/SquareRoot";
 import Abs from "./structure/node/Abs";
 import Logarithm from "./structure/node/Logarithm";
 import Conv2d from "./structure/node/Conv2d";
+import MaxPool from "./structure/node/MaxPool";
 
 /**
  * This is main Utility class for this library.
@@ -194,6 +195,12 @@ class Learn4js {
 
   variable({name, data, shape}) {
     let node = new Variable({name, data, shape});
+    this.activeGraph.add(node);
+    return node;
+  }
+
+  maxPool({name, image, kernelShape, strideWidth, strideHeight}) {
+    let node = new MaxPool({name, image, kernelShape, strideWidth, strideHeight});
     this.activeGraph.add(node);
     return node;
   }

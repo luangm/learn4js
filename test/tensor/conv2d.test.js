@@ -21,7 +21,7 @@ test('conv2d2', function() {
 test('im2col', function() {
   let image = Tensor.linspace(1, 9, 9).reshape([1, 1, 3, 3]); // N, C, H, W
   let kernel = Tensor.linspace(1, 4, 4).reshape([1, 1, 2, 2]); // N C H W
-  let xCol = TensorUtils.im2col(image, kernel);
+  let xCol = TensorUtils.im2col(image, kernel.shape);
   println(xCol);
 });
 
