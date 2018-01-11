@@ -6,9 +6,20 @@ export default class ArrayUtils {
     }
 
     let result = [];
-    for (let i = start; i < stop; i+= step) {
+    for (let i = start; i < stop; i += step) {
       result.push(i);
     }
     return result;
+  }
+
+  static shuffle(array) {
+    let j = 0;
+    let temp = 0;
+    for (let i = array.length - 1; i > 0; i--) {
+      j = Math.floor(Math.random() * (i + 1));
+      temp = array[i];
+      array[i] = array[j];
+      array[j] = temp;
+    }
   }
 }
