@@ -32,5 +32,6 @@ Machine Learning for Javascript
 | TangentGrad   | Y     |       |
 | Tanh          | Y     |       |
 | Conv2d        | Y     | Y     |
-| MaxPool       | Y     |       |
+| MaxPool       | Y     | Y     |
+| Receprocal    | Y     |       |
 

@@ -57,13 +57,6 @@ export default class TensorMath {
     return left;
   }
 
-  static argSet(source, args, shape, dim) {
-    let result = new Tensor({shape: shape});
-    let op = new IndexSetOp(source, args, result);
-    Executor.instance.execAtDim(op, dim);
-    return result;
-  }
-
   static argMax(base, dim) {
     let resultShape = base.shape.slice();
     resultShape[dim] = 1;
@@ -75,6 +68,13 @@ export default class TensorMath {
     resultShape.splice(dim, 1);
 
     return result.reshape(resultShape);
+  }
+
+  static argSet(source, args, shape, dim) {
+    let result = new Tensor({shape: shape});
+    let op = new IndexSetOp(source, args, result);
+    Executor.instance.execAtDim(op, dim);
+    return result;
   }
 
   static conv2d(image, kernel) {
@@ -127,7 +127,9 @@ export default class TensorMath {
   static divide(left, right) {
     let resultShape = TensorUtils.broadcastShapes(left.shape, right.shape);
     let result = new Tensor({shape: resultShape});
-    Executor.instance.exec(new DivideOp(left, right, result));
+    let newLeft = left.broadcast(resultShape);
+    let newRight = right.broadcast(resultShape);
+    Executor.instance.exec(new DivideOp(newLeft, newRight, result));
     return result;
   }
 
@@ -172,6 +174,15 @@ export default class TensorMath {
     let xCol = TensorUtils.im2col(image, kernelShape, {strideWidth, strideHeight});
     let max = TensorMath.reduceMax(xCol, 0);
     let result = max.reshape([numImages, channels, outputHeight, outputWidth]);
+    return result;
+  }
+
+  static maxPoolGrad(image, kernel, grad, {strideWidth, strideHeight}) {
+    let xCol = TensorUtils.im2col(image, kernel.shape, {strideWidth, strideHeight});
+    let argmax = TensorMath.argMax(xCol, 0);
+    let gradReshape = grad.reshape([1, grad.length]);
+    let set = TensorMath.argSet(gradReshape, argmax, xCol.shape, 0);
+    let result = TensorUtils.col2im(set, image, kernel, {strideWidth, strideHeight}).reshape(image.shape);
     return result;
   }
 
@@ -261,10 +272,14 @@ export default class TensorMath {
     return result;
   }
 
-  static softmax(base) {
-    let result = new Tensor({shape: base.shape});
-    // let exp = TensorMath.exp()
-    // Executor.instance.execAtDim(new SoftmaxOp(base, null, result));
+  static softmax(base, dim = -1) {
+    let exp = TensorMath.exp(base);
+    if (dim < 0) {
+      dim += base.rank;
+    }
+    let sum = TensorMath.reduceSum(exp, dim);
+    println(sum);
+    let result = TensorMath.divide(exp, sum);
     return result;
   }
 
@@ -316,15 +331,6 @@ export default class TensorMath {
   static tanh(base) {
     let result = new Tensor({shape: base.shape});
     Executor.instance.exec(new TanhOp(base, null, result));
-    return result;
-  }
-
-  static maxPoolGrad(image, kernel, grad, {strideWidth, strideHeight}) {
-    let xCol = TensorUtils.im2col(image, kernel.shape, {strideWidth, strideHeight});
-    let argmax = TensorMath.argMax(xCol, 0);
-    let gradReshape = grad.reshape([1, grad.length]);
-    let set = TensorMath.argSet(gradReshape, argmax, xCol.shape, 0);
-    let result = TensorUtils.col2im(set, image, kernel, {strideWidth, strideHeight}).reshape(image.shape);
     return result;
   }
 }

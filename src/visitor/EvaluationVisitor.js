@@ -151,6 +151,12 @@ export default class EvaluationVisitor extends Visitor {
     this.valueMap[node.id] = TensorMath.reciprocal(base);
   }
 
+  visitSoftmax(node, params) {
+    super.visitSoftmax(node, params);
+    let base = this.valueMap[node.base.id];
+    this.valueMap[node.id] = TensorMath.softmax(base);
+  }
+
   visitReduceSum(node, params) {
     super.visitReduceSum(node, params);
     let base = this.valueMap[node.base.id];
