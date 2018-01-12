@@ -37,15 +37,11 @@ export default class Mnist {
     }
   }
 
-  init() {
+  async init() {
     let self = this;
-    fetch(this.options.testImageUrl)
-      .then(function(response) {
-        return response.arrayBuffer();
-      })
-      .then(function(buffer) {
-        self._processImages(buffer);
-      });
+    let response = await fetch(this.options.testImageUrl);
+    let buffer = await response.arrayBuffer();
+    self._processImages(buffer);
   }
 
   _processImages(buffer) {
