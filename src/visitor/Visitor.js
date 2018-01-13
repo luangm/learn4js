@@ -95,6 +95,12 @@ export default class Visitor {
     node.base.accept(this, params);
   }
 
+  visitSoftmaxGrad(node, params) {
+    this.preVisit(node, params);
+    node.grad.accept(this, params);
+    node.base.accept(this, params);
+  }
+
   visitMatMul(node, params) {
     this.preVisit(node, params);
     node.left.accept(this, params);

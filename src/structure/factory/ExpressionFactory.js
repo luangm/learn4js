@@ -17,6 +17,7 @@ import Im2Col from "../node/Im2Col";
 import Conv2dImageGrad from "../node/Conv2dImageGrad";
 import Conv2dKernelGrad from "../node/Conv2dKernelGrad";
 import MaxPoolGrad from "../node/MaxPoolGrad";
+import SoftmaxGrad from "../node/SoftmaxGrad";
 
 export default class ExpressionFactory {
 
@@ -97,5 +98,9 @@ export default class ExpressionFactory {
 
   static createMaxPoolGrad({name, image, kernelShape, grad, strideWidth, strideHeight}) {
     return new MaxPoolGrad({name, image, kernelShape, grad, strideWidth, strideHeight});
+  }
+
+  static createSoftmaxGrad({name, base, grad}) {
+    return new SoftmaxGrad({name, base, grad});
   }
 }

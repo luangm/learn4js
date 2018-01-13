@@ -2,6 +2,7 @@ import Visitor from "./Visitor";
 import TensorMath from "../core/util/TensorMath";
 import Tensor from "../core/Tensor";
 import TensorUtils from "../core/util/TensorUtils";
+import {println} from "../index";
 
 export default class EvaluationVisitor extends Visitor {
 
@@ -63,14 +64,6 @@ export default class EvaluationVisitor extends Visitor {
     this.valueMap[node.id] = TensorMath.conv2dKernelGrad(image, kernel, grad);
   }
 
-
-  visitIm2Col(node, params) {
-    super.visitIm2Col(node, params);
-    let image = this.valueMap[node.image.id];
-    let kernel = this.valueMap[node.kernel.id];
-    this.valueMap[node.id] = TensorUtils.im2col(image, kernel);
-  }
-
   visitCosine(node, params) {
     super.visitCosine(node, params);
     let base = this.valueMap[node.base.id];
@@ -99,6 +92,26 @@ export default class EvaluationVisitor extends Visitor {
     }
   }
 
+  visitIm2Col(node, params) {
+    super.visitIm2Col(node, params);
+    let image = this.valueMap[node.image.id];
+    let kernel = this.valueMap[node.kernel.id];
+    this.valueMap[node.id] = TensorUtils.im2col(image, kernel);
+  }
+
+  visitLog(node, params) {
+    super.visitLog(node, params);
+    let base = this.valueMap[node.base.id];
+    this.valueMap[node.id] = TensorMath.log(base);
+  }
+
+  visitMatMul(node, params) {
+    super.visitMatMul(node, params);
+    let left = this.valueMap[node.left.id];
+    let right = this.valueMap[node.right.id];
+    this.valueMap[node.id] = TensorMath.matmul(left, right, node.transposeLeft, node.transposeRight);
+  }
+
   visitMaxPool(node, params) {
     super.visitMaxPool(node, params);
     let image = this.valueMap[node.image.id];
@@ -113,19 +126,6 @@ export default class EvaluationVisitor extends Visitor {
     let kernelShape = node.kernelShape;
     let kernel = new Tensor({shape: kernelShape});
     this.valueMap[node.id] = TensorMath.maxPoolGrad(image, kernel, grad, {strideWidth: 2, strideHeight: 2});
-  }
-
-  visitLog(node, params) {
-    super.visitLog(node, params);
-    let base = this.valueMap[node.base.id];
-    this.valueMap[node.id] = TensorMath.log(base);
-  }
-
-  visitMatMul(node, params) {
-    super.visitMatMul(node, params);
-    let left = this.valueMap[node.left.id];
-    let right = this.valueMap[node.right.id];
-    this.valueMap[node.id] = TensorMath.matmul(left, right, node.transposeLeft, node.transposeRight);
   }
 
   visitMultiply(node, params) {
@@ -145,16 +145,11 @@ export default class EvaluationVisitor extends Visitor {
     this.valueMap[node.id] = node.value;
   }
 
+
   visitReciprocal(node, params) {
     super.visitReciprocal(node, params);
     let base = this.valueMap[node.base.id];
     this.valueMap[node.id] = TensorMath.reciprocal(base);
-  }
-
-  visitSoftmax(node, params) {
-    super.visitSoftmax(node, params);
-    let base = this.valueMap[node.base.id];
-    this.valueMap[node.id] = TensorMath.softmax(base);
   }
 
   visitReduceSum(node, params) {
@@ -191,6 +186,19 @@ export default class EvaluationVisitor extends Visitor {
     super.visitSine(node, params);
     let base = this.valueMap[node.base.id];
     this.valueMap[node.id] = TensorMath.sin(base);
+  }
+
+  visitSoftmax(node, params) {
+    super.visitSoftmax(node, params);
+    let base = this.valueMap[node.base.id];
+    this.valueMap[node.id] = TensorMath.softmax(base);
+  }
+
+  visitSoftmaxGrad(node, params) {
+    super.visitSoftmaxGrad(node, params);
+    let base = this.valueMap[node.base.id];
+    let grad = this.valueMap[node.grad.id];
+    this.valueMap[node.id] = TensorMath.softmaxGrad(base, grad);
   }
 
   visitSqrt(node, params) {

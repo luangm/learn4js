@@ -23,6 +23,7 @@ import Abs from "./structure/node/Abs";
 import Logarithm from "./structure/node/Logarithm";
 import Conv2d from "./structure/node/Conv2d";
 import MaxPool from "./structure/node/MaxPool";
+import Softmax from "./structure/node/Softmax";
 
 /**
  * This is main Utility class for this library.
@@ -57,12 +58,6 @@ class Learn4js {
     return node;
   }
 
-  conv2d({name, image, kernel}) {
-    let node = new Conv2d({name, image, kernel});
-    this.activeGraph.add(node);
-    return node;
-  }
-
   assign({name, target, value}) {
     let node = new Assign({name, target, value});
     this.activeGraph.add(node);
@@ -71,6 +66,12 @@ class Learn4js {
 
   constant({name, data, shape}) {
     let node = new Constant({name, data, shape});
+    this.activeGraph.add(node);
+    return node;
+  }
+
+  conv2d({name, image, kernel}) {
+    let node = new Conv2d({name, image, kernel});
     this.activeGraph.add(node);
     return node;
   }
@@ -128,6 +129,12 @@ class Learn4js {
     return node;
   }
 
+  maxPool({name, image, kernelShape, strideWidth, strideHeight}) {
+    let node = new MaxPool({name, image, kernelShape, strideWidth, strideHeight});
+    this.activeGraph.add(node);
+    return node;
+  }
+
   multiply({name, left, right}) {
     let node = new Multiply({name, left, right});
     this.activeGraph.add(node);
@@ -169,6 +176,12 @@ class Learn4js {
     return node;
   }
 
+  softmax({name, base}) {
+    let node = new Softmax({name, base});
+    this.activeGraph.add(node);
+    return node;
+  }
+
   sqrt({name, base}) {
     let node = new SquareRoot({name, base});
     this.activeGraph.add(node);
@@ -195,12 +208,6 @@ class Learn4js {
 
   variable({name, data, shape}) {
     let node = new Variable({name, data, shape});
-    this.activeGraph.add(node);
-    return node;
-  }
-
-  maxPool({name, image, kernelShape, strideWidth, strideHeight}) {
-    let node = new MaxPool({name, image, kernelShape, strideWidth, strideHeight});
     this.activeGraph.add(node);
     return node;
   }

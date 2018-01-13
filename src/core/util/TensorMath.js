@@ -29,7 +29,6 @@ import SqrtOp from "../op/transform/SqrtOp";
 import ReciprocalOp from "../op/transform/ReciprocalOp";
 import MaxIndexOp from "../op/index/MaxIndexOp";
 import IndexSetOp from "../op/transform/IndexSetOp";
-import {println} from "../../index";
 
 export default class TensorMath {
 
@@ -145,6 +144,18 @@ export default class TensorMath {
     return result;
   }
 
+  static logSumExp(base, dim = -1) {
+    if (dim < 0) {
+      dim += base.rank;
+    }
+    let max = TensorMath.reduceMax(base, dim);
+    let subtract = TensorMath.subtract(base, max);
+    let exp = TensorMath.exp(subtract);
+    let sum = TensorMath.reduceSum(exp, dim);
+    let log = TensorMath.log(sum);
+    return TensorMath.add(log, max);
+  }
+
   static matmul(left, right, transposeA = false, transposeB = false) {
 
     let shape = [0, 0];
@@ -218,8 +229,8 @@ export default class TensorMath {
     let op = new MaxOp(base, null, result);
     Executor.instance.execAtDim(op, dim);
 
-    resultShape = base.shape.slice();
-    resultShape.splice(dim, 1);
+    // resultShape = base.shape.slice();
+    // resultShape.splice(dim, 1);
 
     return result.reshape(resultShape);
   }
@@ -273,14 +284,39 @@ export default class TensorMath {
   }
 
   static softmax(base, dim = -1) {
-    let exp = TensorMath.exp(base);
     if (dim < 0) {
       dim += base.rank;
     }
+    let max = TensorMath.reduceMax(base, dim);
+    let subtract = TensorMath.subtract(base, max);
+    let exp = TensorMath.exp(subtract);
     let sum = TensorMath.reduceSum(exp, dim);
-    println(sum);
-    let result = TensorMath.divide(exp, sum);
-    return result;
+    return TensorMath.divide(exp, sum);
+  }
+
+  static softmaxCrossEntropyWithLogits(logits, labels, dim = -1) {
+    if (dim < 0) {
+      dim += logits.rank;
+    }
+    let logSumExp = TensorMath.logSumExp(logits);
+    let sub = TensorMath.subtract(logits, logSumExp);
+    let mul = TensorMath.multiply(labels, sub);
+    let sum = TensorMath.reduceSum(mul, dim);
+    return TensorMath.negate(sum);
+  }
+
+  /**
+   * Normally a softmax derivative is a Jacobian Matrix.
+   * To get a total derivative, sum up all the partials.
+   *
+   * Assume shape of base = [batch, elements]
+   */
+  static softmaxGrad(base, grad) {
+    let softmax = TensorMath.softmax(base); // default dim = -1
+    let mul = TensorMath.multiply(grad, softmax);
+    let sum = TensorMath.reduceSum(mul, 1); // reduce on last dim
+    let subtract = TensorMath.subtract(grad, sum); // Sum will broadcast
+    return TensorMath.multiply(subtract, softmax);
   }
 
   static sqrt(base) {
