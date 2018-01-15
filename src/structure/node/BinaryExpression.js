@@ -2,8 +2,8 @@ import Expression from "../Expression";
 
 export default class BinaryExpression extends Expression {
 
-  constructor({name, left, right}) {
-    super(name);
+  constructor(left, right, {name} = {}) {
+    super({name});
     this._left = left;
     this._right = right;
   }
@@ -12,8 +12,15 @@ export default class BinaryExpression extends Expression {
     return this._left;
   }
 
+  get params() {
+    return {
+      name: this._name,
+      left: this.left.id,
+      right: this.right.id
+    }
+  }
+
   get right() {
     return this._right;
   }
-
 }

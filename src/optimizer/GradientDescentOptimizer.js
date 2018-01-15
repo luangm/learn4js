@@ -1,19 +1,17 @@
 import DependencyVisitor from "../visitor/DependencyVisitor";
 import ReverseGradientVisitor from "../visitor/ReverseGradientVisitor";
 import Parameter from "../structure/node/Parameter";
-import Learn4js from "../Learn4js";
-import Tensor from "../core/Tensor";
-import ExpressionFactory from "../structure/factory/ExpressionFactory";
+import Optimizer from "./Optimizer";
+import GradientDescentStep from "./GradientDescentStep";
+import Group from "../structure/node/Group";
 
-export default class GradientDescentOptimizer {
+export default class GradientDescentOptimizer extends Optimizer {
 
   constructor({graph, learnRate = 0.001}) {
-    this._graph = graph;
+    super({graph});
     this._learnRate = learnRate;
-  }
-
-  get graph() {
-    return this._graph;
+    this._gradVisitor = new ReverseGradientVisitor();
+    this._depVisitor = new DependencyVisitor();
   }
 
   get learnRate() {
@@ -21,26 +19,21 @@ export default class GradientDescentOptimizer {
   }
 
   minimize(loss) {
-    let learnRate = Learn4js.constant({name: 'learn_rate', data: Tensor.scalar(this._learnRate)});
+    loss.accept(this._depVisitor);
+    loss.accept(this._gradVisitor);
 
-    let depVisitor = new DependencyVisitor();
-    loss.accept(depVisitor);
-
-    let gradVisitor = new ReverseGradientVisitor(loss);
-    loss.accept(gradVisitor);
+    this.graph._subGraphs[loss.id] = this._gradVisitor.graph;
 
     let assignList = [];
 
-    for (let node of Object.values(depVisitor.dependencies)) {
+    for (let node of Object.values(this._depVisitor.dependencies)) {
       if (node instanceof Parameter) {
-        let grad = gradVisitor.graph.getGradient(node);
-        let mul = ExpressionFactory.createMultiply({left: learnRate, right: grad});
-        let sub = ExpressionFactory.createSubtract({left: node, right: mul});
-        let assign = ExpressionFactory.createAssign({target: node, value: sub});
-        assignList.push(assign);
+        let grad = this._gradVisitor.graph.getGradient(node);
+        let step = new GradientDescentStep(node, grad, {learnRate: this.learnRate});
+        assignList.push(step);
       }
     }
 
-    return ExpressionFactory.createGroup({name: "TrainStep", list: assignList});
+    return new Group(assignList);
   }
 }

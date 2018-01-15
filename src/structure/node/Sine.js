@@ -2,8 +2,12 @@ import UnaryExpression from "./UnaryExpression";
 
 export default class Sine extends UnaryExpression {
 
-  constructor({name, base}) {
-    super({name, base});
+  constructor(base, {name} = {}) {
+    super(base, {name});
+  }
+
+  get type() {
+    return 'Sine';
   }
 
   accept(visitor, params) {

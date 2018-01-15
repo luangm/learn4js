@@ -76,6 +76,9 @@ export default class Tensor {
   }
 
   static create(array) {
+    if (array instanceof Tensor) {
+      return array;
+    }
     return TensorFactory.create(array);
   }
 

@@ -138,6 +138,10 @@ export default class TensorMath {
     return result;
   }
 
+  static gradientDescentStep(node, grad, learnRate) {
+    return TensorMath.subtract(node, TensorMath.multiply(Tensor.create(learnRate), grad));
+  }
+
   static log(base) {
     let result = new Tensor({shape: base.shape});
     Executor.instance.exec(new LogOp(base, null, result));
@@ -350,6 +354,13 @@ export default class TensorMath {
     let result = new Tensor({shape: resultShape});
     Executor.instance.exec(new SubtractOp(left, right, result));
     return result;
+  }
+
+  static sumSquaredError(label, prediction) {
+    let sub = TensorMath.subtract(label, prediction);
+    let sqr = TensorMath.square(sub);
+    let sum = TensorMath.reduceSum(sqr, -1);
+    return sum;
   }
 
   static tan(base) {

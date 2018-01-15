@@ -1,20 +1,32 @@
 import Expression from "../Expression";
 import Tensor from "../../core/Tensor";
 
+/**
+ * A parameter expression is one that need to be modified in order to minimize a loss
+ * A parameter takes in a tensor value.
+ */
 export default class Parameter extends Expression {
 
-  constructor({name, data, shape}) {
-    super(name);
+  /**
+   * Value can be a tensor or an array
+   */
+  constructor(value, {name} = {}) {
+    super({name});
+    this._value = Tensor.create(value);
+  }
 
-    if (data instanceof Tensor) {
-      this._value = data;
-    } else {
-      this._value = new Tensor({data, shape});
+  get params() {
+    return {
+      name: this._name
     }
   }
 
   get shape() {
     return this.value.shape;
+  }
+
+  get type() {
+    return 'Parameter';
   }
 
   get value() {

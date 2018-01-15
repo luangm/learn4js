@@ -2,8 +2,12 @@ import UnaryExpression from "./UnaryExpression";
 
 export default class SquareRoot extends UnaryExpression {
 
-  constructor({name, base}) {
-    super({name, base});
+  constructor(base, {name} = {}) {
+    super(base, {name});
+  }
+
+  get type() {
+    return 'SquareRoot';
   }
 
   accept(visitor, params) {

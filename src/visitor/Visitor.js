@@ -10,7 +10,7 @@ export default class Visitor {
     // default empty
   }
 
-  visitAbs(node, params) {
+  visitAbsolute(node, params) {
     this.preVisit(node, params);
     node.base.accept(this, params);
   }
@@ -72,6 +72,13 @@ export default class Visitor {
     // nothing
   }
 
+  visitGradientDescentStep(node, params) {
+    this.preVisit(node, params);
+    console.log(node);
+    node.grad.accept(this, params);
+    node.target.accept(this, params);
+  }
+
   visitGroup(node, params) {
     this.preVisit(node, params);
     for (let exp of node.list) {
@@ -90,17 +97,6 @@ export default class Visitor {
     node.base.accept(this, params);
   }
 
-  visitSoftmax(node, params) {
-    this.preVisit(node, params);
-    node.base.accept(this, params);
-  }
-
-  visitSoftmaxGrad(node, params) {
-    this.preVisit(node, params);
-    node.grad.accept(this, params);
-    node.base.accept(this, params);
-  }
-
   visitMatMul(node, params) {
     this.preVisit(node, params);
     node.left.accept(this, params);
@@ -116,6 +112,12 @@ export default class Visitor {
     this.preVisit(node, params);
     node.grad.accept(this, params);
     node.image.accept(this, params);
+  }
+
+  visitMeanSquaredError(node, params) {
+    this.preVisit(node, params);
+    node.label.accept(this, params);
+    node.prediction.accept(this, params);
   }
 
   visitMultiply(node, params) {
@@ -169,6 +171,17 @@ export default class Visitor {
     node.base.accept(this, params);
   }
 
+  visitSoftmax(node, params) {
+    this.preVisit(node, params);
+    node.base.accept(this, params);
+  }
+
+  visitSoftmaxGrad(node, params) {
+    this.preVisit(node, params);
+    node.grad.accept(this, params);
+    node.base.accept(this, params);
+  }
+
   visitSqrt(node, params) {
     this.preVisit(node, params);
     node.base.accept(this, params);
@@ -193,6 +206,12 @@ export default class Visitor {
     this.preVisit(node, params);
     node.left.accept(this, params);
     node.right.accept(this, params);
+  }
+
+  visitSumSquaredError(node, params) {
+    this.preVisit(node, params);
+    node.label.accept(this, params);
+    node.prediction.accept(this, params);
   }
 
   visitTangent(node, params) {

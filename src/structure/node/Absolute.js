@@ -1,17 +1,17 @@
 import UnaryExpression from "./UnaryExpression";
 
-export default class Sign extends UnaryExpression {
+export default class Absolute extends UnaryExpression {
 
   constructor(base, {name} = {}) {
     super(base, {name});
   }
 
   get type() {
-    return 'Sign';
+    return 'Absolute'
   }
 
   accept(visitor, params) {
-    visitor.visitSign(this, params);
+    visitor.visitAbs(this, params);
   }
 
 }

@@ -34,11 +34,11 @@ export default class ExpressionFactory {
   }
 
   static createCosine({name, base}) {
-    return new Cosine({name, base});
+    return new Cosine(base, {name});
   }
 
-  static createGroup({name, list}) {
-    return new Group({name, list});
+  static createGroup(list, {name} = {}) {
+    return new Group(list, {name});
   }
 
   static createIm2Col({name, image, kernel}) {
@@ -46,15 +46,19 @@ export default class ExpressionFactory {
   }
 
   static createMatMul({name, left, right, transposeLeft, transposeRight}) {
-    return new MatMul({name, left, right, transposeLeft, transposeRight});
+    return new MatMul(left, right, {name, transposeLeft, transposeRight});
+  }
+
+  static createMaxPoolGrad({name, image, kernelShape, grad, strideWidth, strideHeight}) {
+    return new MaxPoolGrad({name, image, kernelShape, grad, strideWidth, strideHeight});
   }
 
   static createMultiply({name, left, right}) {
-    return new Multiply({name, left, right});
+    return new Multiply(left, right, {name});
   }
 
   static createNegate({name, base}) {
-    return new Negate({name, base});
+    return new Negate(base, {name});
   }
 
   static createReciprocal({name, base}) {
@@ -69,38 +73,34 @@ export default class ExpressionFactory {
   }
 
   static createSigmoidGrad({name, base}) {
-    return new SigmoidGrad({name, base});
+    return new SigmoidGrad(base, {name});
   }
 
   static createSign({name, base}) {
-    return new Sign({name, base});
+    return new Sign(base, {name});
   }
 
   static createSine({name, base}) {
-    return new Sine({name, base});
-  }
-
-  static createSqrtGrad({name, base}) {
-    return new SquareRootGrad({name, base});
-  }
-
-  static createStep({name, base}) {
-    return new Step({name, base});
-  }
-
-  static createSubtract({name, left, right}) {
-    return new Subtract({name, left, right});
-  }
-
-  static createTanGrad({name, base}) {
-    return new TangentGrad({name, base});
-  }
-
-  static createMaxPoolGrad({name, image, kernelShape, grad, strideWidth, strideHeight}) {
-    return new MaxPoolGrad({name, image, kernelShape, grad, strideWidth, strideHeight});
+    return new Sine(base, {name});
   }
 
   static createSoftmaxGrad({name, base, grad}) {
     return new SoftmaxGrad({name, base, grad});
+  }
+
+  static createSqrtGrad({name, base}) {
+    return new SquareRootGrad(base, {name});
+  }
+
+  static createStep({name, base}) {
+    return new Step(base, {name});
+  }
+
+  static createSubtract({name, left, right}) {
+    return new Subtract(left, right, {name});
+  }
+
+  static createTanGrad({name, base}) {
+    return new TangentGrad(base, {name});
   }
 }

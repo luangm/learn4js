@@ -6,8 +6,8 @@ import Expression from "../Expression";
  */
 export default class Fill extends Expression {
 
-  constructor({name, scalar, shape}) {
-    super(name);
+  constructor(scalar, shape, {name} = {}) {
+    super({name});
 
     this._scalar = scalar;
     this._shape = shape;
@@ -19,6 +19,18 @@ export default class Fill extends Expression {
 
   get shape() {
     return this._shape;
+  }
+
+  get params() {
+    return {
+      name: this._name,
+      scalar: this.scalar,
+      shape: this.shape
+    }
+  }
+
+  get type() {
+    return 'Fill';
   }
 
   accept(visitor, params) {

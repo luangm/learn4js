@@ -2,13 +2,17 @@ import Expression from "../Expression";
 
 export default class Group extends Expression {
 
-  constructor({name, list}) {
-    super(name);
+  constructor(list, {name} = {}) {
+    super({name});
     this._list = list;
   }
 
   get list() {
     return this._list;
+  }
+
+  get type() {
+    return 'Group';
   }
 
   accept(visitor, params) {

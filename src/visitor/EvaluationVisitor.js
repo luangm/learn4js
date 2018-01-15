@@ -2,7 +2,6 @@ import Visitor from "./Visitor";
 import TensorMath from "../core/util/TensorMath";
 import Tensor from "../core/Tensor";
 import TensorUtils from "../core/util/TensorUtils";
-import {println} from "../index";
 
 export default class EvaluationVisitor extends Visitor {
 
@@ -15,8 +14,12 @@ export default class EvaluationVisitor extends Visitor {
     return this.valueMap[node.id];
   }
 
-  visitAbs(node, params) {
-    super.visitAbs(node, params);
+  setValue(node, value) {
+    this.valueMap[node.id] = value;
+  }
+
+  visitAbsolute(node, params) {
+    super.visitAbsolute(node, params);
     let base = this.valueMap[node.base.id];
     this.valueMap[node.id] = TensorMath.abs(base);
   }
@@ -46,7 +49,6 @@ export default class EvaluationVisitor extends Visitor {
     let kernel = this.valueMap[node.kernel.id];
     this.valueMap[node.id] = TensorMath.conv2d(image, kernel);
   }
-
 
   visitConv2dImageGrad(node, params) {
     super.visitConv2dImageGrad(node, params);
@@ -90,6 +92,16 @@ export default class EvaluationVisitor extends Visitor {
       tensor = TensorMath.set(tensor, node.scalar);
       this.valueMap[node.id] = tensor;
     }
+  }
+
+  visitGradientDescentStep(node, params) {
+    super.visitGradientDescentStep(node, params);
+    let grad = this.valueMap[node.grad.id];
+    let target = this.valueMap[node.target.id];
+    let newValue = TensorMath.gradientDescentStep(target, grad, node.learnRate);
+    node.target.value = newValue;
+    this.valueMap[node.id] = newValue;
+    this.valueMap[node.target.id] = newValue;
   }
 
   visitIm2Col(node, params) {
@@ -144,7 +156,6 @@ export default class EvaluationVisitor extends Visitor {
   visitParameter(node, params) {
     this.valueMap[node.id] = node.value;
   }
-
 
   visitReciprocal(node, params) {
     super.visitReciprocal(node, params);
@@ -232,6 +243,13 @@ export default class EvaluationVisitor extends Visitor {
     this.valueMap[node.id] = left.subtract(right);
   }
 
+  visitSumSquaredError(node, params) {
+    super.visitSumSquaredError(node, params);
+    let label = this.valueMap[node.label.id];
+    let prediction = this.valueMap[node.prediction.id];
+    this.setValue(node, TensorMath.sumSquaredError(label, prediction));
+  }
+
   visitTangent(node, params) {
     super.visitTangent(node, params);
     let base = this.valueMap[node.base.id];
@@ -251,6 +269,6 @@ export default class EvaluationVisitor extends Visitor {
   }
 
   visitVariable(node, params) {
-    this.valueMap[node.id] = node.value;
+    //this.valueMap[node.id] = node.value;
   }
 }

@@ -7,11 +7,12 @@ export default class GradientGraph extends ComputeGraph {
 
   constructor(name) {
     super(name);
-
-    // key = node, value = array of gradients
     this._gradientMap = {};
   }
 
+  /**
+   * key = node, value = array of gradients
+   */
   get gradientMap() {
     return this._gradientMap;
   }
@@ -26,7 +27,6 @@ export default class GradientGraph extends ComputeGraph {
     } else {
       list.push(gradientNode);
     }
-
   }
 
   getGradient(node) {

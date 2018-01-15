@@ -1,28 +1,26 @@
 import Expression from "../Expression";
-import Tensor from "../../core/Tensor";
 
+/**
+ * A Variable is holder of externally changed data (such as input and label).
+ * The variable's value is expected to change on each iteration.
+ *
+ * This is contrast to Parameter where the changes are driven internally.
+ *
+ * equivalent to TensorFlow's Placeholder and Pytorch's Variable(nonDifferentiable)
+ */
 export default class Variable extends Expression {
 
-  constructor({name, data, shape}) {
-    super(name);
-
-    if (data instanceof Tensor) {
-      this._value = data;
-    } else {
-      this._value = new Tensor({data, shape});
-    }
+  constructor(shape, {name} = {}) {
+    super({name});
+    this._shape = shape;
   }
 
   get shape() {
-    return this.value.shape;
+    return this._shape;
   }
 
-  get value() {
-    return this._value;
-  }
-
-  set value(val) {
-    this._value = val;
+  get type() {
+    return 'Variable';
   }
 
   accept(visitor, params) {

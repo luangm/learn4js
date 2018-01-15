@@ -1,5 +1,6 @@
 import Learn4js from '../../src/index';
 import GradientDescentOptimizer from "../../src/optimizer/GradientDescentOptimizer";
+import Tensor from "../../src/core/Tensor";
 
 test('Linear Regression', function() {
 
@@ -8,7 +9,7 @@ test('Linear Regression', function() {
 
   let X = Learn4js.variable({name: 'x', data: train_X, shape: [1, train_X.length]});
   let Y = Learn4js.variable({name: 'y', data: train_Y, shape: [1, train_Y.length]});
-  let W = Learn4js.parameter({name: 'weight', data: [0.5], shape: [1, 1]});
+  let W = Learn4js.parameter(Tensor.create([[0.5]]), {name: 'weight'});
   let b = Learn4js.parameter({name: 'bias', data: [0.5], shape: [1, 1]});
 
   let mul = Learn4js.multiply({left: W, right: X});

@@ -5,6 +5,7 @@ import Shape from "../Shape";
 import LinspaceOp from "../op/transform/LinspaceOp";
 
 export default class TensorFactory {
+
   /**
    * Create a tensor from the given array.
    * The length of the tensor is array.length * array[0].length * .... array[0]...[0].length

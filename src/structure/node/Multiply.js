@@ -3,14 +3,17 @@ import TensorUtils from "../../core/util/TensorUtils";
 
 export default class Multiply extends BinaryExpression {
 
-  constructor({name, left, right}) {
-    super({name, left, right});
-
+  constructor(left, right, {name} = {}) {
+    super(left, right, {name});
     this._shape = TensorUtils.broadcastShapes(left.shape, right.shape);
   }
 
   get shape() {
     return this._shape;
+  }
+
+  get type() {
+    return 'Multiply';
   }
 
   accept(visitor, params) {

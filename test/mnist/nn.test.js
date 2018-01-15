@@ -5,8 +5,8 @@ import Tensor from "../../src/core/Tensor";
 test('Neural Net', function() {
 
   let x = Learn4js.variable({name: 'x', shape: [-1, 784]});
-  let W = Learn4js.parameter({name: 'W', data: Tensor.zeros([784, 10])});
-  let b = Learn4js.parameter({name: 'b', data: Tensor.zeros([10])});
+  let W = Learn4js.parameter(Tensor.zeros([784, 10]);
+  let b = Learn4js.parameter(Tensor.zeros([10]));
 
   let mm = Learn4js.matmul({name: 'mm', left: x, right: W});
   let y = Learn4js.add({name: 'y', left: mm, right: b});
