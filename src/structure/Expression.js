@@ -106,16 +106,6 @@ export default class Expression {
     throw new Error('Not Supported');
   }
 
-  addGradient(target, grad) {
-    if (!this._gradients) {
-      this._gradients = {};
-    }
-    if (!this._gradients[target.id]) {
-      this._gradients[target.id] = [];
-    }
-    this._gradients[target.id].push(grad);
-  }
-
   /**
    * Forces an evaluation of the current expression at the given session.
    * If a session is not provided, then default session is used.
@@ -126,11 +116,15 @@ export default class Expression {
     return this._value;
   }
 
-  getGradients(target) {
+  getGradient(target) {
+    return this._gradients ? this._gradients[target.id] : null;
+  }
+
+  setGradient(targetId, grad) {
     if (!this._gradients) {
-      return [];
+      this._gradients = {};
     }
-    return this._gradients[target.id] || [];
+    this._gradients[targetId] = grad;
   }
 
   toString() {

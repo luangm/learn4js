@@ -28,14 +28,14 @@ export default class GradientDescentOptimizer extends Optimizer {
 
     // If the loss function already has gradients, no need to rebuild it.
     if (!loss.gradientMap) {
-      let gradVisitor = new ReverseGradientVisitor(this.graph, loss);
-      loss.accept(gradVisitor);
+      let gradVisitor = new ReverseGradientVisitor(this.graph);
+      gradVisitor.visit(loss);
     }
 
     let assignList = [];
     for (let node of paramNodes) {
-      let grads = loss.getGradients(node); // Grad is a list of gradient nodes.
-      let step = this.graph.add(new GradientDescentStep(node, grads, {learnRate: this.learnRate}));
+      let grad = loss.getGradient(node); // Grad is a list of gradient nodes.
+      let step = this.graph.add(new GradientDescentStep(node, grad, {learnRate: this.learnRate}));
       assignList.push(step);
     }
 

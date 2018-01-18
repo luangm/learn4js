@@ -61,5 +61,6 @@ let loss = Learn4js.sumSquaredError(y, yHat);
 | Receprocal    | Y     |       |
 | Softmax       | Y     | Y     |
 | LogSumExp     | Y     |       |
+| AddN          | Y     |       |
 
 

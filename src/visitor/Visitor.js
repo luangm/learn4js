@@ -21,6 +21,13 @@ export default class Visitor {
     node.right.accept(this, params);
   }
 
+  visitAddN(node, params) {
+    this.preVisit(node, params);
+    for (let exp of node.list) {
+      exp.accept(this, params);
+    }
+  }
+
   visitAssign(node, params) {
     this.preVisit(node, params);
     node.value.accept(this, params);
@@ -74,9 +81,7 @@ export default class Visitor {
 
   visitGradientDescentStep(node, params) {
     this.preVisit(node, params);
-    for (let gradItem of node.grads) {
-      gradItem.accept(this, params);
-    }
+    node.grad.accept(this, params);
     node.target.accept(this, params);
   }
 
@@ -119,12 +124,6 @@ export default class Visitor {
     this.preVisit(node, params);
     node.left.accept(this, params);
     node.right.accept(this, params);
-  }
-
-  visitSoftmaxCrossEntropy(node, params) {
-    this.preVisit(node, params);
-    node.labels.accept(this, params);
-    node.logits.accept(this, params);
   }
 
   visitNegate(node, params) {
@@ -175,6 +174,12 @@ export default class Visitor {
   visitSoftmax(node, params) {
     this.preVisit(node, params);
     node.base.accept(this, params);
+  }
+
+  visitSoftmaxCrossEntropy(node, params) {
+    this.preVisit(node, params);
+    node.labels.accept(this, params);
+    node.logits.accept(this, params);
   }
 
   visitSoftmaxGrad(node, params) {

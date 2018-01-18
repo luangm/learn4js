@@ -31,11 +31,14 @@ export default class EvaluationVisitor extends Visitor {
     this.valueMap[node.id] = TensorMath.add(left, right);
   }
 
-  visitSoftmaxCrossEntropy(node, params) {
-    super.visitSoftmaxCrossEntropy(node, params);
-    let labels = this.valueMap[node.labels.id];
-    let logits = this.valueMap[node.logits.id];
-    this.valueMap[node.id] = TensorMath.softmaxCrossEntropyWithLogits(labels, logits);
+  visitAddN(node, params) {
+    super.visitAddN(node, params);
+    let items = node.list.map(x => this.valueMap[x.id]);
+    let result = items[0];
+    for (let i = 1; i < items.length; i++) {
+      result = TensorMath.addi(result, items[i]);
+    }
+    this.valueMap[node.id] = result;
   }
 
   visitAssign(node, params) {
@@ -104,9 +107,9 @@ export default class EvaluationVisitor extends Visitor {
   visitGradientDescentStep(node, params) {
     super.visitGradientDescentStep(node, params);
 
-    let grads = node.grads.map(item => this.valueMap[item.id]);
+    let grad = this.valueMap[node.grad.id];
     let target = this.valueMap[node.target.id];
-    let newValue = TensorMath.gradientDescentStep(target, grads, node.learnRate);
+    let newValue = TensorMath.gradientDescentStep(target, grad, node.learnRate);
     node.target.value = newValue;
     this.valueMap[node.id] = newValue;
     this.valueMap[node.target.id] = newValue;
@@ -211,6 +214,13 @@ export default class EvaluationVisitor extends Visitor {
     super.visitSoftmax(node, params);
     let base = this.valueMap[node.base.id];
     this.valueMap[node.id] = TensorMath.softmax(base);
+  }
+
+  visitSoftmaxCrossEntropy(node, params) {
+    super.visitSoftmaxCrossEntropy(node, params);
+    let labels = this.valueMap[node.labels.id];
+    let logits = this.valueMap[node.logits.id];
+    this.valueMap[node.id] = TensorMath.softmaxCrossEntropyWithLogits(labels, logits);
   }
 
   visitSoftmaxGrad(node, params) {

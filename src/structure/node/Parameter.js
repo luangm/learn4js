@@ -16,9 +16,9 @@ export default class Parameter extends Expression {
   }
 
   get params() {
-    return {
+    return !this._name ? null : {
       name: this._name
-    }
+    };
   }
 
   get shape() {

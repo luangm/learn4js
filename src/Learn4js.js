@@ -128,11 +128,17 @@ class Learn4js {
    * The result is the gradients wrt each of the nodes.
    */
   gradients(target, nodes) {
-    let visitor = new ReverseGradientVisitor(target);
-    target.accept(visitor);
+
+    let visitor = new ReverseGradientVisitor(this.activeGraph);
+    visitor.visit(target);
+
     let gradients = [];
     for (let node of nodes) {
-      gradients.push(target.getGradients(node));
+      let grad = target.getGradient(node);
+      if (this.interactive) {
+        grad.eval();
+      }
+      gradients.push(grad);
     }
     return gradients;
   }

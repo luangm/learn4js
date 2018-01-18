@@ -2,15 +2,15 @@ import Expression from "../structure/Expression";
 
 export default class OptimizationStep extends Expression {
 
-  constructor(target, grads, {name} = {}) {
+  constructor(target, grad, {name} = {}) {
     super({name});
 
     this._target = target;
-    this._grads = grads;
+    this._grad = grad;
   }
 
-  get grads() {
-    return this._grads;
+  get grad() {
+    return this._grad;
   }
 
   get shape() {

@@ -2,24 +2,23 @@ import Learn4js, {println} from '../../src/index';
 import ReverseGradientVisitor from "../../src/visitor/ReverseGradientVisitor";
 import Tensor from "../../src/core/Tensor";
 
-test('sin', function() {
+test('add', function() {
+  Learn4js.interactive = true;
 
-  let data = [1, 2, 3, 4];
+  let node = Learn4js.parameter([[1, 2, 3, 4]]);
+  println(node);
+  let other = Learn4js.parameter([[5, 6, 7, 8]]);
+  println(other);
+  let result = Learn4js.add(node, other);
+  println(result);
 
-  let node = Learn4js.variable({name: 'node', data: data, shape: [data.length]});
+  let grads = Learn4js.gradients(result, [node, other]);
 
-  let out = Learn4js.log({base: node});
+  let nodeGrad = grads[0];
+  let otherGrad = grads[1];
 
-  let gradVisitor = new ReverseGradientVisitor(out);
-  out.accept(gradVisitor);
-
-  let grad = gradVisitor.graph.getGradient(node);
-
-  let sess = Learn4js.session();
-
-  println(sess.run(node));
-  println(sess.run(out));
-  println(sess.run(grad));
+  println(nodeGrad);
+  println(otherGrad);
 
 });
 

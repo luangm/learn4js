@@ -47,6 +47,10 @@ export default class TensorMath {
     return result;
   }
 
+  static addN(items) {
+
+  }
+
   static addi(left, right) {
     // let resultShape = TensorUtils.broadcastShapes(left.shape, right.shape);
     // let result = new Tensor({shape: resultShape});
@@ -138,12 +142,9 @@ export default class TensorMath {
     return result;
   }
 
-  static gradientDescentStep(node, grads, learnRate) {
-    let sum = grads[0];
-    for (let i = 1; i < grads.length; i++) {
-      sum = TensorMath.add(sum, grads[1]);
-    }
-    let mul = TensorMath.multiply(Tensor.create(learnRate), sum);
+  static gradientDescentStep(node, grad, learnRate) {
+    let lr = Tensor.create(learnRate);
+    let mul = TensorMath.multiply(lr, grad);
     return TensorMath.subtract(node, mul);
   }
 
@@ -303,6 +304,11 @@ export default class TensorMath {
     return TensorMath.divide(exp, sum);
   }
 
+  static softmaxCrossEntropyGrad(labels, logits) {
+    let softmax = TensorMath(logits);
+    return TensorMath.subtract(softmax, labels);
+  }
+
   static softmaxCrossEntropyWithLogits(labels, logits, dim = -1) {
     if (dim < 0) {
       dim += logits.rank;
@@ -312,11 +318,6 @@ export default class TensorMath {
     let mul = TensorMath.multiply(labels, sub);
     let sum = TensorMath.reduceSum(mul, dim);
     return TensorMath.negate(sum);
-  }
-
-  static softmaxCrossEntropyGrad(labels, logits) {
-    let softmax = TensorMath(logits);
-    return TensorMath.subtract(softmax, labels);
   }
 
   /**

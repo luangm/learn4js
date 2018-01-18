@@ -38,7 +38,10 @@ export default class ComputeGraph {
     if (!this._nodeParams[node.type]) {
       this._nodeParams[node.type] = {};
     }
-    this._nodeParams[node.type][node.id] = JSON.stringify(node.params);
+
+    if (node.params) {
+      this._nodeParams[node.type][node.id] = JSON.stringify(node.params);
+    }
 
     return node;
   }
@@ -47,6 +50,10 @@ export default class ComputeGraph {
    * Try to find a node with the same type and params
    */
   findNode(type, params) {
+    if (!params) {
+      return null;
+    }
+
     let paramJson = JSON.stringify(params);
     let list = this._nodeParams[type];
     if (list) {

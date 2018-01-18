@@ -20,7 +20,6 @@ test('Neural Net', function() {
     let yHat = Learn4js.add(mm, b);
     let loss = Learn4js.loss.softmaxCrossEntropy(y, yHat);
 
-    console.log(loss.value.data[0]);
     let trainStep = optimizer.minimize(loss);
     trainStep.eval();
   }
