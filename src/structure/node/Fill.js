@@ -6,19 +6,11 @@ import Expression from "../Expression";
  */
 export default class Fill extends Expression {
 
-  constructor(scalar, shape, {name} = {}) {
-    super({name});
+  constructor(scalar, shape, {name, scope} = {}) {
+    super({name, scope});
 
     this._scalar = scalar;
     this._shape = shape;
-  }
-
-  get scalar() {
-    return this._scalar;
-  }
-
-  get shape() {
-    return this._shape;
   }
 
   get params() {
@@ -27,6 +19,14 @@ export default class Fill extends Expression {
       scalar: this.scalar,
       shape: this.shape
     }
+  }
+
+  get scalar() {
+    return this._scalar;
+  }
+
+  get shape() {
+    return this._shape;
   }
 
   get type() {

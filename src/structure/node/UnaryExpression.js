@@ -2,8 +2,8 @@ import Expression from "../Expression";
 
 export default class UnaryExpression extends Expression {
 
-  constructor(base, {name} = {}) {
-    super({name});
+  constructor(base, {name, scope} = {}) {
+    super({name, scope});
     this._base = base;
   }
 

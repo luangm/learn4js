@@ -1,35 +1,27 @@
 import Learn4js from '../../src/index';
-import GradientDescentOptimizer from "../../src/optimizer/GradientDescentOptimizer";
 import Tensor from "../../src/core/Tensor";
 
 test('Neural Net', function() {
 
-  let x = Learn4js.variable({name: 'x', shape: [-1, 784]});
-  let W = Learn4js.parameter(Tensor.zeros([784, 10]);
-  let b = Learn4js.parameter(Tensor.zeros([10]));
+  let xData = Tensor.ones([1, 784]);
+  let yData = Tensor.zeros([1, 10]);
 
-  let mm = Learn4js.matmul({name: 'mm', left: x, right: W});
-  let y = Learn4js.add({name: 'y', left: mm, right: b});
+  let W = Learn4js.parameter(Tensor.zeros([784, 10]), {name: 'W'});
+  let x = Learn4js.variable([1, 784], {name: 'x'});
+  let b = Learn4js.parameter(Tensor.zeros([10]), {name: 'b'});
+  let y = Learn4js.variable([1, 10], {name: 'y'});
 
-  let yHat = Learn4js.variable({name: 'yHat', shape: [-1, 10]});
+  let optimizer = Learn4js.optimizer.gradientDescent({learnRate: 0.001});
 
-//  tf.reduce_mean(-tf.reduce_sum(y_ * tf.log(tf.nn.softmax(y)), reduction_indices=[1]))
+  for (let i = 0; i < 100; i++) {
+    x.value = xData;
+    y.value = yData;
+    let mm = Learn4js.matmul(x, W);
+    let yHat = Learn4js.add(mm, b);
+    let loss = Learn4js.loss.softmaxCrossEntropy(y, yHat);
 
-    // cross_entropy = tf.reduce_mean(
-    // tf.nn.softmax_cross_entropy_with_logits(labels=y_, logits=y))
-  // train_step = tf.train.GradientDescentOptimizer(0.5).minimize(cross_entropy)
-
-  let optimizer = new GradientDescentOptimizer({learnRate: 0.001});
-  let trainStep = optimizer.minimize(loss);
-
-  let sess = Learn4js.session();
-
-  for (let i = 0; i < 1000; i++) {
-    sess.run(trainStep);
+    console.log(loss.value.data[0]);
+    let trainStep = optimizer.minimize(loss);
+    trainStep.eval();
   }
-
-  console.log("W", sess.run(W));
-  console.log("b", sess.run(b));
-  console.log("loss", sess.run(loss));
-
 });

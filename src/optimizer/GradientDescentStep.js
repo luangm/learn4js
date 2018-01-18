@@ -2,8 +2,8 @@ import OptimizationStep from "./OptimizationStep";
 
 export default class GradientDescentStep extends OptimizationStep {
 
-  constructor(target, grad, {name, learnRate = 0.001} = {}) {
-    super(target, grad, {name});
+  constructor(target, grads, {name, learnRate = 0.001} = {}) {
+    super(target, grads, {name});
     this._learnRate = learnRate;
   }
 
@@ -17,6 +17,15 @@ export default class GradientDescentStep extends OptimizationStep {
 
   get type() {
     return 'GradientDescentStep';
+  }
+
+  get params() {
+    return {
+      name: this._name,
+      target: this.target.id,
+      grads: this.grads.map(x => x.id),
+      learnRate: this.learnRate
+    }
   }
 
   accept(visitor, params) {

@@ -11,6 +11,13 @@ export default class Group extends Expression {
     return this._list;
   }
 
+  get params() {
+    return {
+      name: this._name,
+      list: this.list.map(x => x.id)
+    }
+  }
+
   get type() {
     return 'Group';
   }

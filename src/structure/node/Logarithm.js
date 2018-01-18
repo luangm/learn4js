@@ -2,8 +2,8 @@ import UnaryExpression from "./UnaryExpression";
 
 export default class Logarithm extends UnaryExpression {
 
-  constructor(base, {name} = {}) {
-    super(base, {name});
+  constructor(base, {name, scope} = {}) {
+    super(base, {name, scope});
   }
 
   get type() {

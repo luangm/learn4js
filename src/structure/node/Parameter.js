@@ -10,8 +10,8 @@ export default class Parameter extends Expression {
   /**
    * Value can be a tensor or an array
    */
-  constructor(value, {name} = {}) {
-    super({name});
+  constructor(value, {name, scope} = {}) {
+    super({name, scope});
     this._value = Tensor.create(value);
   }
 

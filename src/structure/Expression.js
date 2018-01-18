@@ -1,4 +1,3 @@
-import ExpressionState from './constant/ExpressionState';
 import Session from '../session/Session';
 
 /**
@@ -9,11 +8,19 @@ import Session from '../session/Session';
  */
 export default class Expression {
 
-  constructor({name} = {}) {
+  constructor({name, scope} = {}) {
     this._id = Expression.ID_COUNTER++;
-    this._state = ExpressionState.DETACHED;
-    this._name = name;
-    this._value = null;
+    // this._state = ExpressionState.DETACHED;
+    if (name) {
+      this._name = name;
+    }
+    // this._value = null;
+    // this._scope = scope;
+    // this._gradients = null; // key = target.id, value = [gradient].
+  }
+
+  get gradientMap() {
+    return this._gradients;
   }
 
   get id() {
@@ -42,6 +49,18 @@ export default class Expression {
     }
   }
 
+  /**
+   * The scope of an Expression
+   * is when an expression can be safely hidden in a parent element without external references.
+   */
+  get scope() {
+    return this._scope;
+  }
+
+  set scope(val) {
+    this._scope = val;
+  }
+
   get session() {
     return Session.active;
   }
@@ -50,13 +69,13 @@ export default class Expression {
     throw new Error('Expression.shape should not be called from base Expression');
   }
 
-  get state() {
-    return this._state;
-  }
-
-  set state(value) {
-    this._state = value;
-  }
+  // get state() {
+  //   return this._state;
+  // }
+  //
+  // set state(value) {
+  //   this._state = value;
+  // }
 
   get type() {
     throw new Error('Expression.type should not be called from base Expression');
@@ -68,7 +87,7 @@ export default class Expression {
    * In Normal mode, the value will be null. Should call eval() first before calling value.
    */
   get value() {
-    return this._value;
+    return this.session.getValue(this);
   }
 
   /**
@@ -87,11 +106,15 @@ export default class Expression {
     throw new Error('Not Supported');
   }
 
-  // gradients(grad) {
-  //   let gradVisitor = new ReverseGradientVisitor();
-  //   this.accept(gradVisitor, grad);
-  //   return gradVisitor.graph;
-  // }
+  addGradient(target, grad) {
+    if (!this._gradients) {
+      this._gradients = {};
+    }
+    if (!this._gradients[target.id]) {
+      this._gradients[target.id] = [];
+    }
+    this._gradients[target.id].push(grad);
+  }
 
   /**
    * Forces an evaluation of the current expression at the given session.
@@ -103,6 +126,13 @@ export default class Expression {
     return this._value;
   }
 
+  getGradients(target) {
+    if (!this._gradients) {
+      return [];
+    }
+    return this._gradients[target.id] || [];
+  }
+
   toString() {
     let result = this.name + '[' + this.id + ']: ';
     if (this.value) {
@@ -112,4 +142,4 @@ export default class Expression {
   }
 }
 
-Expression.ID_COUNTER = 0;
+Expression.ID_COUNTER = 1;

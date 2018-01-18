@@ -6,14 +6,22 @@ import Expression from "../Expression";
  */
 export default class ReductionExpression extends Expression {
 
-  constructor({name, base, reduceDim}) {
-    super(name);
+  constructor(base, {name, scope, reduceDim = -1} = {}) {
+    super({name, scope});
     this._base = base;
     this._reduceDim = reduceDim;
   }
 
   get base() {
     return this._base;
+  }
+
+  get params() {
+    return {
+      name: this._name,
+      base: this.base.id,
+      dim: this.reduceDim
+    }
   }
 
   get reduceDim() {

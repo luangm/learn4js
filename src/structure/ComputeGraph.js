@@ -1,10 +1,7 @@
-import ExpressionState from "./constant/ExpressionState";
-
 /**
- * Compute Graph containing all the expression nodes.
- * TODO: Check name conflicts
- *
- *
+ * Compute Graph contains:
+ * - All Nodes (inc. intermediate)
+ * - Gradient from a Node to another Node.
  */
 export default class ComputeGraph {
 
@@ -12,7 +9,6 @@ export default class ComputeGraph {
     this._name = name;
     this._nodes = {}; // a map of all nodes, key = node.id
     this._nodeParams = {}; // a map of all node params, key = node.type, value = { id: param}
-    this._subGraphs = {}; // a map of all sub graphs.
   }
 
   get name() {
@@ -23,21 +19,28 @@ export default class ComputeGraph {
     return this._nodes;
   }
 
-  get subGraphs() {
-    return this._subGraphs;
-  }
-
   /**
    * Adds a node to the graph
+   * The graph first checks if there is already a same (params) node existing, if yes, then return it.
+   * Use forced = true if want to add it regardless.
    */
-  add(node) {
-    node.state = ExpressionState.ATTACHED;
+  add(node, forced) {
+    if (!forced) {
+      let existing = this.findNode(node.type, node.params);
+      if (existing) {
+        return existing;
+      }
+    }
+
+    // node.state = ExpressionState.ATTACHED;
     this._nodes[node.id] = node;
 
     if (!this._nodeParams[node.type]) {
       this._nodeParams[node.type] = {};
     }
     this._nodeParams[node.type][node.id] = JSON.stringify(node.params);
+
+    return node;
   }
 
   /**
@@ -53,6 +56,10 @@ export default class ComputeGraph {
         }
       }
     }
+  }
+
+  get(id) {
+    return this._nodes[id];
   }
 
 }

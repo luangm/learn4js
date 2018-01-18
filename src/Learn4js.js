@@ -24,8 +24,6 @@ import Logarithm from "./structure/node/Logarithm";
 import Conv2d from "./structure/node/Conv2d";
 import MaxPool from "./structure/node/MaxPool";
 import Softmax from "./structure/node/Softmax";
-import MeanSquaredError from "./structure/node/MeanSquaredError";
-import SumSquaredError from "./structure/node/SumSquaredError";
 import LossFactory from "./LossFactory";
 import OptimizerFactory from "./OptimizerFactory";
 import Sign from "./structure/node/Sign";
@@ -87,23 +85,19 @@ class Learn4js {
   }
 
   abs(base, {name} = {}) {
-    return this._addOrGet(new Absolute(base, {name}));
+    return this._addNode(new Absolute(base, {name}));
   }
 
   add(left, right, {name} = {}) {
-    return this._addOrGet(new Add(left, right, {name}));
+    return this._addNode(new Add(left, right, {name}));
   }
 
-  assign({name, target, value}) {
-    let node = new Assign({name, target, value});
-    this.activeGraph.add(node);
-    return node;
+  assign(target, assignment, {name} = {}) {
+    return this._addNode(new Assign(target, assignment, {name}));
   }
 
-  constant({name, data, shape}) {
-    let node = new Constant({name, data, shape});
-    this.activeGraph.add(node);
-    return node;
+  constant(value, {name} = {}) {
+    return this._addNode(new Constant(value, {name}));
   }
 
   conv2d({name, image, kernel}) {
@@ -113,38 +107,32 @@ class Learn4js {
   }
 
   cos(base, {name} = {}) {
-    return this._addOrGet(new Cosine(base, {name}));
+    return this._addNode(new Cosine(base, {name}));
   }
 
   exp(base, {name} = {}) {
-    return this._addOrGet(new Exponential(base, {name}));
+    return this._addNode(new Exponential(base, {name}));
   }
 
-  feed(node, value) {
-    this.activeSession.setValue(node, value);
+  fill(scalar, shape, {name} = {}) {
+    return this._addNode(new Fill(scalar, shape, {name}));
   }
 
-  fill({name, scalar, shape}) {
-    let node = new Fill({name, scalar, shape});
-    this.activeGraph.add(node);
-    return node;
+  getNode(id) {
+    return this.activeGraph.get(id);
   }
 
   /**
-   * Computes the gradients of the target wrt the nodes
-   *
+   * Computes the gradients of the target wrt all of its dependencies
    * This is only a graph building step, does not do any computation.
-   *
-   * @param target The target function
-   * @param nodes the denominators.
+   * The result is the gradients wrt each of the nodes.
    */
   gradients(target, nodes) {
     let visitor = new ReverseGradientVisitor(target);
     target.accept(visitor);
-    this.activeGraph._subGraphs[target.id] = visitor.graph;
     let gradients = [];
     for (let node of nodes) {
-      gradients.push(visitor.graph.getGradient(node));
+      gradients.push(target.getGradients(node));
     }
     return gradients;
   }
@@ -154,11 +142,11 @@ class Learn4js {
   }
 
   log(base, {name} = {}) {
-    return this._addOrGet(new Logarithm(base, {name}));
+    return this._addNode(new Logarithm(base, {name}));
   }
 
   matmul(left, right, {name} = {}) {
-    return this._addOrGet(new MatMul(left, right, {name}));
+    return this._addNode(new MatMul(left, right, {name}));
   }
 
   maxPool({name, image, kernelShape, strideWidth, strideHeight}) {
@@ -167,26 +155,20 @@ class Learn4js {
     return node;
   }
 
-  meanSquaredError(label, prediction, {name} = {}) {
-    return this._addOrGet(new MeanSquaredError(label, prediction, {name}));
-  }
-
   multiply(left, right, {name} = {}) {
-    return this._addOrGet(new Multiply(left, right, {name}));
+    return this._addNode(new Multiply(left, right, {name}));
   }
 
   negate(base, {name} = {}) {
-    return this._addOrGet(new Negate(base, {name}));
+    return this._addNode(new Negate(base, {name}));
   }
 
   parameter(value, {name} = {}) {
-    return this._addOrGet(new Parameter(value, {name}));
+    return this._addNode(new Parameter(value, {name}));
   }
 
-  reduceSum({name, base}) {
-    let node = new ReduceSum({name, base});
-    this.activeGraph.add(node);
-    return node;
+  reduceSum(base, reduceDim = -1, {name} = {}) {
+    return this._addNode(new ReduceSum(base, {name, reduceDim}));
   }
 
   session(graph) {
@@ -195,54 +177,43 @@ class Learn4js {
   }
 
   sigmoid(base, {name} = {}) {
-    return this._addOrGet(new Sigmoid(base, {name}));
+    return this._addNode(new Sigmoid(base, {name}));
   }
 
   sign(base, {name} = {}) {
-    return this._addOrGet(new Sign(base, {name}));
+    return this._addNode(new Sign(base, {name}));
   }
 
   sin(base, {name} = {}) {
-    return this._addOrGet(new Sine(base, {name}));
+    return this._addNode(new Sine(base, {name}));
   }
 
   softmax(base, {name} = {}) {
-    return this._addOrGet(new Softmax(base, {name}));
+    return this._addNode(new Softmax(base, {name}));
   }
 
   sqrt(base, {name} = {}) {
-    return this._addOrGet(new SquareRoot(base, {name}));
+    return this._addNode(new SquareRoot(base, {name}));
   }
 
   square(base, {name} = {}) {
-    return this._addOrGet(new Square(base, {name}));
+    return this._addNode(new Square(base, {name}));
   }
 
   subtract(left, right, {name} = {}) {
-    return this._addOrGet(new Subtract(left, right, {name}));
-  }
-
-  sumSquaredError(label, prediction, {name} = {}) {
-    return this._addOrGet(new SumSquaredError(label, prediction, {name}));
+    return this._addNode(new Subtract(left, right, {name}));
   }
 
   tan(base, {name} = {}) {
-    return this._addOrGet(new Tangent(base, {name}));
+    return this._addNode(new Tangent(base, {name}));
   }
 
   variable(shape, {name} = {}) {
-    return this._addOrGet(new Variable(shape, {name}));
+    return this._addNode(new Variable(shape, {name}));
   }
 
-  _addOrGet(node) {
-    let existing = this.activeGraph.findNode(node.type, node.params);
-    if (existing) {
-      if (this.interactive) {
-        existing.eval();
-      }
-      return existing;
-    }
-    this.activeGraph.add(node);
+  _addNode(node) {
+    node = this.activeGraph.add(node);
     if (this.interactive) {
       node.eval();
     }

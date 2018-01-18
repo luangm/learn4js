@@ -31,6 +31,13 @@ export default class EvaluationVisitor extends Visitor {
     this.valueMap[node.id] = TensorMath.add(left, right);
   }
 
+  visitSoftmaxCrossEntropy(node, params) {
+    super.visitSoftmaxCrossEntropy(node, params);
+    let labels = this.valueMap[node.labels.id];
+    let logits = this.valueMap[node.logits.id];
+    this.valueMap[node.id] = TensorMath.softmaxCrossEntropyWithLogits(labels, logits);
+  }
+
   visitAssign(node, params) {
     super.visitAssign(node, params);
     let value = this.valueMap[node.value.id];
@@ -96,9 +103,10 @@ export default class EvaluationVisitor extends Visitor {
 
   visitGradientDescentStep(node, params) {
     super.visitGradientDescentStep(node, params);
-    let grad = this.valueMap[node.grad.id];
+
+    let grads = node.grads.map(item => this.valueMap[item.id]);
     let target = this.valueMap[node.target.id];
-    let newValue = TensorMath.gradientDescentStep(target, grad, node.learnRate);
+    let newValue = TensorMath.gradientDescentStep(target, grads, node.learnRate);
     node.target.value = newValue;
     this.valueMap[node.id] = newValue;
     this.valueMap[node.target.id] = newValue;
@@ -240,14 +248,7 @@ export default class EvaluationVisitor extends Visitor {
     super.visitSubtract(node, params);
     let left = this.valueMap[node.left.id];
     let right = this.valueMap[node.right.id];
-    this.valueMap[node.id] = left.subtract(right);
-  }
-
-  visitSumSquaredError(node, params) {
-    super.visitSumSquaredError(node, params);
-    let label = this.valueMap[node.label.id];
-    let prediction = this.valueMap[node.prediction.id];
-    this.setValue(node, TensorMath.sumSquaredError(label, prediction));
+    this.valueMap[node.id] = TensorMath.subtract(left, right);
   }
 
   visitTangent(node, params) {

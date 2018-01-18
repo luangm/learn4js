@@ -2,8 +2,12 @@ import UnaryExpression from "./UnaryExpression";
 
 export default class Relu extends UnaryExpression {
 
-  constructor({name, base}) {
-    super({name, base});
+  constructor(base, {name, scope} = {}) {
+    super(base, {name, scope});
+  }
+
+  get type() {
+    return 'Relu';
   }
 
   accept(visitor, params) {

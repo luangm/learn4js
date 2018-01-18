@@ -74,8 +74,9 @@ export default class Visitor {
 
   visitGradientDescentStep(node, params) {
     this.preVisit(node, params);
-    console.log(node);
-    node.grad.accept(this, params);
+    for (let gradItem of node.grads) {
+      gradItem.accept(this, params);
+    }
     node.target.accept(this, params);
   }
 
@@ -114,16 +115,16 @@ export default class Visitor {
     node.image.accept(this, params);
   }
 
-  visitMeanSquaredError(node, params) {
-    this.preVisit(node, params);
-    node.label.accept(this, params);
-    node.prediction.accept(this, params);
-  }
-
   visitMultiply(node, params) {
     this.preVisit(node, params);
     node.left.accept(this, params);
     node.right.accept(this, params);
+  }
+
+  visitSoftmaxCrossEntropy(node, params) {
+    this.preVisit(node, params);
+    node.labels.accept(this, params);
+    node.logits.accept(this, params);
   }
 
   visitNegate(node, params) {
@@ -206,12 +207,6 @@ export default class Visitor {
     this.preVisit(node, params);
     node.left.accept(this, params);
     node.right.accept(this, params);
-  }
-
-  visitSumSquaredError(node, params) {
-    this.preVisit(node, params);
-    node.label.accept(this, params);
-    node.prediction.accept(this, params);
   }
 
   visitTangent(node, params) {

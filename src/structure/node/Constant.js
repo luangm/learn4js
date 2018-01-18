@@ -3,18 +3,23 @@ import Tensor from "../../core/Tensor";
 
 export default class Constant extends Expression {
 
-  constructor({name, data, shape}) {
-    super(name);
+  constructor(value, {name, scope}) {
+    super({name, scope});
+    this._value = Tensor.create(value);
+  }
 
-    if (data instanceof Tensor) {
-      this._value = data;
-    } else {
-      this._value = new Tensor({data, shape});
+  get params() {
+    return {
+      name: this._name
     }
   }
 
   get shape() {
     return this.value.shape;
+  }
+
+  get type() {
+    return 'Constant';
   }
 
   get value() {
@@ -30,4 +35,4 @@ export default class Constant extends Expression {
   }
 }
 
-Constant.TWO = new Constant({name: 'TWO', data: [2], shape: [1,1]});
+Constant.TWO = new Constant([2], {name: 'TWO'});

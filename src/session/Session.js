@@ -16,6 +16,10 @@ export default class Session {
     return this._graph;
   }
 
+  getValue(node) {
+    return this._visitor.getValue(node);
+  }
+
   setValue(node, value) {
     this._visitor.setValue(node, value);
   }

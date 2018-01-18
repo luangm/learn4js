@@ -4,21 +4,28 @@ test('graph', function() {
 
   Learn4js.interactive = true;
 
+  let graph = Learn4js.activeGraph;
+
   let W1 = Learn4js.parameter([[.1, .2, .3], [.4, .5, .6]], {name: 'W1'});
   let b1 = Learn4js.parameter([[.6], [.5]], {name: 'b1'});
   let x = Learn4js.variable([3, 1], {name: 'x'});
   let y = Learn4js.variable([2, 1], {name: 'y'});
+  let c = Learn4js.constant([[2, 3, 4], [5, 6, 7]], {name: 'c'});
 
   let optimizer = Learn4js.optimizer.gradientDescent({learnRate: 0.1});
 
-  for (let i = 0; i < 10; i++) {
-    x.value = Tensor.create([[1 + i], [2 + i], [3 + i]]);
-    y.value = Tensor.create([[0.5 + i], [0.5 + i]]);
+  for (let i = 0; i < 100; i++) {
+    x.value = Tensor.create([[1], [2], [3]]);
+    y.value = Tensor.create([[0.5], [0.5]]);
     let mm = Learn4js.matmul(W1, x);
-    // let z = Learn4js.add(mm, b1);
-    // let yHat = Learn4js.sigmoid(z);
-    // let loss = Learn4js.loss.sumSquaredError(y, yHat);
-    let trainStep = optimizer.minimize(mm);
+    let z = Learn4js.add(mm, b1);
+    let yHat = Learn4js.sigmoid(z);
+
+    let loss = Learn4js.loss.sumSquaredError(y, yHat);
+
+    println(loss.value.data[0]);
+
+    let trainStep = optimizer.minimize(loss);
     trainStep.eval();
   }
 

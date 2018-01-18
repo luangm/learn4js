@@ -2,8 +2,8 @@ import BinaryExpression from "./BinaryExpression";
 
 export default class MatMul extends BinaryExpression {
 
-  constructor(left, right, {name, transposeLeft, transposeRight} = {}) {
-    super(left, right, {name});
+  constructor(left, right, {name, scope, transposeLeft, transposeRight} = {}) {
+    super(left, right, {name, scope});
     this._transposeLeft = transposeLeft || false;
     this._transposeRight = transposeRight || false;
 

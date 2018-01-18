@@ -2,14 +2,19 @@ import ReductionExpression from "./ReductionExpression";
 
 export default class ReduceSum extends ReductionExpression {
 
-  constructor({name, base, reduceDim = -1}) {
-    super({name, base, reduceDim});
+  constructor(base, {name, scope, reduceDim = -1} = {}) {
+    super(base, {name, scope, reduceDim});
     this._shape = [1, 1];
   }
 
   get shape() {
     return this._shape;
   }
+
+  get type() {
+    return 'ReduceSum';
+  }
+
 
   accept(visitor, params) {
     visitor.visitReduceSum(this, params);

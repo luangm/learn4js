@@ -2,8 +2,8 @@ import Expression from "../Expression";
 
 export default class BinaryExpression extends Expression {
 
-  constructor(left, right, {name} = {}) {
-    super({name});
+  constructor(left, right, {name, scope} = {}) {
+    super({name, scope});
     this._left = left;
     this._right = right;
   }

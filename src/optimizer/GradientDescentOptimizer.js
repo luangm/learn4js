@@ -10,8 +10,6 @@ export default class GradientDescentOptimizer extends Optimizer {
   constructor({graph, learnRate = 0.001}) {
     super({graph});
     this._learnRate = learnRate;
-    this._gradVisitor = new ReverseGradientVisitor();
-    this._depVisitor = new DependencyVisitor();
   }
 
   get learnRate() {
@@ -19,21 +17,28 @@ export default class GradientDescentOptimizer extends Optimizer {
   }
 
   minimize(loss) {
-    loss.accept(this._depVisitor);
-    loss.accept(this._gradVisitor);
-
-    this.graph._subGraphs[loss.id] = this._gradVisitor.graph;
-
-    let assignList = [];
-
-    for (let node of Object.values(this._depVisitor.dependencies)) {
+    let depVisitor = new DependencyVisitor();
+    loss.accept(depVisitor);
+    let paramNodes = [];
+    for (let node of Object.values(depVisitor.dependencies)) {
       if (node instanceof Parameter) {
-        let grad = this._gradVisitor.graph.getGradient(node);
-        let step = new GradientDescentStep(node, grad, {learnRate: this.learnRate});
-        assignList.push(step);
+        paramNodes.push(node);
       }
     }
 
-    return new Group(assignList);
+    // If the loss function already has gradients, no need to rebuild it.
+    if (!loss.gradientMap) {
+      let gradVisitor = new ReverseGradientVisitor(this.graph, loss);
+      loss.accept(gradVisitor);
+    }
+
+    let assignList = [];
+    for (let node of paramNodes) {
+      let grads = loss.getGradients(node); // Grad is a list of gradient nodes.
+      let step = this.graph.add(new GradientDescentStep(node, grads, {learnRate: this.learnRate}));
+      assignList.push(step);
+    }
+
+    return this.graph.add(new Group(assignList));
   }
 }
