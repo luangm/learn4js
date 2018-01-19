@@ -12,6 +12,9 @@ import Softmax from "../structure/node/Softmax";
 import Subtract from "../structure/node/Subtract";
 import Step from "../structure/node/Step";
 import AddN from "../structure/node/AddN";
+import Logger from "../util/Logger";
+
+let logger = new Logger("ReverseGradientVisitor");
 
 /**
  * The Reverse Gradient Visitor visit a ComputeGraph from a single node (Source),
@@ -92,7 +95,8 @@ export default class ReverseGradientVisitor extends Visitor {
   }
 
   visitAbsolute(node, params) {
-    let grad = this.getGradient(node, params);
+    logger.info("visitAbsolute", node.id);
+    let grad = this.preVisit(node, params);
 
     let gradName = node.name + "/grad_" + node.base.name;
     let signName = gradName + '/sign';
@@ -103,6 +107,7 @@ export default class ReverseGradientVisitor extends Visitor {
   }
 
   visitAdd(node, params) {
+    logger.info("visitAdd", node.id);
     let grad = this.preVisit(node, params);
 
     let pair = TensorUtils.getReductionIndices(node.left.shape, node.right.shape);
@@ -115,10 +120,12 @@ export default class ReverseGradientVisitor extends Visitor {
   }
 
   visitConstant(node, params) {
+    logger.info("visitConstant", node.id);
     this.preVisit(node, params);
   }
 
   visitConv2d(node, params) {
+    logger.info("visitConv2d", node.id);
     let grad = this.preVisit(node, params);
 
     let imageGradName = node.name + "/grad_" + node.image.name;
@@ -143,6 +150,7 @@ export default class ReverseGradientVisitor extends Visitor {
   }
 
   visitCosine(node, params) {
+    logger.info("visitCosine", node.id);
     let grad = this.preVisit(node, params);
 
     let gradName = node.name + "/grad_" + node.base.name;
@@ -156,6 +164,7 @@ export default class ReverseGradientVisitor extends Visitor {
   }
 
   visitExp(node, params) {
+    logger.info("visitExp", node.id);
     let grad = this.preVisit(node, params);
 
     let gradName = node.name + "/grad_" + node.base.name;
@@ -164,6 +173,7 @@ export default class ReverseGradientVisitor extends Visitor {
   }
 
   visitLog(node, params) {
+    logger.info("visitLog", node.id);
     let grad = this.preVisit(node, params);
 
     let gradName = node.name + "/grad_" + node.base.name;
@@ -176,6 +186,7 @@ export default class ReverseGradientVisitor extends Visitor {
   }
 
   visitMatMul(node, params) {
+    logger.info("visitMatMul", node.id);
     let grad = this.preVisit(node, params);
 
     let leftGrad = this.addNode(new MatMul(grad, node.right, {transposeRight: true}));
@@ -186,10 +197,11 @@ export default class ReverseGradientVisitor extends Visitor {
   }
 
   visitMaxPool(node, params) {
+    logger.info("visitMaxPool", node.id);
     let grad = this.preVisit(node, params);
 
     let gradName = node.name + "/grad_" + node.image.name;
-    console.log(gradName);
+    logger.info(gradName);
 
     let imageGrad = ExpressionFactory.createMaxPoolGrad({
       name: gradName,
@@ -204,6 +216,7 @@ export default class ReverseGradientVisitor extends Visitor {
   }
 
   visitMultiply(node, params) {
+    logger.info("visitMultiply", node.id);
     let grad = this.preVisit(node, params);
 
     let pair = TensorUtils.getReductionIndices(node.left.shape, node.right.shape);
@@ -219,6 +232,7 @@ export default class ReverseGradientVisitor extends Visitor {
   }
 
   visitNegate(node, params) {
+    logger.info("visitNegate", node.id);
     let grad = this.preVisit(node, params);
 
     let result = this.addNode(new Negate(grad));
@@ -227,16 +241,19 @@ export default class ReverseGradientVisitor extends Visitor {
   }
 
   visitParameter(node, params) {
+    logger.info("visitParameter", node.id);
     this.preVisit(node, params);
   }
 
   visitReduceSum(node, params) {
+    logger.info("visitReduceSum", node.id);
     let grad = this.preVisit(node, params);
 
     node.base.accept(this, grad);
   }
 
   visitRelu(node, params) {
+    logger.info("visitRelu", node.id);
     let grad = this.preVisit(node, params);
 
     let step = this.addNode(new Step(node.base));
@@ -246,6 +263,7 @@ export default class ReverseGradientVisitor extends Visitor {
   }
 
   visitSigmoid(node, params) {
+    logger.info("visitSigmoid", node.id);
     let grad = this.preVisit(node, params);
 
     let sigGrad = this.addNode(new SigmoidGrad(grad));
@@ -255,6 +273,7 @@ export default class ReverseGradientVisitor extends Visitor {
   }
 
   visitSine(node, params) {
+    logger.info("visitSine", node.id);
     let grad = this.preVisit(node, params);
 
     let gradName = node.name + "/grad_" + node.base.name;
@@ -266,6 +285,7 @@ export default class ReverseGradientVisitor extends Visitor {
   }
 
   visitSoftmax(node, params) {
+    logger.info("visitSoftmax", node.id);
     let grad = this.preVisit(node, params);
 
     let gradName = node.name + "/grad_" + node.base.name;
@@ -275,6 +295,7 @@ export default class ReverseGradientVisitor extends Visitor {
   }
 
   visitSoftmaxCrossEntropy(node, params) {
+    logger.info("visitSoftmaxCrossEntropy", node.id);
     let grad = this.preVisit(node, params);
 
     let softmax = this.addNode(new Softmax(node.logits));
@@ -285,6 +306,7 @@ export default class ReverseGradientVisitor extends Visitor {
   }
 
   visitSqrt(node, params) {
+    logger.info("visitSqrt", node.id);
     let grad = this.preVisit(node, params);
 
     let gradName = node.name + "/grad_" + node.base.name;
@@ -296,6 +318,7 @@ export default class ReverseGradientVisitor extends Visitor {
   }
 
   visitSquare(node, params) {
+    logger.info("visitSquare", node.id);
     let grad = this.preVisit(node, params);
 
     let two = this.addNode(Constant.TWO);
@@ -306,6 +329,7 @@ export default class ReverseGradientVisitor extends Visitor {
   }
 
   visitSubtract(node, params) {
+    logger.info("visitSubtract", node.id);
     let grad = this.preVisit(node, params);
 
     let rightGrad = this.addNode(new Negate(grad));
@@ -315,6 +339,7 @@ export default class ReverseGradientVisitor extends Visitor {
   }
 
   visitTangent(node, params) {
+    logger.info("visitTangent", node.id);
     let grad = this.preVisit(node, params);
 
     let gradName = node.name + "/grad_" + node.base.name;
@@ -327,6 +352,7 @@ export default class ReverseGradientVisitor extends Visitor {
   }
 
   visitVariable(node, params) {
+    logger.info("visitVariable", node.id);
     this.preVisit(node, params);
   }
 }

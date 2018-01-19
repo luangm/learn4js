@@ -13,7 +13,7 @@ test('Neural Net', function() {
 
   let optimizer = Learn4js.optimizer.gradientDescent({learnRate: 0.001});
 
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < 1; i++) {
     x.value = xData;
     y.value = yData;
     let mm = Learn4js.matmul(x, W);

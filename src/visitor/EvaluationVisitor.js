@@ -2,12 +2,20 @@ import Visitor from "./Visitor";
 import TensorMath from "../core/util/TensorMath";
 import Tensor from "../core/Tensor";
 import TensorUtils from "../core/util/TensorUtils";
+import Logger from "../util/Logger";
 
 export default class EvaluationVisitor extends Visitor {
 
   constructor() {
     super();
     this.valueMap = {};
+  }
+
+  get logger() {
+    if (!this._logger) {
+      this._logger = new Logger('EvaluationVisitor');
+    }
+    return this._logger;
   }
 
   getValue(node) {
@@ -50,6 +58,7 @@ export default class EvaluationVisitor extends Visitor {
   }
 
   visitConstant(node, params) {
+    super.visitConstant(node, params);
     this.valueMap[node.id] = node.value;
   }
 
@@ -165,6 +174,7 @@ export default class EvaluationVisitor extends Visitor {
   }
 
   visitParameter(node, params) {
+    super.visitParameter(node, params);
     this.valueMap[node.id] = node.value;
   }
 
@@ -280,6 +290,6 @@ export default class EvaluationVisitor extends Visitor {
   }
 
   visitVariable(node, params) {
-    //this.valueMap[node.id] = node.value;
+    super.visitVariable(node, params);
   }
 }

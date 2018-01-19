@@ -1,16 +1,17 @@
 import Learn4js, {println} from '../../src/index';
 import ReverseGradientVisitor from "../../src/visitor/ReverseGradientVisitor";
 import Tensor from "../../src/core/Tensor";
+import Logger from "../../src/util/Logger";
 
 test('add', function() {
-  Learn4js.interactive = true;
+  // Learn4js.interactive = true;
 
   let node = Learn4js.parameter([[1, 2, 3, 4]]);
-  println(node);
+  // println(node);
   let other = Learn4js.parameter([[5, 6, 7, 8]]);
-  println(other);
+  // println(other);
   let result = Learn4js.add(node, other);
-  println(result);
+  // println(result);
 
   let grads = Learn4js.gradients(result, [node, other]);
 
@@ -18,7 +19,7 @@ test('add', function() {
   let otherGrad = grads[1];
 
   println(nodeGrad);
-  println(otherGrad);
+  // println(otherGrad);
 
 });
 
