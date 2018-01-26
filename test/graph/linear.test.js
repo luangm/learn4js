@@ -23,7 +23,7 @@ test('Linear Regression', function() {
 
   let sess = Learn4js.session();
 
-  for (let i = 0; i < 1000; i++) {
+  for (let i = 0; i < 10000; i++) {
     sess.run(trainStep);
   }
 

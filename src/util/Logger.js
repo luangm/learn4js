@@ -29,7 +29,7 @@ export default class Logger {
   }
 
   info(...message) {
-    if (this.level === Logger.Level.INFO) {
+    if (this.level === Logger.Level.INFO && Logger.LogLevel === Logger.Level.INFO) {
       console.log('[ INFO] ' + this.category + ' - ' + message);
     }
   }
@@ -56,10 +56,5 @@ Logger.Level.DEBUG = new Logger.Level(200, 'DEBUG');
 Logger.Level.TRACE = new Logger.Level(50, 'TRACE');
 Logger.Level.WARN = new Logger.Level(300, 'WARN');
 Logger.Level.ERROR = new Logger.Level(400, 'ERROR');
-// Logger.Level = Object.freeze({
-//   TRACE: Symbol('TRACE'),
-//   INFO: Symbol('INFO'),
-//   DEBUG: Symbol('DEBUG'),
-//   WARN: Symbol('WARN'),
-//   ERROR: Symbol('ERROR')
-// });
+
+Logger.LogLevel = Logger.Level.INFO;

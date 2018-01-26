@@ -39,7 +39,9 @@ export default class Mnist {
 
   async init() {
     let self = this;
+    console.log("init");
     let response = await fetch(this.options.testImageUrl);
+    console.log(response);
     let buffer = await response.arrayBuffer();
     self._processImages(buffer);
   }
@@ -49,6 +51,11 @@ export default class Mnist {
     let out = pako.inflate(array);
     // let view = new DataView(out.buffer);
     this._testImageData = new Uint8Array(out.buffer, 16);
+    for (let i = 0; i < this._testImageData.length; i++) {
+      if (this._testImageData[i] > 0) {
+        this._testImageData[i] = 1;
+      }
+    }
     this._testArray = ArrayUtils.range(10000);
     this.testOffset = 0;
   }
