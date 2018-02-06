@@ -55,7 +55,7 @@ test('Neural Net', function() {
     trainStep.eval();
   }
 
-  // println("W", W);
+  println("W", W);
   println("b", b);
   // println(W);
   // println(b);

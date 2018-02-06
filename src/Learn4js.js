@@ -27,6 +27,7 @@ import Softmax from "./structure/node/Softmax";
 import LossFactory from "./LossFactory";
 import OptimizerFactory from "./OptimizerFactory";
 import Sign from "./structure/node/Sign";
+import Divide from "./structure/node/Divide";
 
 /**
  * This is main Utility class for this library.
@@ -85,19 +86,24 @@ class Learn4js {
   }
 
   abs(base, {name} = {}) {
-    return this._addNode(new Absolute(base, {name}));
+    return this._addToGraph(new Absolute(base, {name}));
   }
 
   add(left, right, {name} = {}) {
-    return this._addNode(new Add(left, right, {name}));
+    return this._addToGraph(new Add(left, right, {name}));
   }
 
+  divide(left, right, {name} = {}) {
+    return this._addToGraph(new Divide(left, right, {name}));
+  }
+
+
   assign(target, assignment, {name} = {}) {
-    return this._addNode(new Assign(target, assignment, {name}));
+    return this._addToGraph(new Assign(target, assignment, {name}));
   }
 
   constant(value, {name} = {}) {
-    return this._addNode(new Constant(value, {name}));
+    return this._addToGraph(new Constant(value, {name}));
   }
 
   conv2d({name, image, kernel}) {
@@ -107,15 +113,15 @@ class Learn4js {
   }
 
   cos(base, {name} = {}) {
-    return this._addNode(new Cosine(base, {name}));
+    return this._addToGraph(new Cosine(base, {name}));
   }
 
   exp(base, {name} = {}) {
-    return this._addNode(new Exponential(base, {name}));
+    return this._addToGraph(new Exponential(base, {name}));
   }
 
   fill(scalar, shape, {name} = {}) {
-    return this._addNode(new Fill(scalar, shape, {name}));
+    return this._addToGraph(new Fill(scalar, shape, {name}));
   }
 
   getNode(id) {
@@ -148,11 +154,11 @@ class Learn4js {
   }
 
   log(base, {name} = {}) {
-    return this._addNode(new Logarithm(base, {name}));
+    return this._addToGraph(new Logarithm(base, {name}));
   }
 
   matmul(left, right, {name} = {}) {
-    return this._addNode(new MatMul(left, right, {name}));
+    return this._addToGraph(new MatMul(left, right, {name}));
   }
 
   maxPool({name, image, kernelShape, strideWidth, strideHeight}) {
@@ -162,19 +168,19 @@ class Learn4js {
   }
 
   multiply(left, right, {name} = {}) {
-    return this._addNode(new Multiply(left, right, {name}));
+    return this._addToGraph(new Multiply(left, right, {name}));
   }
 
   negate(base, {name} = {}) {
-    return this._addNode(new Negate(base, {name}));
+    return this._addToGraph(new Negate(base, {name}));
   }
 
   parameter(value, {name} = {}) {
-    return this._addNode(new Parameter(value, {name}));
+    return this._addToGraph(new Parameter(value, {name}));
   }
 
   reduceSum(base, reduceDim = -1, {name} = {}) {
-    return this._addNode(new ReduceSum(base, {name, reduceDim}));
+    return this._addToGraph(new ReduceSum(base, reduceDim, {name}));
   }
 
   session(graph) {
@@ -183,42 +189,42 @@ class Learn4js {
   }
 
   sigmoid(base, {name} = {}) {
-    return this._addNode(new Sigmoid(base, {name}));
+    return this._addToGraph(new Sigmoid(base, {name}));
   }
 
   sign(base, {name} = {}) {
-    return this._addNode(new Sign(base, {name}));
+    return this._addToGraph(new Sign(base, {name}));
   }
 
   sin(base, {name} = {}) {
-    return this._addNode(new Sine(base, {name}));
+    return this._addToGraph(new Sine(base, {name}));
   }
 
   softmax(base, {name} = {}) {
-    return this._addNode(new Softmax(base, {name}));
+    return this._addToGraph(new Softmax(base, {name}));
   }
 
   sqrt(base, {name} = {}) {
-    return this._addNode(new SquareRoot(base, {name}));
+    return this._addToGraph(new SquareRoot(base, {name}));
   }
 
   square(base, {name} = {}) {
-    return this._addNode(new Square(base, {name}));
+    return this._addToGraph(new Square(base, {name}));
   }
 
   subtract(left, right, {name} = {}) {
-    return this._addNode(new Subtract(left, right, {name}));
+    return this._addToGraph(new Subtract(left, right, {name}));
   }
 
   tan(base, {name} = {}) {
-    return this._addNode(new Tangent(base, {name}));
+    return this._addToGraph(new Tangent(base, {name}));
   }
 
   variable(shape, {name} = {}) {
-    return this._addNode(new Variable(shape, {name}));
+    return this._addToGraph(new Variable(shape, {name}));
   }
 
-  _addNode(node) {
+  _addToGraph(node) {
     node = this.activeGraph.add(node);
     if (this.interactive) {
       node.eval();

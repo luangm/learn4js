@@ -48,4 +48,14 @@ export default class ShapeUtils {
     }
     return 'c';
   }
+
+  static reduce(shape, dimension) {
+    let result = shape.slice();
+    for (let i = 0; i < shape.length; i++) {
+      if (i === dimension || dimension === -1) {
+        result[i] = 1;
+      }
+    }
+    return result;
+  }
 }

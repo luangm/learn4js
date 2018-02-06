@@ -13,6 +13,8 @@ import Subtract from "../structure/node/Subtract";
 import Step from "../structure/node/Step";
 import AddN from "../structure/node/AddN";
 import Logger from "../util/Logger";
+import Divide from "../structure/node/Divide";
+import SoftmaxGrad from "../structure/node/SoftmaxGrad";
 
 let logger = new Logger("ReverseGradientVisitor");
 
@@ -119,6 +121,14 @@ export default class ReverseGradientVisitor extends Visitor {
     node.right.accept(this, rightGrad);
   }
 
+  visitAddN(node, params) {
+    logger.info("visitAddN", node.id);
+    let grad = this.preVisit(node, params);
+    for (let item of node.list) {
+      item.accept(this, grad);
+    }
+  }
+
   visitConstant(node, params) {
     logger.info("visitConstant", node.id);
     this.preVisit(node, params);
@@ -163,25 +173,25 @@ export default class ReverseGradientVisitor extends Visitor {
     node.base.accept(this, result);
   }
 
+  visitDivide(node, params) {
+    logger.info("visitDivide", node.id);
+    let grad = this.preVisit(node, params);
+    node.base.accept(this, grad);
+
+
+  }
+
   visitExp(node, params) {
     logger.info("visitExp", node.id);
     let grad = this.preVisit(node, params);
-
-    let gradName = node.name + "/grad_" + node.base.name;
-    let result = ExpressionFactory.createMultiply({name: gradName, left: grad, right: node});
+    let result = this.addNode(new Multiply(grad, node));
     node.base.accept(this, result);
   }
 
   visitLog(node, params) {
     logger.info("visitLog", node.id);
     let grad = this.preVisit(node, params);
-
-    let gradName = node.name + "/grad_" + node.base.name;
-    let recName = gradName + "/reciprocal";
-
-    let reciprocal = ExpressionFactory.createReciprocal({name: recName, base: node.base});
-    let result = ExpressionFactory.createMultiply({name: gradName, left: grad, right: reciprocal});
-
+    let result = this.addNode(new Divide(grad, node.base));
     node.base.accept(this, result);
   }
 
@@ -248,7 +258,6 @@ export default class ReverseGradientVisitor extends Visitor {
   visitReduceSum(node, params) {
     logger.info("visitReduceSum", node.id);
     let grad = this.preVisit(node, params);
-
     node.base.accept(this, grad);
   }
 
@@ -287,10 +296,7 @@ export default class ReverseGradientVisitor extends Visitor {
   visitSoftmax(node, params) {
     logger.info("visitSoftmax", node.id);
     let grad = this.preVisit(node, params);
-
-    let gradName = node.name + "/grad_" + node.base.name;
-    let softmaxGrad = ExpressionFactory.createSoftmaxGrad({name: gradName, base: node.base, grad});
-
+    let softmaxGrad = this.addNode(new SoftmaxGrad(node.base, grad));
     node.base.accept(this, softmaxGrad);
   }
 

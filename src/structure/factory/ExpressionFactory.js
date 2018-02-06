@@ -21,6 +21,14 @@ import SoftmaxGrad from "../node/SoftmaxGrad";
 
 export default class ExpressionFactory {
 
+  constructor(graph) {
+    this._graph = graph;
+  }
+
+  get graph() {
+    return this._graph;
+  }
+
   static createAssign({name, target, value}) {
     return new Assign({name, target, value});
   }

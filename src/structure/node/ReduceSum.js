@@ -1,10 +1,11 @@
 import ReductionExpression from "./ReductionExpression";
+import ShapeUtils from "../../core/util/ShapeUtils";
 
 export default class ReduceSum extends ReductionExpression {
 
-  constructor(base, {name, scope, reduceDim = -1} = {}) {
-    super(base, {name, scope, reduceDim});
-    this._shape = [1, 1];
+  constructor(base, reduceDim = -1, {name, scope} = {}) {
+    super(base, reduceDim, {name, scope});
+    this._shape = ShapeUtils.reduce(base.shape, reduceDim);
   }
 
   get shape() {

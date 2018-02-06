@@ -6,7 +6,7 @@ import Expression from "../Expression";
  */
 export default class ReductionExpression extends Expression {
 
-  constructor(base, {name, scope, reduceDim = -1} = {}) {
+  constructor(base, reduceDim = -1, {name, scope} = {}) {
     super({name, scope});
     this._base = base;
     this._reduceDim = reduceDim;

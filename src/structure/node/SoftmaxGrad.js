@@ -2,8 +2,8 @@ import UnaryExpression from "./UnaryExpression";
 
 export default class SoftmaxGrad extends UnaryExpression {
 
-  constructor({name, base, grad}) {
-    super({name, base});
+  constructor(base, grad, {name} = {}) {
+    super(base, {name});
     this._grad = grad;
   }
 
@@ -13,6 +13,10 @@ export default class SoftmaxGrad extends UnaryExpression {
 
   get shape() {
     return this.base.shape;
+  }
+
+  get type() {
+    return 'SoftmaxGrad';
   }
 
   accept(visitor, params) {

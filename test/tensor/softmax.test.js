@@ -6,7 +6,7 @@ test('softmax', function() {
   let logits = Tensor.create([[1, 2, 3, 4], [5, 6, 7, 8]]);
   let yTrue = Tensor.create([[0, 0, 0, 1], [1, 0, 0, 0]]);
 
-  let result = TensorMath.softmaxCrossEntropyWithLogits(logits, yTrue);
+  let result = TensorMath.softmaxCrossEntropyWithLogits(yTrue, logits);
   println(result);
   console.log(result);
 
@@ -14,4 +14,11 @@ test('softmax', function() {
   let sum = TensorMath.reduceSum(num, 1);
   println(num);
   println(sum);
+});
+
+
+test('softmax2', function() {
+  let logits = Tensor.create([[1, 2, 3], [4, 5, 6]]);
+  let result = TensorMath.softmax(logits);
+  println(result);
 });

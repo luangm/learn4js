@@ -29,6 +29,7 @@ import SqrtOp from "../op/transform/SqrtOp";
 import ReciprocalOp from "../op/transform/ReciprocalOp";
 import MaxIndexOp from "../op/index/MaxIndexOp";
 import IndexSetOp from "../op/transform/IndexSetOp";
+import {println} from "../../index";
 
 export default class TensorMath {
 
@@ -83,6 +84,7 @@ export default class TensorMath {
   static conv2d(image, kernel) {
 
     let xCol = TensorUtils.im2col(image, kernel.shape);
+    println(xCol);
 
     let numImages = image.shape[0];
     let channels = image.shape[1];
