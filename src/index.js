@@ -1,4 +1,4 @@
-import ComputeGraph from "./structure/ComputeGraph";
+import ComputeGraph from "./structure/Graph";
 import Tensor from "./core/Tensor";
 import Session from "./session/Session";
 import Logger from "./util/Logger";

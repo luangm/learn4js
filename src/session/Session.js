@@ -1,5 +1,4 @@
 import EvaluationVisitor from "../visitor/EvaluationVisitor";
-import ComputeGraph from '../structure/ComputeGraph';
 
 /**
  * A session object is one that keeps all the tensor values of each Expression node.
@@ -9,25 +8,28 @@ export default class Session {
 
   constructor(graph) {
     this._graph = graph;
-    this._visitor = new EvaluationVisitor();
+    this._valueMap = {}; // key = node.id
   }
 
   get graph() {
     return this._graph;
   }
 
+  eval(node) {
+    return eval(node, {});
+  }
+
+  eval(node, feed) {
+    let visitor = new EvaluationVisitor(this);
+    node.accept(visitor);
+    return this.getValue(node);
+  }
+
   getValue(node) {
-    return this._visitor.getValue(node);
+    return this._valueMap[node.id];
   }
 
   setValue(node, value) {
-    this._visitor.setValue(node, value);
-  }
-
-  run(node) {
-    node.accept(this._visitor);
-    return this._visitor.getValue(node);
+    this._valueMap[node.id] = value;
   }
 }
-
-Session.active = new Session(ComputeGraph.active);

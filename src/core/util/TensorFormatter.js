@@ -1,6 +1,6 @@
 export default class TensorFormatter {
 
-  constructor({separator = ', ', padding = 0, decimalFormat, precision = 3} = {}) {
+  constructor({separator = ', ', padding = 0, decimalFormat, precision = 4} = {}) {
     this._separator = separator;
     this._padding = padding;
     this._decimalFormat = decimalFormat;

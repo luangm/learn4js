@@ -1,33 +1,10 @@
-import ComputeGraph from "./structure/ComputeGraph";
-import Constant from "./structure/node/Constant";
-import Add from "./structure/node/Add";
-import MatMul from "./structure/node/MatMul";
-import Sigmoid from "./structure/node/Sigmoid";
-import Subtract from "./structure/node/Subtract";
-import Square from "./structure/node/Square";
-import ReduceSum from "./structure/node/ReduceSum";
-import ReverseGradientVisitor from "./visitor/ReverseGradientVisitor";
-import Fill from "./structure/node/Fill";
-import Negate from "./structure/node/Negate";
-import Multiply from "./structure/node/Multiply";
-import Assign from "./structure/node/Assign";
-import Parameter from "./structure/node/Parameter";
-import Variable from "./structure/node/Variable";
-import Session from "./session/Session";
-import Sine from "./structure/node/Sine";
-import Cosine from "./structure/node/Cosine";
-import Tangent from "./structure/node/Tangent";
-import Exponential from "./structure/node/Exponential";
-import SquareRoot from "./structure/node/SquareRoot";
-import Absolute from "./structure/node/Absolute";
-import Logarithm from "./structure/node/Logarithm";
-import Conv2d from "./structure/node/Conv2d";
-import MaxPool from "./structure/node/MaxPool";
-import Softmax from "./structure/node/Softmax";
 import LossFactory from "./LossFactory";
 import OptimizerFactory from "./OptimizerFactory";
-import Sign from "./structure/node/Sign";
-import Divide from "./structure/node/Divide";
+import Session from "./session/Session";
+import ExpressionFactory from "./structure/factory/ExpressionFactory";
+import Graph from "./structure/Graph";
+import MaxPool from "./structure/node/cnn/MaxPool";
+import ReverseGradientVisitor from "./visitor/ReverseGradientVisitor";
 
 /**
  * This is main Utility class for this library.
@@ -49,14 +26,15 @@ class Learn4js {
     this._interactive = false;
     this._loss = LossFactory;
     this._optimizer = OptimizerFactory;
+    this._factory = new ExpressionFactory(this.activeGraph);
   }
 
   get activeGraph() {
-    return ComputeGraph.active;
+    return Graph.active;
   }
 
   set activeGraph(value) {
-    ComputeGraph.active = value;
+    Graph.active = value;
   }
 
   get activeSession() {
@@ -65,6 +43,10 @@ class Learn4js {
 
   set activeSession(value) {
     Session.active = value;
+  }
+
+  get factory() {
+    return this._factory;
   }
 
   get interactive() {
@@ -86,42 +68,39 @@ class Learn4js {
   }
 
   abs(base, {name} = {}) {
-    return this._addToGraph(new Absolute(base, {name}));
+    return this.factory.abs(base, {name});
   }
 
   add(left, right, {name} = {}) {
-    return this._addToGraph(new Add(left, right, {name}));
+    return this.factory.add(left, right, {name});
   }
 
-  divide(left, right, {name} = {}) {
-    return this._addToGraph(new Divide(left, right, {name}));
-  }
-
-
-  assign(target, assignment, {name} = {}) {
-    return this._addToGraph(new Assign(target, assignment, {name}));
+  assign(target, value, {name} = {}) {
+    return this.factory.assign(target, value, {name});
   }
 
   constant(value, {name} = {}) {
-    return this._addToGraph(new Constant(value, {name}));
+    return this.factory.constant(value, {name});
   }
 
-  conv2d({name, image, kernel}) {
-    let node = new Conv2d({name, image, kernel});
-    this.activeGraph.add(node);
-    return node;
+  conv2d(image, kernel, {name} = {}) {
+    return this.factory.conv2d(image, kernel, {name});
   }
 
   cos(base, {name} = {}) {
-    return this._addToGraph(new Cosine(base, {name}));
+    return this.factory.cos(base, {name});
+  }
+
+  divide(left, right, {name} = {}) {
+    return this.factory.divide(left, right, {name});
   }
 
   exp(base, {name} = {}) {
-    return this._addToGraph(new Exponential(base, {name}));
+    return this.factory.exp(base, {name});
   }
 
   fill(scalar, shape, {name} = {}) {
-    return this._addToGraph(new Fill(scalar, shape, {name}));
+    return this.factory.fill(scalar, shape, {name});
   }
 
   getNode(id) {
@@ -154,11 +133,11 @@ class Learn4js {
   }
 
   log(base, {name} = {}) {
-    return this._addToGraph(new Logarithm(base, {name}));
+    return this.factory.log(base, {name});
   }
 
-  matmul(left, right, {name} = {}) {
-    return this._addToGraph(new MatMul(left, right, {name}));
+  matmul(left, right, transposeLeft, transposeRight, {name} = {}) {
+    return this.factory.matmul(left, right, transposeLeft, transposeRight, {name});
   }
 
   maxPool({name, image, kernelShape, strideWidth, strideHeight}) {
@@ -168,19 +147,23 @@ class Learn4js {
   }
 
   multiply(left, right, {name} = {}) {
-    return this._addToGraph(new Multiply(left, right, {name}));
+    return this.factory.multiply(left, right, {name});
   }
 
   negate(base, {name} = {}) {
-    return this._addToGraph(new Negate(base, {name}));
+    return this.factory.negate(base, {name});
   }
 
   parameter(value, {name} = {}) {
-    return this._addToGraph(new Parameter(value, {name}));
+    return this.factory.parameter(value, {name});
   }
 
-  reduceSum(base, reduceDim = -1, {name} = {}) {
-    return this._addToGraph(new ReduceSum(base, reduceDim, {name}));
+  reciprocal(base, {name} = {}) {
+    return this.factory.reciprocal(base, {name});
+  }
+
+  reduceSum(base, dimension = -1, {name} = {}) {
+    return this.factory.reduceSum(base, dimension, {name});
   }
 
   session(graph) {
@@ -189,48 +172,41 @@ class Learn4js {
   }
 
   sigmoid(base, {name} = {}) {
-    return this._addToGraph(new Sigmoid(base, {name}));
+    return this.factory.sigmoid(base, {name});
   }
 
   sign(base, {name} = {}) {
-    return this._addToGraph(new Sign(base, {name}));
+    return this.factory.sign(base, {name});
   }
 
   sin(base, {name} = {}) {
-    return this._addToGraph(new Sine(base, {name}));
+    return this.factory.sin(base, {name});
   }
 
   softmax(base, {name} = {}) {
-    return this._addToGraph(new Softmax(base, {name}));
+    return this.factory.softmax(base, {name});
   }
 
   sqrt(base, {name} = {}) {
-    return this._addToGraph(new SquareRoot(base, {name}));
+    return this.factory.sqrt(base, {name});
   }
 
   square(base, {name} = {}) {
-    return this._addToGraph(new Square(base, {name}));
+    return this.factory.square(base, {name});
   }
 
   subtract(left, right, {name} = {}) {
-    return this._addToGraph(new Subtract(left, right, {name}));
+    return this.factory.subtract(left, right, {name});
   }
 
   tan(base, {name} = {}) {
-    return this._addToGraph(new Tangent(base, {name}));
+    return this.factory.tan(base, {name});
   }
 
   variable(shape, {name} = {}) {
-    return this._addToGraph(new Variable(shape, {name}));
+    return this.factory.variable(shape, {name});
   }
 
-  _addToGraph(node) {
-    node = this.activeGraph.add(node);
-    if (this.interactive) {
-      node.eval();
-    }
-    return node;
-  }
 }
 
 

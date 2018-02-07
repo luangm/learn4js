@@ -1,9 +1,9 @@
-import ComputeGraph from "./structure/ComputeGraph";
 import Session from "./session/Session";
-import Subtract from "./structure/node/Subtract";
-import Square from "./structure/node/Square";
-import ReduceSum from "./structure/node/ReduceSum";
+import Graph from "./structure/Graph";
+import Subtract from "./structure/node/binary/Subtract";
+import ReduceSum from "./structure/node/reduction/ReduceSum";
 import SoftmaxCrossEntropy from "./structure/node/SoftmaxCrossEntropy";
+import Square from "./structure/node/transform/Square";
 
 /**
  * This is a convenience for Loss functions
@@ -16,11 +16,11 @@ class LossFactory {
   }
 
   get activeGraph() {
-    return ComputeGraph.active;
+    return Graph.active;
   }
 
   set activeGraph(value) {
-    ComputeGraph.active = value;
+    Graph.active = value;
   }
 
   get activeSession() {

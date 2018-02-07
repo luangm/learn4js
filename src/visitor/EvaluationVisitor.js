@@ -1,21 +1,21 @@
-import Visitor from "./Visitor";
-import TensorMath from "../core/util/TensorMath";
 import Tensor from "../core/Tensor";
+import TensorMath from "../core/util/TensorMath";
 import TensorUtils from "../core/util/TensorUtils";
+import ExpressionState from "../structure/constant/ExpressionState";
 import Logger from "../util/Logger";
+import Visitor from "./Visitor";
+
+let logger = new Logger("EvaluationVisitor");
 
 export default class EvaluationVisitor extends Visitor {
 
-  constructor() {
+  constructor(session) {
     super();
-    this.valueMap = {};
+    this._session = session;
   }
 
-  get logger() {
-    if (!this._logger) {
-      this._logger = new Logger('EvaluationVisitor');
-    }
-    return this._logger;
+  get session() {
+    return this._session;
   }
 
   getValue(node) {
@@ -26,40 +26,69 @@ export default class EvaluationVisitor extends Visitor {
     this.valueMap[node.id] = value;
   }
 
+  // DONE
   visitAbsolute(node, params) {
-    super.visitAbsolute(node, params);
-    let base = this.valueMap[node.base.id];
-    this.valueMap[node.id] = TensorMath.abs(base);
-  }
+    logger.info("visitAbsolute", node.id);
 
-  visitAdd(node, params) {
-    super.visitAdd(node, params);
-    let left = this.valueMap[node.left.id];
-    let right = this.valueMap[node.right.id];
-    this.valueMap[node.id] = TensorMath.add(left, right);
-  }
-
-  visitAddN(node, params) {
-    super.visitAddN(node, params);
-    let items = node.list.map(x => this.valueMap[x.id]);
-    let result = items[0];
-    for (let i = 1; i < items.length; i++) {
-      result = TensorMath.addi(result, items[i]);
+    if (node.base.isInvalid) {
+      node.base.accept(this, params);
     }
-    this.valueMap[node.id] = result;
+
+    let base = node.base.value;
+    node.value = TensorMath.abs(base);
+    node.state = ExpressionState.EVALUATED;
   }
 
+  // DONE
+  visitAdd(node, params) {
+    logger.info("visitAdd", node.id);
+
+    if (node.left.isInvalid) {
+      node.left.accept(this, params);
+    }
+
+    if (node.right.isInvalid) {
+      node.right.accept(this, params);
+    }
+
+    let left = node.left.value;
+    let right = node.right.value;
+    node.value = TensorMath.add(left, right);
+    node.state = ExpressionState.EVALUATED;
+  }
+
+  // DONE
+  visitAddN(node, params) {
+    logger.info("visitAddN", node.id);
+
+    for (let item of node.list) {
+      if (item.isInvalid) {
+        item.accept(this, params);
+      }
+    }
+
+    let items = node.list.map(x => x.value);
+    node.value = TensorMath.addN(items);
+    node.state = ExpressionState.EVALUATED;
+  }
+
+  // DONE
   visitAssign(node, params) {
-    super.visitAssign(node, params);
-    let value = this.valueMap[node.value.id];
-    node.target.value = value;
-    this.valueMap[node.id] = value;
-    this.valueMap[node.target.id] = value;
+    logger.info("visitAssign", node.id);
+
+    if (node.newValue.isInvalid) {
+      node.newValue.accept(this, params);
+    }
+
+    node.target.value = node.newValue.value;
+    node.state = ExpressionState.EVALUATED;
   }
 
+  // DONE
   visitConstant(node, params) {
-    super.visitConstant(node, params);
-    this.valueMap[node.id] = node.value;
+    logger.info("visitConstant", node.id);
+    this.session.setValue(node, node.value);
+    node.state = ExpressionState.EVALUATED;
   }
 
   visitConv2d(node, params) {
@@ -85,23 +114,48 @@ export default class EvaluationVisitor extends Visitor {
     this.valueMap[node.id] = TensorMath.conv2dKernelGrad(image, kernel, grad);
   }
 
+  // DONE
   visitCosine(node, params) {
-    super.visitCosine(node, params);
-    let base = this.valueMap[node.base.id];
-    this.valueMap[node.id] = TensorMath.cos(base);
+    logger.info("visitCosine", node.id);
+
+    if (node.base.isInvalid) {
+      node.base.accept(this, params);
+    }
+
+    let base = node.base.value;
+    node.value = TensorMath.cos(base);
+    node.state = ExpressionState.EVALUATED;
   }
 
+  // DONE
   visitDivide(node, params) {
-    super.visitDivide(node, params);
-    let left = this.valueMap[node.left.id];
-    let right = this.valueMap[node.right.id];
-    this.valueMap[node.id] = TensorMath.divide(left, right);
+    logger.info("visitDivide", node.id);
+
+    if (node.left.isInvalid) {
+      node.left.accept(this, params);
+    }
+
+    if (node.right.isInvalid) {
+      node.right.accept(this, params);
+    }
+
+    let left = node.left.value;
+    let right = node.right.value;
+    node.value = TensorMath.divide(left, right);
+    node.state = ExpressionState.EVALUATED;
   }
 
+  // DONE
   visitExp(node, params) {
-    super.visitExp(node, params);
-    let base = this.valueMap[node.base.id];
-    this.valueMap[node.id] = TensorMath.exp(base);
+    logger.info("visitExp", node.id);
+
+    if (node.base.isInvalid) {
+      node.base.accept(this, params);
+    }
+
+    let base = node.base.value;
+    node.value = TensorMath.exp(base);
+    node.state = ExpressionState.EVALUATED;
   }
 
   visitFill(node, params) {
@@ -132,9 +186,15 @@ export default class EvaluationVisitor extends Visitor {
   }
 
   visitLog(node, params) {
-    super.visitLog(node, params);
-    let base = this.valueMap[node.base.id];
-    this.valueMap[node.id] = TensorMath.log(base);
+    logger.info("visitLog", node.id);
+
+    if (node.base.isInvalid) {
+      node.base.accept(this, params);
+    }
+
+    let base = node.base.value;
+    node.value = TensorMath.log(base);
+    node.state = ExpressionState.EVALUATED;
   }
 
   visitMatMul(node, params) {
@@ -168,9 +228,15 @@ export default class EvaluationVisitor extends Visitor {
   }
 
   visitNegate(node, params) {
-    super.visitNegate(node, params);
-    let base = this.valueMap[node.base.id];
-    this.valueMap[node.id] = TensorMath.negate(base);
+    logger.info("visitNegate", node.id);
+
+    if (node.base.isInvalid) {
+      node.base.accept(this, params);
+    }
+
+    let base = node.base.value;
+    node.value = TensorMath.negate(base);
+    node.state = ExpressionState.EVALUATED;
   }
 
   visitParameter(node, params) {
@@ -179,9 +245,15 @@ export default class EvaluationVisitor extends Visitor {
   }
 
   visitReciprocal(node, params) {
-    super.visitReciprocal(node, params);
-    let base = this.valueMap[node.base.id];
-    this.valueMap[node.id] = TensorMath.reciprocal(base);
+    logger.info("visitReciprocal", node.id);
+
+    if (node.base.isInvalid) {
+      node.base.accept(this, params);
+    }
+
+    let base = node.base.value;
+    node.value = TensorMath.reciprocal(base);
+    node.state = ExpressionState.EVALUATED;
   }
 
   visitReduceSum(node, params) {
@@ -190,40 +262,82 @@ export default class EvaluationVisitor extends Visitor {
     this.valueMap[node.id] = TensorMath.reduceSum(base, node.reduceDim);
   }
 
+  // DONE
   visitRelu(node, params) {
-    super.visitRelu(node, params);
-    let base = this.valueMap[node.base.id];
-    this.valueMap[node.id] = TensorMath.relu(base);
+    logger.info("visitRelu", node.id);
+
+    if (node.base.isInvalid) {
+      node.base.accept(this, params);
+    }
+
+    let base = node.base.value;
+    node.value = TensorMath.relu(base);
+    node.state = ExpressionState.EVALUATED;
   }
 
+  // DONE
   visitSigmoid(node, params) {
-    super.visitSigmoid(node, params);
-    let base = this.valueMap[node.base.id];
-    this.valueMap[node.id] = TensorMath.sigmoid(base);
+    logger.info("visitSigmoid", node.id);
+
+    if (node.base.isInvalid) {
+      node.base.accept(this, params);
+    }
+
+    let base = node.base.value;
+    node.value = TensorMath.sigmoid(base);
+    node.state = ExpressionState.EVALUATED;
   }
 
+  // DONE
   visitSigmoidGrad(node, params) {
-    super.visitSigmoidGrad(node, params);
-    let base = this.valueMap[node.base.id];
-    this.valueMap[node.id] = TensorMath.sigmoidGrad(base);
+    logger.info("visitSigmoidGrad", node.id);
+
+    if (node.base.isInvalid) {
+      node.base.accept(this, params);
+    }
+
+    let base = node.base.value;
+    node.value = TensorMath.sigmoidGrad(base);
+    node.state = ExpressionState.EVALUATED;
   }
 
+  // DONE
   visitSign(node, params) {
-    super.visitSign(node, params);
-    let base = this.valueMap[node.base.id];
-    this.valueMap[node.id] = TensorMath.sign(base);
+    logger.info("visitSign", node.id);
+
+    if (node.base.isInvalid) {
+      node.base.accept(this, params);
+    }
+
+    let base = node.base.value;
+    node.value = TensorMath.sign(base);
+    node.state = ExpressionState.EVALUATED;
   }
 
+  // DONE
   visitSine(node, params) {
-    super.visitSine(node, params);
-    let base = this.valueMap[node.base.id];
-    this.valueMap[node.id] = TensorMath.sin(base);
+    logger.info("visitSine", node.id);
+
+    if (node.base.isInvalid) {
+      node.base.accept(this, params);
+    }
+
+    let base = node.base.value;
+    node.value = TensorMath.sin(base);
+    node.state = ExpressionState.EVALUATED;
   }
 
+  // DONE
   visitSoftmax(node, params) {
-    super.visitSoftmax(node, params);
-    let base = this.valueMap[node.base.id];
-    this.valueMap[node.id] = TensorMath.softmax(base);
+    logger.info("visitSoftmax", node.id);
+
+    if (node.base.isInvalid) {
+      node.base.accept(this, params);
+    }
+
+    let base = node.base.value;
+    node.value = TensorMath.softmax(base);
+    node.state = ExpressionState.EVALUATED;
   }
 
   visitSoftmaxCrossEntropy(node, params) {
@@ -233,60 +347,127 @@ export default class EvaluationVisitor extends Visitor {
     this.valueMap[node.id] = TensorMath.softmaxCrossEntropyWithLogits(labels, logits);
   }
 
+  // DONE
   visitSoftmaxGrad(node, params) {
-    super.visitSoftmaxGrad(node, params);
-    let base = this.valueMap[node.base.id];
-    let grad = this.valueMap[node.grad.id];
-    this.valueMap[node.id] = TensorMath.softmaxGrad(base, grad);
+    logger.info("visitSoftmaxGrad", node.id);
+
+    if (node.base.isInvalid) {
+      node.base.accept(this, params);
+    }
+
+    let base = node.base.value;
+    let grad = node.grad.value;
+    node.value = TensorMath.softmaxGrad(base, grad);
+    node.state = ExpressionState.EVALUATED;
   }
 
+  // DONE
   visitSqrt(node, params) {
-    super.visitSqrt(node, params);
-    let base = this.valueMap[node.base.id];
-    this.valueMap[node.id] = TensorMath.sqrt(base);
+    logger.info("visitSqrt", node.id);
+
+    if (node.base.isInvalid) {
+      node.base.accept(this, params);
+    }
+
+    let base = node.base.value;
+    node.value = TensorMath.sqrt(base);
+    node.state = ExpressionState.EVALUATED;
   }
 
+  // DONE
   visitSqrtGrad(node, params) {
-    super.visitSqrtGrad(node, params);
-    let base = this.valueMap[node.base.id];
-    this.valueMap[node.id] = TensorMath.sqrtGrad(base);
+    logger.info("visitSqrtGrad", node.id);
+
+    if (node.base.isInvalid) {
+      node.base.accept(this, params);
+    }
+
+    let base = node.base.value;
+    node.value = TensorMath.sqrtGrad(base);
+    node.state = ExpressionState.EVALUATED;
   }
 
+  // DONE
   visitSquare(node, params) {
-    super.visitSquare(node, params);
-    let base = this.valueMap[node.base.id];
-    this.valueMap[node.id] = TensorMath.square(base);
+    logger.info("visitSquare", node.id);
+
+    if (node.base.isInvalid) {
+      node.base.accept(this, params);
+    }
+
+    let base = node.base.value;
+    node.value = TensorMath.square(base);
+    node.state = ExpressionState.EVALUATED;
   }
 
+  // DONE
   visitStep(node, params) {
-    super.visitStep(node, params);
-    let base = this.valueMap[node.base.id];
-    this.valueMap[node.id] = TensorMath.step(base);
+    logger.info("visitStep", node.id);
+
+    if (node.base.isInvalid) {
+      node.base.accept(this, params);
+    }
+
+    let base = node.base.value;
+    node.value = TensorMath.step(base);
+    node.state = ExpressionState.EVALUATED;
   }
 
+  // DONE
   visitSubtract(node, params) {
-    super.visitSubtract(node, params);
-    let left = this.valueMap[node.left.id];
-    let right = this.valueMap[node.right.id];
-    this.valueMap[node.id] = TensorMath.subtract(left, right);
+    logger.info("visitSubtract", node.id);
+
+    if (node.left.isInvalid) {
+      node.left.accept(this, params);
+    }
+
+    if (node.right.isInvalid) {
+      node.right.accept(this, params);
+    }
+
+    let left = node.left.value;
+    let right = node.right.value;
+    node.value = TensorMath.subtract(left, right);
+    node.state = ExpressionState.EVALUATED;
   }
 
+  // DONE
   visitTangent(node, params) {
-    super.visitTangent(node, params);
-    let base = this.valueMap[node.base.id];
-    this.valueMap[node.id] = TensorMath.tan(base);
+    logger.info("visitTangent", node.id);
+
+    if (node.base.isInvalid) {
+      node.base.accept(this, params);
+    }
+
+    let base = node.base.value;
+    node.value = TensorMath.tan(base);
+    node.state = ExpressionState.EVALUATED;
   }
 
+  // DONE
   visitTangentGrad(node, params) {
-    super.visitTangentGrad(node, params);
-    let base = this.valueMap[node.base.id];
-    this.valueMap[node.id] = TensorMath.tanGrad(base);
+    logger.info("visitTangentGrad", node.id);
+
+    if (node.base.isInvalid) {
+      node.base.accept(this, params);
+    }
+
+    let base = node.base.value;
+    node.value = TensorMath.tanGrad(base);
+    node.state = ExpressionState.EVALUATED;
   }
 
+  // DONE
   visitTanh(node, params) {
-    super.visitTanh(node, params);
-    let base = this.valueMap[node.base.id];
-    this.valueMap[node.id] = TensorMath.tanh(base);
+    logger.info("visitTanh", node.id);
+
+    if (node.base.isInvalid) {
+      node.base.accept(this, params);
+    }
+
+    let base = node.base.value;
+    node.value = TensorMath.tanh(base);
+    node.state = ExpressionState.EVALUATED;
   }
 
   visitVariable(node, params) {

@@ -1,24 +1,39 @@
-import MatMul from "../node/MatMul";
-import Negate from "../node/Negate";
-import Multiply from "../node/Multiply";
-import SigmoidGrad from "../node/SigmoidGrad";
-import ReduceSum from "../node/ReduceSum";
-import Subtract from "../node/Subtract";
 import Assign from "../node/Assign";
+import Add from "../node/binary/Add";
+import Divide from "../node/binary/Divide";
+import MatMul from "../node/binary/MatMul";
+import Multiply from "../node/binary/Multiply";
+import Subtract from "../node/binary/Subtract";
+import Conv2d from "../node/cnn/Conv2d";
+import Conv2dImageGrad from "../node/cnn/Conv2dImageGrad";
+import Constant from "../node/core/Constant";
+import Parameter from "../node/core/Parameter";
+import Variable from "../node/core/Variable";
+import Fill from "../node/Fill";
 import Group from "../node/Group";
-import Step from "../node/Step";
-import Cosine from "../node/Cosine";
-import Sine from "../node/Sine";
-import TangentGrad from "../node/TangentGrad";
-import SquareRootGrad from "../node/SquareRootGrad";
-import Sign from "../node/Sign";
-import Reciprocal from "../node/Reciprocal";
-import Im2Col from "../node/Im2Col";
-import Conv2dImageGrad from "../node/Conv2dImageGrad";
-import Conv2dKernelGrad from "../node/Conv2dKernelGrad";
-import MaxPoolGrad from "../node/MaxPoolGrad";
-import SoftmaxGrad from "../node/SoftmaxGrad";
+import ReduceSum from "../node/reduction/ReduceSum";
+import Absolute from "../node/transform/Absolute";
+import Cosine from "../node/transform/Cosine";
+import Exponential from "../node/transform/Exponential";
+import Logarithm from "../node/transform/Logarithm";
+import Negate from "../node/transform/Negate";
+import Reciprocal from "../node/transform/Reciprocal";
+import Sigmoid from "../node/transform/Sigmoid";
+import SigmoidGrad from "../node/transform/SigmoidGrad";
+import Sign from "../node/transform/Sign";
+import Sine from "../node/transform/Sine";
+import Softmax from "../node/transform/Softmax";
+import SoftmaxGrad from "../node/transform/SoftmaxGrad";
+import Square from "../node/transform/Square";
+import SquareRoot from "../node/transform/SquareRoot";
+import SquareRootGrad from "../node/transform/SquareRootGrad";
+import Step from "../node/transform/Step";
+import Tangent from "../node/transform/Tangent";
+import TangentGrad from "../node/transform/TangentGrad";
 
+/**
+ * Expression Factory create nodes and add it to the Graph.
+ */
 export default class ExpressionFactory {
 
   constructor(graph) {
@@ -29,86 +44,215 @@ export default class ExpressionFactory {
     return this._graph;
   }
 
-  static createAssign({name, target, value}) {
-    return new Assign({name, target, value});
-  }
-
-  static createConv2dImageGrad({name, image, kernel, grad}) {
-    return new Conv2dImageGrad({name, image, kernel, grad});
-  }
-
   static createConv2dKernelGrad({name, image, kernel, grad}) {
     return new Conv2dKernelGrad({name, image, kernel, grad});
-  }
-
-  static createCosine({name, base}) {
-    return new Cosine(base, {name});
-  }
-
-  static createGroup(list, {name} = {}) {
-    return new Group(list, {name});
   }
 
   static createIm2Col({name, image, kernel}) {
     return new Im2Col({name, image, kernel});
   }
 
-  static createMatMul({name, left, right, transposeLeft, transposeRight}) {
-    return new MatMul(left, right, {name, transposeLeft, transposeRight});
-  }
-
   static createMaxPoolGrad({name, image, kernelShape, grad, strideWidth, strideHeight}) {
     return new MaxPoolGrad({name, image, kernelShape, grad, strideWidth, strideHeight});
   }
 
-  static createMultiply({name, left, right}) {
-    return new Multiply(left, right, {name});
+  abs(base, {name} = {}) {
+    let result = this.graph.add(new Absolute(base, {name}));
+    base.addObserver(result);
+    return result;
   }
 
-  static createNegate({name, base}) {
-    return new Negate(base, {name});
+  add(left, right, {name} = {}) {
+    let result = this.graph.add(new Add(left, right, {name}));
+    left.addObserver(result);
+    right.addObserver(result);
+    return result;
   }
 
-  static createReciprocal({name, base}) {
-    return new Reciprocal({name, base});
+  assign(target, newValue, {name} = {}) {
+    let result = this.graph.add(new Assign(target, newValue, {name}));
+    newValue.addObserver(result);
+    return result;
   }
 
-  static createReduceSum({name, base, reduceDim}) {
-    if (reduceDim >= 0) {
-      return new ReduceSum({name, base, reduceDim});
+  constant(value, {name} = {}) {
+    return this.graph.add(new Constant(value, {name}));
+  }
+
+  conv2d(image, kernel, {name} = {}) {
+    let result = this.graph.add(new Conv2d(image, kernel, {name}));
+    image.addObserver(result);
+    kernel.addObserver(result);
+    return result;
+  }
+
+  conv2dImageGrad(image, kernel, grad, {name} = {}) {
+    let result = this.graph.add(new Conv2dImageGrad(image, kernel, grad, {name}));
+    return result;
+  }
+
+  cos(base, {name} = {}) {
+    let result = this.graph.add(new Cosine(base, {name}));
+    base.addObserver(result);
+    return result;
+  }
+
+  divide(left, right, {name} = {}) {
+    let result = this.graph.add(new Divide(left, right, {name}));
+    left.addObserver(result);
+    right.addObserver(result);
+    return result;
+  }
+
+  exp(base, {name} = {}) {
+    let result = this.graph.add(new Exponential(base, {name}));
+    base.addObserver(result);
+    return result;
+  }
+
+  fill(scalar, shape, {name} = {}) {
+    return this.graph.add(new Fill(scalar, shape, {name}));
+  }
+
+  group(list, {name} = {}) {
+    let result = this.graph.add(new Group(list, {name}));
+    for (let item of list) {
+      item.addObserver(result);
+    }
+    return result;
+  }
+
+  log(base, {name} = {}) {
+    let result = this.graph.add(new Logarithm(base, {name}));
+    base.addObserver(result);
+    return result;
+  }
+
+  matmul(left, right, transposeLeft, transposeRight, {name} = {}) {
+    let result = this.graph.add(new MatMul(left, right, transposeLeft, transposeRight, {name}));
+    left.addObserver(result);
+    right.addObserver(result);
+    return result;
+  }
+
+  // maxPool({name, image, kernelShape, strideWidth, strideHeight}) {
+  //   let node = new MaxPool({name, image, kernelShape, strideWidth, strideHeight});
+  //   this.activeGraph.add(node);
+  //   return node;
+  // }
+
+  multiply(left, right, {name} = {}) {
+    let result = this.graph.add(new Multiply(left, right, {name}));
+    left.addObserver(result);
+    right.addObserver(result);
+    return result;
+  }
+
+  negate(base, {name} = {}) {
+    let result = this.graph.add(new Negate(base, {name}));
+    base.addObserver(result);
+    return result;
+  }
+
+  parameter(value, {name} = {}) {
+    return this.graph.add(new Parameter(value, {name}));
+  }
+
+  reciprocal(base, {name} = {}) {
+    let result = this.graph.add(new Reciprocal(base, {name}));
+    base.addObserver(result);
+    return result;
+  }
+
+  reduceSum(base, dimension, {name} = {}) {
+    if (dimension != null) {
+      let result = this.graph.add(new ReduceSum(base, dimension, {name}));
+      base.addObserver(result);
+      return result;
     }
     return base;
   }
 
-  static createSigmoidGrad({name, base}) {
-    return new SigmoidGrad(base, {name});
+  sigmoid(base, {name} = {}) {
+    let result = this.graph.add(new Sigmoid(base, {name}));
+    base.addObserver(result);
+    return result;
   }
 
-  static createSign({name, base}) {
-    return new Sign(base, {name});
+  sigmoidGrad(base, {name} = {}) {
+    let result = this.graph.add(new SigmoidGrad(base, {name}));
+    base.addObserver(result);
+    return result;
   }
 
-  static createSine({name, base}) {
-    return new Sine(base, {name});
+  sign(base, {name} = {}) {
+    let result = this.graph.add(new Sign(base, {name}));
+    base.addObserver(result);
+    return result;
   }
 
-  static createSoftmaxGrad({name, base, grad}) {
-    return new SoftmaxGrad({name, base, grad});
+  sin(base, {name} = {}) {
+    let result = this.graph.add(new Sine(base, {name}));
+    base.addObserver(result);
+    return result;
   }
 
-  static createSqrtGrad({name, base}) {
-    return new SquareRootGrad(base, {name});
+  softmax(base, {name} = {}) {
+    let result = this.graph.add(new Softmax(base, {name}));
+    base.addObserver(result);
+    return result;
   }
 
-  static createStep({name, base}) {
-    return new Step(base, {name});
+  softmaxGrad(base, grad, {name} = {}) {
+    let result = this.graph.add(new SoftmaxGrad(base, grad, {name}));
+    base.addObserver(result);
+    return result;
   }
 
-  static createSubtract({name, left, right}) {
-    return new Subtract(left, right, {name});
+  sqrt(base, {name} = {}) {
+    let result = this.graph.add(new SquareRoot(base, {name}));
+    base.addObserver(result);
+    return result;
   }
 
-  static createTanGrad({name, base}) {
-    return new TangentGrad(base, {name});
+  sqrtGrad(base, {name} = {}) {
+    let result = this.graph.add(new SquareRootGrad(base, {name}));
+    base.addObserver(result);
+    return result;
+  }
+
+  square(base, {name} = {}) {
+    let result = this.graph.add(new Square(base, {name}));
+    base.addObserver(result);
+    return result;
+  }
+
+  step(base, {name} = {}) {
+    let result = this.graph.add(new Step(base, {name}));
+    base.addObserver(result);
+    return result;
+  }
+
+  subtract(left, right, {name} = {}) {
+    let result = this.graph.add(new Subtract(left, right, {name}));
+    left.addObserver(result);
+    right.addObserver(result);
+    return result;
+  }
+
+  tan(base, {name} = {}) {
+    let result = this.graph.add(new Tangent(base, {name}));
+    base.addObserver(result);
+    return result;
+  }
+
+  tanGrad(base, {name} = {}) {
+    let result = this.graph.add(new TangentGrad(base, {name}));
+    base.addObserver(result);
+    return result;
+  }
+
+  variable(shape, {name} = {}) {
+    return this.graph.add(new Variable(shape, {name}));
   }
 }

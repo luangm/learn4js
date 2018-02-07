@@ -1,88 +1,42 @@
-import Visitor from "./Visitor";
-import Fill from "../structure/node/Fill";
-import ExpressionFactory from "../structure/factory/ExpressionFactory";
-import Constant from "../structure/node/Constant";
+import Tensor from "../core/Tensor";
 import TensorUtils from "../core/util/TensorUtils";
-import MatMul from "../structure/node/MatMul";
-import ReduceSum from "../structure/node/ReduceSum";
-import SigmoidGrad from "../structure/node/SigmoidGrad";
-import Multiply from "../structure/node/Multiply";
-import Negate from "../structure/node/Negate";
-import Softmax from "../structure/node/Softmax";
-import Subtract from "../structure/node/Subtract";
-import Step from "../structure/node/Step";
-import AddN from "../structure/node/AddN";
+import ExpressionFactory from "../structure/factory/ExpressionFactory";
+import Fill from "../structure/node/Fill";
 import Logger from "../util/Logger";
-import Divide from "../structure/node/Divide";
-import SoftmaxGrad from "../structure/node/SoftmaxGrad";
+import Visitor from "./Visitor";
 
 let logger = new Logger("ReverseGradientVisitor");
 
 /**
- * The Reverse Gradient Visitor visit a ComputeGraph from a single node (Source),
+ * The Reverse Gradient Visitor visit a Graph from a single node (Source),
  * Then create a GradientGraph as a result.
  *
- * The nodes of the GradientGraph is the gradient of the Source node wrt. each Node from the original ComputeGraph
+ * The nodes of the GradientGraph is the gradient of the Source node wrt. each Node from the original Graph
  */
 export default class ReverseGradientVisitor extends Visitor {
 
-  /**
-   * The source is where the reverse gradient starts.
-   */
   constructor(graph) {
     super();
     this._graph = graph;
+    this._factory = new ExpressionFactory(graph);
+    this._gradMap = {}; // Key = target.id, value = list of grads
+  }
+
+  get factory() {
+    return this._factory;
   }
 
   get graph() {
     return this._graph;
   }
 
-  addGradient(target, grad) {
-    let list = this._gradMap[target.id];
-    if (!list) {
-      list = [];
-      this._gradMap[target.id] = list;
-    }
-    list.push(grad);
-  }
-
-  /**
-   * Use this method for adding intermediate nodes to the graph.
-   */
-  addNode(node) {
-    return this.graph.add(node);
-  }
-
-  /**
-   * This method is called after all nodes are visited
-   */
-  finalize() {
-    for (let key in this._gradMap) {
-      let grads = this._gradMap[key];
-      if (grads.length === 1) {
-        this._source.setGradient(key, grads[0]);
-      } else {
-        let addN = this.addNode(new AddN(grads));
-        this._source.setGradient(key, addN);
-      }
-    }
-  }
-
-  /**
-   * This method returns the gradient value of the current node.
-   */
-  getGradient(node, params) {
-    let grad = params || new Fill(1, node.shape);
-    return this.graph.add(grad);
-  }
-
   /**
    * Called before each method
    */
   preVisit(node, params) {
-    let grad = this.getGradient(node, params);
-    this.addGradient(node, grad);
+    let grad = params || new Fill(1, node.shape);
+    grad = this.graph.add(grad);
+    this._addGradient(node, grad);
     return grad;
   }
 
@@ -91,36 +45,32 @@ export default class ReverseGradientVisitor extends Visitor {
    */
   visit(source) {
     this._source = source;
-    this._gradMap = {};
+    this._gradMap = {}; // Resets the grad map
     source.accept(this);
-    this.finalize();
+    this._finalize();
   }
 
+  // DONE
   visitAbsolute(node, params) {
     logger.info("visitAbsolute", node.id);
     let grad = this.preVisit(node, params);
-
-    let gradName = node.name + "/grad_" + node.base.name;
-    let signName = gradName + '/sign';
-    let sign = ExpressionFactory.createSign({name: signName, base: node.base});
-    let result = ExpressionFactory.createMultiply({name: gradName, left: grad, right: sign});
-
+    let sign = this.factory.sign(node.base);
+    let result = this.factory.multiply(grad, sign);
     node.base.accept(this, result);
   }
 
+  // DONE
   visitAdd(node, params) {
     logger.info("visitAdd", node.id);
     let grad = this.preVisit(node, params);
-
     let pair = TensorUtils.getReductionIndices(node.left.shape, node.right.shape);
-
-    let leftGrad = pair.left >= 0 ? this.addNode(new ReduceSum(grad, {reduceDim: pair.left})) : grad;
-    let rightGrad = pair.right >= 0 ? this.addNode(new ReduceSum(grad, {reduceDim: pair.right})) : grad;
-
+    let leftGrad = this.factory.reduceSum(grad, pair.left);
+    let rightGrad = this.factory.reduceSum(grad, pair.right);
     node.left.accept(this, leftGrad);
     node.right.accept(this, rightGrad);
   }
 
+  // DONE
   visitAddN(node, params) {
     logger.info("visitAddN", node.id);
     let grad = this.preVisit(node, params);
@@ -129,6 +79,7 @@ export default class ReverseGradientVisitor extends Visitor {
     }
   }
 
+  // DONE
   visitConstant(node, params) {
     logger.info("visitConstant", node.id);
     this.preVisit(node, params);
@@ -159,49 +110,58 @@ export default class ReverseGradientVisitor extends Visitor {
     node.kernel.accept(this, kernelGrad);
   }
 
+  // DONE
   visitCosine(node, params) {
     logger.info("visitCosine", node.id);
     let grad = this.preVisit(node, params);
-
-    let gradName = node.name + "/grad_" + node.base.name;
-    let sinName = gradName + '/sin';
-    let negName = sinName + '/neg';
-    let sin = ExpressionFactory.createSine({name: sinName, base: node.base});
-    let neg = ExpressionFactory.createNegate({name: negName, base: sin});
-    let result = ExpressionFactory.createMultiply({name: gradName, left: grad, right: neg});
-
+    let sine = this.factory.sin(node.base);
+    let neg = this.factory.negate(sine);
+    let result = this.factory.multiply(grad, neg);
     node.base.accept(this, result);
   }
 
+  // DONE
   visitDivide(node, params) {
     logger.info("visitDivide", node.id);
     let grad = this.preVisit(node, params);
-    node.base.accept(this, grad);
+    let pair = TensorUtils.getReductionIndices(node.left.shape, node.right.shape);
 
+    // left = grad / right
+    // right = -grad * left / right^2
+    let leftDiv = this.factory.divide(grad, node.right);
+    let rightDiv = this.factory.divide(leftDiv, node.right);
+    let rightMul = this.factory.multiply(node.left, rightDiv);
+    let rightNeg = this.factory.negate(rightMul);
 
+    let leftGrad = this.factory.reduceSum(leftDiv, pair.left);
+    let rightGrad = this.factory.reduceSum(rightNeg, pair.right);
+
+    node.left.accept(this, leftGrad);
+    node.right.accept(this, rightGrad);
   }
 
+  // DONE
   visitExp(node, params) {
     logger.info("visitExp", node.id);
     let grad = this.preVisit(node, params);
-    let result = this.addNode(new Multiply(grad, node));
+    let result = this.factory.multiply(grad, node);
     node.base.accept(this, result);
   }
 
+  // DONE
   visitLog(node, params) {
     logger.info("visitLog", node.id);
     let grad = this.preVisit(node, params);
-    let result = this.addNode(new Divide(grad, node.base));
+    let result = this.factory.divide(grad, node.base);
     node.base.accept(this, result);
   }
 
+  // DONE
   visitMatMul(node, params) {
     logger.info("visitMatMul", node.id);
     let grad = this.preVisit(node, params);
-
-    let leftGrad = this.addNode(new MatMul(grad, node.right, {transposeRight: true}));
-    let rightGrad = this.addNode(new MatMul(node.left, grad, {transposeLeft: true}));
-
+    let leftGrad = this.factory.matmul(grad, node.right, false, true);
+    let rightGrad = this.factory.matmul(node.left, grad, true, false);
     node.left.accept(this, leftGrad);
     node.right.accept(this, rightGrad);
   }
@@ -225,89 +185,82 @@ export default class ReverseGradientVisitor extends Visitor {
     node.image.accept(this, imageGrad);
   }
 
+  // DONE
   visitMultiply(node, params) {
     logger.info("visitMultiply", node.id);
     let grad = this.preVisit(node, params);
-
     let pair = TensorUtils.getReductionIndices(node.left.shape, node.right.shape);
-
-    let leftMul = this.addNode(new Multiply(grad, node.right));
-    let rightMul = this.addNode(new Multiply(node.left, grad));
-
-    let leftGrad = pair.left >= 0 ? this.addNode(new ReduceSum(leftMul, {reduceDim: pair.left})) : leftMul;
-    let rightGrad = pair.right >= 0 ? this.addNode(new ReduceSum(rightMul, {reduceDim: pair.right})) : rightMul;
-
+    let leftMul = this.factory.multiply(grad, node.right);
+    let rightMul = this.factory.multiply(node.left, grad);
+    let leftGrad = this.factory.reduceSum(leftMul, pair.left);
+    let rightGrad = this.factory.reduceSum(rightMul, pair.right);
     node.left.accept(this, leftGrad);
     node.right.accept(this, rightGrad);
   }
 
+  // DONE
   visitNegate(node, params) {
     logger.info("visitNegate", node.id);
     let grad = this.preVisit(node, params);
-
-    let result = this.addNode(new Negate(grad));
-
+    let result = this.factory.negate(grad);
     node.base.accept(this, result);
   }
 
+  // DONE
   visitParameter(node, params) {
     logger.info("visitParameter", node.id);
     this.preVisit(node, params);
   }
 
+  // TODO: Fix
   visitReduceSum(node, params) {
     logger.info("visitReduceSum", node.id);
     let grad = this.preVisit(node, params);
     node.base.accept(this, grad);
   }
 
+  // DONE
   visitRelu(node, params) {
     logger.info("visitRelu", node.id);
     let grad = this.preVisit(node, params);
-
-    let step = this.addNode(new Step(node.base));
-    let result = this.addNode(new Multiply(grad, step));
-
+    let step = this.factory.step(node.base);
+    let result = this.factory.multiply(grad, step);
     node.base.accept(this, result);
   }
 
+  // DONE
   visitSigmoid(node, params) {
     logger.info("visitSigmoid", node.id);
     let grad = this.preVisit(node, params);
-
-    let sigGrad = this.addNode(new SigmoidGrad(grad));
-    let result = this.addNode(new Multiply(grad, sigGrad));
-
+    let sigGrad = this.factory.sigmoidGrad(node.base);
+    let result = this.factory.multiply(grad, sigGrad);
     node.base.accept(this, result);
   }
 
+  // DONE
   visitSine(node, params) {
     logger.info("visitSine", node.id);
     let grad = this.preVisit(node, params);
-
-    let gradName = node.name + "/grad_" + node.base.name;
-    let cosName = gradName + '/cos';
-    let cos = ExpressionFactory.createCosine({name: cosName, base: node.base});
-    let result = ExpressionFactory.createMultiply({name: gradName, left: grad, right: cos});
-
+    let cos = this.factory.cos(node.base);
+    let result = this.factory.multiply(grad, cos);
     node.base.accept(this, result);
   }
 
+  // DONE
   visitSoftmax(node, params) {
     logger.info("visitSoftmax", node.id);
     let grad = this.preVisit(node, params);
-    let softmaxGrad = this.addNode(new SoftmaxGrad(node.base, grad));
+    let softmaxGrad = this.factory.softmaxGrad(node.base, grad);
     node.base.accept(this, softmaxGrad);
   }
 
+  // DONE
   visitSoftmaxCrossEntropy(node, params) {
     logger.info("visitSoftmaxCrossEntropy", node.id);
     let grad = this.preVisit(node, params);
-
-    let softmax = this.addNode(new Softmax(node.logits));
-    let subtract = this.addNode(new Subtract(softmax, node.labels));
-    let result = this.addNode(new Multiply(grad, subtract));
-
+    let softmax = this.factory.softmax(node.logits);
+    let subtract = this.factory.subtract(softmax, node.labels);
+    let result = this.factory.multiply(grad, subtract);
     node.logits.accept(this, result);
   }
 
@@ -323,42 +276,64 @@ export default class ReverseGradientVisitor extends Visitor {
     node.base.accept(this, result);
   }
 
+  // DONE
   visitSquare(node, params) {
     logger.info("visitSquare", node.id);
     let grad = this.preVisit(node, params);
-
-    let two = this.addNode(Constant.TWO);
-    let mul = this.addNode(new Multiply(two, node.base));
-    let result = this.addNode(new Multiply(grad, mul));
-
+    let two = this.factory.constant(Tensor.scalar(2), {name: 'TWO'});
+    let mul = this.factory.multiply(two, node.base);
+    let result = this.factory.multiply(grad, mul);
     node.base.accept(this, result);
   }
 
+  // DONE
   visitSubtract(node, params) {
     logger.info("visitSubtract", node.id);
     let grad = this.preVisit(node, params);
-
-    let rightGrad = this.addNode(new Negate(grad));
-
-    node.left.accept(this, grad);
-    node.right.accept(this, rightGrad);
+    let pair = TensorUtils.getReductionIndices(node.left.shape, node.right.shape);
+    let leftGrad = this.factory.reduceSum(grad, pair.left);
+    let rightGrad = this.factory.reduceSum(grad, pair.right);
+    let rightGradNeg = this.factory.negate(rightGrad);
+    node.left.accept(this, leftGrad);
+    node.right.accept(this, rightGradNeg);
   }
 
+  // DONE
   visitTangent(node, params) {
     logger.info("visitTangent", node.id);
     let grad = this.preVisit(node, params);
-
-    let gradName = node.name + "/grad_" + node.base.name;
-    let sigGradName = gradName + "/sigGrad";
-
-    let sigGrad = ExpressionFactory.createTanGrad({name: sigGradName, base: node.base});
-    let result = ExpressionFactory.createMultiply({name: gradName, left: grad, right: sigGrad});
-
+    let sigGrad = this.factory.tanGrad(node.base);
+    let result = this.factory.multiply(grad, sigGrad);
     node.base.accept(this, result);
   }
 
+  // DONE
   visitVariable(node, params) {
     logger.info("visitVariable", node.id);
     this.preVisit(node, params);
+  }
+
+  _addGradient(target, grad) {
+    let list = this._gradMap[target.id];
+    if (!list) {
+      list = [];
+      this._gradMap[target.id] = list;
+    }
+    list.push(grad);
+  }
+
+  /**
+   * This method is called after all nodes are visited
+   */
+  _finalize() {
+    for (let key in this._gradMap) {
+      let grads = this._gradMap[key];
+      if (grads.length === 1) {
+        this._source.setGradient(key, grads[0]);
+      } else {
+        let addN = this.factory.addN(grads);
+        this._source.setGradient(key, addN);
+      }
+    }
   }
 }

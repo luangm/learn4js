@@ -1,10 +1,3 @@
-import DependencyVisitor from "../visitor/DependencyVisitor";
-import ReverseGradientVisitor from "../visitor/ReverseGradientVisitor";
-import Parameter from "../structure/node/Parameter";
-import Learn4js from "../Learn4js";
-import Tensor from "../core/Tensor";
-import ExpressionFactory from "../structure/factory/ExpressionFactory";
-
 export default class Optimizer {
 
   constructor({graph}) {

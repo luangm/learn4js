@@ -1,4 +1,4 @@
-import ComputeGraph from "./structure/ComputeGraph";
+import Graph from "./structure/Graph";
 import GradientDescentOptimizer from "./optimizer/GradientDescentOptimizer";
 
 /**
@@ -12,11 +12,11 @@ class OptimizerFactory {
   }
 
   get activeGraph() {
-    return ComputeGraph.active;
+    return Graph.active;
   }
 
   set activeGraph(value) {
-    ComputeGraph.active = value;
+    Graph.active = value;
   }
 
   gradientDescent({learnRate} = {}) {

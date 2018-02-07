@@ -149,21 +149,12 @@ export default class TensorUtils {
     return result;
   }
 
-  static computeMaxPoolShape(imageShape, kernelShape, strideWidth, strideHeight) {
-    let numImages = imageShape[0];
-    let channels = imageShape[1];
-    let height = imageShape[2]; // rows
-    let width = imageShape[3]; // cols
-
-    let numKernels = kernelShape[0];
-    let kernelChannels = kernelShape[1];
-    let kernelHeight = kernelShape[2]; // rows
-    let kernelWidth = kernelShape[3]; // cols
-
-    let outputHeight = TensorUtils.computeConv2dOutSize(height, kernelHeight, 0, strideHeight);
-    let outputWidth = TensorUtils.computeConv2dOutSize(width, kernelWidth, 0, strideWidth);
-
-    return [numImages, numKernels, outputHeight, outputWidth];
+  static computeConv2dOutSize(imageSize, kernelSize, padSize = 0, stride = 1) {
+    let result = (imageSize - kernelSize + 2 * padSize) / stride + 1;
+    if (result !== Math.floor(result)) {
+      throw new Error('Cannot do conv2d with these values: imageSize: {' + imageSize + '}, kernelSize: {' + kernelSize + '}');
+    }
+    return result;
   }
 
   static computeConv2dShape(image, kernel) {
@@ -183,12 +174,21 @@ export default class TensorUtils {
     return [numImages, numKernels, outputHeight, outputWidth];
   }
 
-  static computeConv2dOutSize(imageSize, kernelSize, padSize = 0, stride = 1) {
-    let result = (imageSize - kernelSize + 2 * padSize) / stride + 1;
-    if (result !== Math.floor(result)) {
-      throw new Error('Cannot do conv2d with these values: imageSize: {' + imageSize + '}, kernelSize: {' + kernelSize + '}');
-    }
-    return result;
+  static computeMaxPoolShape(imageShape, kernelShape, strideWidth, strideHeight) {
+    let numImages = imageShape[0];
+    let channels = imageShape[1];
+    let height = imageShape[2]; // rows
+    let width = imageShape[3]; // cols
+
+    let numKernels = kernelShape[0];
+    let kernelChannels = kernelShape[1];
+    let kernelHeight = kernelShape[2]; // rows
+    let kernelWidth = kernelShape[3]; // cols
+
+    let outputHeight = TensorUtils.computeConv2dOutSize(height, kernelHeight, 0, strideHeight);
+    let outputWidth = TensorUtils.computeConv2dOutSize(width, kernelWidth, 0, strideWidth);
+
+    return [numImages, numKernels, outputHeight, outputWidth];
   }
 
   static computeOffset(indices, shape, strides) {
@@ -206,6 +206,9 @@ export default class TensorUtils {
     return offset;
   }
 
+  /**
+   * Get the indices that are reduced, return null if one of the indices is not reduced.
+   */
   static getReductionIndices(a, b) {
     let resultShape = TensorUtils.broadcastShapes(a, b);
     let left = -1;
@@ -220,7 +223,10 @@ export default class TensorUtils {
       }
     }
 
-    return {left, right}
+    return {
+      left: left >= 0 ? left : null,
+      right: right >= 0 ? right : null
+    }
   }
 
   // image is a tensor of [channels, rows, cols]

@@ -1,4 +1,4 @@
-import Session from '../session/Session';
+import ExpressionState from './constant/ExpressionState';
 
 /**
  * Default class for expression.
@@ -10,10 +10,12 @@ export default class Expression {
 
   constructor({name, scope} = {}) {
     this._id = Expression.ID_COUNTER++;
-    // this._state = ExpressionState.DETACHED;
+    this._state = ExpressionState.DETACHED;
     if (name) {
       this._name = name;
     }
+    this._observers = [];
+    this._graph = null;
     // this._value = null;
     // this._scope = scope;
     // this._gradients = null; // key = target.id, value = [gradient].
@@ -23,8 +25,16 @@ export default class Expression {
     return this._gradients;
   }
 
+  get graph() {
+    return this._graph;
+  }
+
   get id() {
     return this._id;
+  }
+
+  get isInvalid() {
+    return this._state !== ExpressionState.EVALUATED;
   }
 
   /**
@@ -61,21 +71,17 @@ export default class Expression {
     this._scope = val;
   }
 
-  get session() {
-    return Session.active;
-  }
-
   get shape() {
     throw new Error('Expression.shape should not be called from base Expression');
   }
 
-  // get state() {
-  //   return this._state;
-  // }
-  //
-  // set state(value) {
-  //   this._state = value;
-  // }
+  get state() {
+    return this._state;
+  }
+
+  set state(value) {
+    this._state = value;
+  }
 
   get type() {
     throw new Error('Expression.type should not be called from base Expression');
@@ -87,7 +93,7 @@ export default class Expression {
    * In Normal mode, the value will be null. Should call eval() first before calling value.
    */
   get value() {
-    return this.session.getValue(this);
+    return this.graph.session.getValue(this);
   }
 
   /**
@@ -95,7 +101,7 @@ export default class Expression {
    * This will update the value in the current session.
    */
   set value(val) {
-    this.session.setValue(this, val);
+    this.graph.session.setValue(this, val);
   }
 
   /**
@@ -106,14 +112,21 @@ export default class Expression {
     throw new Error('Not Supported');
   }
 
-  /**
-   * Forces an evaluation of the current expression at the given session.
-   * If a session is not provided, then default session is used.
-   */
-  eval(session) {
-    session = session || Session.active;
-    this._value = session.run(this);
-    return this._value;
+  addObserver(observer) {
+    this._observers.push(observer);
+  }
+
+  attach(graph) {
+    this._graph = graph;
+    this._state = ExpressionState.ATTACHED;
+  }
+
+  eval() {
+    if (this.graph == null) {
+      throw new Error('Must attach first');
+    }
+
+    return this.graph.session.eval(this);
   }
 
   getGradient(target) {

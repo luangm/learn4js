@@ -2,15 +2,15 @@ import Expression from "../Expression";
 
 export default class Assign extends Expression {
 
-  constructor(target, assignment, {name, scope} = {}) {
+  constructor(target, newValue, {name, scope} = {}) {
     super({name, scope});
 
     this._target = target;
-    this._assignment = assignment;
+    this._newValue = newValue;
   }
 
-  get assignment() {
-    return this._assignment;
+  get newValue() {
+    return this._newValue;
   }
 
   get shape() {

@@ -1,9 +1,9 @@
 import DependencyVisitor from "../visitor/DependencyVisitor";
 import ReverseGradientVisitor from "../visitor/ReverseGradientVisitor";
-import Parameter from "../structure/node/Parameter";
 import Optimizer from "./Optimizer";
 import GradientDescentStep from "./GradientDescentStep";
 import Group from "../structure/node/Group";
+import Parameter from "../structure/node/core/Parameter";
 
 export default class GradientDescentOptimizer extends Optimizer {
 
