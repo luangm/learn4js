@@ -34,6 +34,7 @@ export default class Expression {
   }
 
   get isInvalid() {
+    // return true;
     return this._state !== ExpressionState.EVALUATED;
   }
 
@@ -102,6 +103,8 @@ export default class Expression {
    */
   set value(val) {
     this.graph.session.setValue(this, val);
+    this.state = ExpressionState.MODIFIED;
+    this.notifyValueChanged();
   }
 
   /**
@@ -131,6 +134,20 @@ export default class Expression {
 
   getGradient(target) {
     return this._gradients ? this._gradients[target.id] : null;
+  }
+
+  notifyValueChanged() {
+    for (let id in this._observers) {
+      let observer = this._observers[id];
+      observer.onEvent();
+    }
+  }
+
+  onEvent() {
+    if (this.state === ExpressionState.EVALUATED) {
+      this.state = ExpressionState.MODIFIED;
+      this.notifyValueChanged();
+    }
   }
 
   setGradient(targetId, grad) {

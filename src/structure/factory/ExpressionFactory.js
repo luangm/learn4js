@@ -30,6 +30,7 @@ import SquareRootGrad from "../node/transform/SquareRootGrad";
 import Step from "../node/transform/Step";
 import Tangent from "../node/transform/Tangent";
 import TangentGrad from "../node/transform/TangentGrad";
+import Tile from "../node/Tile";
 
 /**
  * Expression Factory create nodes and add it to the Graph.
@@ -77,6 +78,12 @@ export default class ExpressionFactory {
 
   constant(value, {name} = {}) {
     return this.graph.add(new Constant(value, {name}));
+  }
+
+  tile(base, scale, {name} = {}) {
+    let result = this.graph.add(new Tile(base, scale, {name}));
+    base.addObserver(result);
+    return result;
   }
 
   conv2d(image, kernel, {name} = {}) {

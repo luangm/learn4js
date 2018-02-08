@@ -1,4 +1,5 @@
 import Tensor from "../core/Tensor";
+import ShapeUtils from "../core/util/ShapeUtils";
 import TensorUtils from "../core/util/TensorUtils";
 import ExpressionFactory from "../structure/factory/ExpressionFactory";
 import Fill from "../structure/node/Fill";
@@ -216,7 +217,8 @@ export default class ReverseGradientVisitor extends Visitor {
   visitReduceSum(node, params) {
     logger.info("visitReduceSum", node.id);
     let grad = this.preVisit(node, params);
-    node.base.accept(this, grad);
+    let result = this._getReductionGrad(node, grad);
+    node.base.accept(this, result);
   }
 
   // DONE
@@ -335,5 +337,12 @@ export default class ReverseGradientVisitor extends Visitor {
         this._source.setGradient(key, addN);
       }
     }
+  }
+
+  _getReductionGrad(node, grad) {
+    let inputShape = node.base.shape;
+    let outputShape = node.shape;
+    let scale = ShapeUtils.safeDivide(inputShape, outputShape);
+    return this.factory.tile(grad, scale);
   }
 }

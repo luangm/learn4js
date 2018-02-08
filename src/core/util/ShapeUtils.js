@@ -58,4 +58,17 @@ export default class ShapeUtils {
     }
     return result;
   }
+
+  /**
+   * By calling this method the caller ensures the two shapes have the same rank
+   * and can be cleanly divided.
+   * Normally used on reduction.
+   */
+  static safeDivide(shape1, shape2) {
+    let result = [];
+    for (let i = 0; i < shape1.length; i++) {
+      result.push(shape1[i] / shape2[i]);
+    }
+    return result;
+  }
 }

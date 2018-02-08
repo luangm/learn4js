@@ -39,11 +39,18 @@ export default class TensorMath {
     return result;
   }
 
-  static add(left, right) {
-    let resultShape = TensorUtils.broadcastShapes(left.shape, right.shape);
-    let result = new Tensor({shape: resultShape});
-    left = left.broadcast(resultShape);
-    right = right.broadcast(resultShape);
+  static add(left, right, result) {
+
+    if (!result) {
+      let resultShape = TensorUtils.broadcastShapes(left.shape, right.shape);
+      result = new Tensor({shape: resultShape});
+      left = left.broadcast(resultShape);
+      right = right.broadcast(resultShape);
+    } else {
+      left = left.broadcast(result.shape);
+      right = right.broadcast(result.shape);
+    }
+
     Executor.instance.exec(new AddOp(left, right, result));
     return result;
   }
@@ -168,13 +175,16 @@ export default class TensorMath {
     return TensorMath.add(log, max);
   }
 
-  static matmul(left, right, transposeA = false, transposeB = false) {
+  static matmul(left, right, transposeA = false, transposeB = false, result) {
 
-    let shape = [0, 0];
-    shape[0] = transposeA ? left.shape[1] : left.shape[0];
-    shape[1] = transposeB ? right.shape[0] : right.shape[1];
+    if (!result) {
+      let shape = [0, 0];
+      shape[0] = transposeA ? left.shape[1] : left.shape[0];
+      shape[1] = transposeB ? right.shape[0] : right.shape[1];
 
-    let result = new Tensor({shape});
+      result = new Tensor({shape});
+    }
+
     Executor.instance.exec(new MatMulOp(left, right, result, transposeA, transposeB));
     return result;
   }
@@ -217,6 +227,14 @@ export default class TensorMath {
     Executor.instance.exec(new MultiplyOp(newLeft, newRight, result));
     return result;
   }
+
+  // static multiply(left, right, result) {
+  //   let newLeft = left.broadcast(resultShape);
+  //   let newRight = right.broadcast(resultShape);
+    // Executor.instance.exec(new MultiplyOp(left, right, result));
+    // return result;
+  // }
+
 
   static negate(base) {
     let result = new Tensor({shape: base.shape});
@@ -390,6 +408,17 @@ export default class TensorMath {
   static tanh(base) {
     let result = new Tensor({shape: base.shape});
     Executor.instance.exec(new TanhOp(base, null, result));
+    return result;
+  }
+
+  // TODO: This is a Hack. TB Fixed
+  static tile(base, repeats) {
+    let shape = base.shape.slice();
+    for (let i = 0; i < shape.length; i++) {
+      shape[i] *= repeats[i];
+    }
+    let result = new Tensor({shape});
+    Executor.instance.exec(new SetOp(result, base.get([0, 0]), result));
     return result;
   }
 }

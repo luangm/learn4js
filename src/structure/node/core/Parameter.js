@@ -34,6 +34,7 @@ export default class Parameter extends Expression {
   }
 
   set value(val) {
+    super.value = val;
     this._value = val;
   }
 

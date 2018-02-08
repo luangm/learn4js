@@ -1,9 +1,10 @@
-import TensorUtils from "../util/TensorUtils";
-import SpecialOp from "../op/special/SpecialOp";
-import ReductionOp from "../op/reduction/ReductionOp";
-import Tensor from "../Tensor";
 import IndexOp from "../op/index/IndexOp";
+import AddOp from "../op/pairwise/AddOp";
+import ReductionOp from "../op/reduction/ReductionOp";
+import SpecialOp from "../op/special/SpecialOp";
 import IndexSetOp from "../op/transform/IndexSetOp";
+import Tensor from "../Tensor";
+import TensorUtils from "../util/TensorUtils";
 
 const singleton = Symbol();
 
@@ -31,6 +32,19 @@ export default class Executor {
    * This function loops through the Tensor with consideration of buffer index
    */
   exec(op) {
+    // if (op instanceof MultiplyOp) {
+    //   this._execMul(op);
+    //   return;
+    // }
+    if (op instanceof AddOp) {
+      op.exec();
+      return;
+    }
+    // if (op instanceof SubtractOp) {
+    //   this._execSub(op);
+    //   return;
+    // }
+
     if (op instanceof SpecialOp) {
       // Special Ops bypasses executor
       op.exec();
@@ -55,19 +69,6 @@ export default class Executor {
 
     if (op instanceof IndexSetOp) {
       this._set(op, 0, dim, new Array(op.input.rank));
-    }
-  }
-
-  _set(op, currentDim, targetDim, indices) {
-    let input = op.input;
-    let args = op.other;
-    let result = op.result;
-
-    for (let i = 0; i < input.length; i++) {
-      indices[targetDim] = args.get([i]);
-      indices[1] = i;
-      let val = input.data[i];
-      result.set(indices, val);
     }
   }
 
@@ -98,40 +99,6 @@ export default class Executor {
       for (let i = 0; i < input.shape[currentDim]; i++) {
         indices[currentDim] = i;
         this._accum(op, currentDim + 1, targetDim, indices);
-      }
-    }
-  }
-
-  _indexAccum(op, currentDim, targetDim, indices) {
-    let input = op.input;
-    let result = op.result;
-
-    if (currentDim === input.rank) {
-      let accum = 0;
-      let accumIndex = -1;
-      for (let i = 0; i < input.shape[targetDim]; i++) {
-        indices[targetDim] = i;
-        let offset = TensorUtils.computeOffset(indices, input.shape, input.strides);
-        let val = input.data[offset];
-        let update = op.update(accum, val, accumIndex, i);
-        accum = update[0];
-        accumIndex = update[1];
-      }
-
-      indices[targetDim] = 0;
-      let offset = TensorUtils.computeOffset(indices, result.shape, result.strides);
-      result.data[offset] = accumIndex;
-      return;
-    }
-
-    // When encounter the target dim, set the result indices[dim] = 0
-    if (currentDim === targetDim) {
-      indices[currentDim] = 0;
-      this._indexAccum(op, currentDim + 1, targetDim, indices);
-    } else {
-      for (let i = 0; i < input.shape[currentDim]; i++) {
-        indices[currentDim] = i;
-        this._indexAccum(op, currentDim + 1, targetDim, indices);
       }
     }
   }
@@ -209,6 +176,71 @@ export default class Executor {
       }
 
       this._execAtDim(op, dim + 1, indices);
+    }
+  }
+
+  _execMul(op) {
+    let input = op.input.data;
+    let other = op.other.data;
+    let result = op.result.data;
+    for (let i = 0; i < op.input.data.length; i++) {
+      result[i] = input[i] * other[i];
+    }
+  }
+
+  _execSub(op) {
+    let input = op.input.data;
+    let other = op.other.data;
+    let result = op.result.data;
+    for (let i = 0; i < op.input.data.length; i++) {
+      result[i] = input[i] - other[i];
+    }
+  }
+
+  _indexAccum(op, currentDim, targetDim, indices) {
+    let input = op.input;
+    let result = op.result;
+
+    if (currentDim === input.rank) {
+      let accum = 0;
+      let accumIndex = -1;
+      for (let i = 0; i < input.shape[targetDim]; i++) {
+        indices[targetDim] = i;
+        let offset = TensorUtils.computeOffset(indices, input.shape, input.strides);
+        let val = input.data[offset];
+        let update = op.update(accum, val, accumIndex, i);
+        accum = update[0];
+        accumIndex = update[1];
+      }
+
+      indices[targetDim] = 0;
+      let offset = TensorUtils.computeOffset(indices, result.shape, result.strides);
+      result.data[offset] = accumIndex;
+      return;
+    }
+
+    // When encounter the target dim, set the result indices[dim] = 0
+    if (currentDim === targetDim) {
+      indices[currentDim] = 0;
+      this._indexAccum(op, currentDim + 1, targetDim, indices);
+    } else {
+      for (let i = 0; i < input.shape[currentDim]; i++) {
+        indices[currentDim] = i;
+        this._indexAccum(op, currentDim + 1, targetDim, indices);
+      }
+    }
+  }
+
+  _set(op, currentDim, targetDim, indices) {
+    let input = op.input;
+    let args = op.other;
+    let result = op.result;
+
+    for (let i = 0; i < input.length; i++) {
+      indices[targetDim] = args.get([i]);
+      indices[1] = i;
+      let val = input.data[i];
+      result.set(indices, val);
     }
   }
 }

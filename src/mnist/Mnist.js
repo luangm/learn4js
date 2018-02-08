@@ -1,5 +1,5 @@
-import Tensor from "../core/Tensor";
 import pako from "pako";
+import Tensor from "../core/Tensor";
 import ArrayUtils from "../core/util/ArrayUtils";
 
 export default class Mnist {
@@ -50,10 +50,11 @@ export default class Mnist {
     let array = new Uint8Array(buffer);
     let out = pako.inflate(array);
     // let view = new DataView(out.buffer);
-    this._testImageData = new Uint8Array(out.buffer, 16);
+    let rawData = new Uint8Array(out.buffer, 16);
+    this._testImageData = new Float32Array(rawData.length);
     for (let i = 0; i < this._testImageData.length; i++) {
-      if (this._testImageData[i] > 0) {
-        this._testImageData[i] = 1;
+      if (rawData[i] > 0) {
+        this._testImageData[i] = rawData[i] / 255;
       }
     }
     this._testArray = ArrayUtils.range(10000);

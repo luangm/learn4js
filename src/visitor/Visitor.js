@@ -275,6 +275,12 @@ export default class Visitor {
     node.base.accept(this, params);
   }
 
+  visitTile(node, params) {
+    this.logger.info("visitTile", node.name);
+    this.preVisit(node, params);
+    node.base.accept(this, params);
+  }
+
   visitVariable(node, params) {
     this.logger.info("visitVariable", node.name);
     this.preVisit(node, params);

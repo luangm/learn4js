@@ -19,11 +19,11 @@ export default class EvaluationVisitor extends Visitor {
   }
 
   getValue(node) {
-    return this.valueMap[node.id];
+    return this._valueMap[node.id];
   }
 
   setValue(node, value) {
-    this.valueMap[node.id] = value;
+    this._valueMap[node.id] = value;
   }
 
   // DONE
@@ -158,13 +158,17 @@ export default class EvaluationVisitor extends Visitor {
     node.state = ExpressionState.EVALUATED;
   }
 
+  // DONE
   visitFill(node, params) {
     super.visitFill(node, params);
-    if (!this.valueMap[node.id]) {
+
+    if (!this.session.getValue(node)) {
       let tensor = new Tensor({shape: node.shape});
       tensor = TensorMath.set(tensor, node.scalar);
-      this.valueMap[node.id] = tensor;
+      this.session.setValue(node, tensor);
     }
+
+    node.state = ExpressionState.EVALUATED;
   }
 
   visitGradientDescentStep(node, params) {
@@ -197,11 +201,22 @@ export default class EvaluationVisitor extends Visitor {
     node.state = ExpressionState.EVALUATED;
   }
 
+  // DONE
   visitMatMul(node, params) {
-    super.visitMatMul(node, params);
-    let left = this.valueMap[node.left.id];
-    let right = this.valueMap[node.right.id];
-    this.valueMap[node.id] = TensorMath.matmul(left, right, node.transposeLeft, node.transposeRight);
+    logger.info("visitMatMul", node.id);
+
+    if (node.left.isInvalid) {
+      node.left.accept(this, params);
+    }
+
+    if (node.right.isInvalid) {
+      node.right.accept(this, params);
+    }
+
+    let left = node.left.value;
+    let right = node.right.value;
+    node.value = TensorMath.matmul(left, right, node.transposeLeft, node.transposeRight);
+    node.state = ExpressionState.EVALUATED;
   }
 
   visitMaxPool(node, params) {
@@ -220,11 +235,22 @@ export default class EvaluationVisitor extends Visitor {
     this.valueMap[node.id] = TensorMath.maxPoolGrad(image, kernel, grad, {strideWidth: 2, strideHeight: 2});
   }
 
+  // DONE
   visitMultiply(node, params) {
-    super.visitMultiply(node, params);
-    let left = this.valueMap[node.left.id];
-    let right = this.valueMap[node.right.id];
-    this.valueMap[node.id] = TensorMath.multiply(left, right);
+    logger.info("visitMultiply", node.id);
+
+    if (node.left.isInvalid) {
+      node.left.accept(this, params);
+    }
+
+    if (node.right.isInvalid) {
+      node.right.accept(this, params);
+    }
+
+    let left = node.left.value;
+    let right = node.right.value;
+    node.value = TensorMath.multiply(left, right);
+    node.state = ExpressionState.EVALUATED;
   }
 
   visitNegate(node, params) {
@@ -240,8 +266,9 @@ export default class EvaluationVisitor extends Visitor {
   }
 
   visitParameter(node, params) {
-    super.visitParameter(node, params);
-    this.valueMap[node.id] = node.value;
+    logger.info("visitParameter", node.id);
+    this.session.setValue(node, node.value);
+    node.state = ExpressionState.EVALUATED;
   }
 
   visitReciprocal(node, params) {
@@ -256,11 +283,32 @@ export default class EvaluationVisitor extends Visitor {
     node.state = ExpressionState.EVALUATED;
   }
 
+  // DONE
   visitReduceSum(node, params) {
-    super.visitReduceSum(node, params);
-    let base = this.valueMap[node.base.id];
-    this.valueMap[node.id] = TensorMath.reduceSum(base, node.reduceDim);
+    logger.info("visitRelu", node.id);
+
+    if (node.base.isInvalid) {
+      node.base.accept(this, params);
+    }
+
+    let base = node.base.value;
+    node.value = TensorMath.reduceSum(base, node.dimension);
+    node.state = ExpressionState.EVALUATED;
   }
+
+  // DONE
+  visitTile(node, params) {
+    logger.info("visitTile", node.id);
+
+    if (node.base.isInvalid) {
+      node.base.accept(this, params);
+    }
+
+    let base = node.base.value;
+    node.value = TensorMath.tile(base, node.repeats);
+    node.state = ExpressionState.EVALUATED;
+  }
+
 
   // DONE
   visitRelu(node, params) {
@@ -340,11 +388,18 @@ export default class EvaluationVisitor extends Visitor {
     node.state = ExpressionState.EVALUATED;
   }
 
+  // DONE
   visitSoftmaxCrossEntropy(node, params) {
-    super.visitSoftmaxCrossEntropy(node, params);
-    let labels = this.valueMap[node.labels.id];
-    let logits = this.valueMap[node.logits.id];
-    this.valueMap[node.id] = TensorMath.softmaxCrossEntropyWithLogits(labels, logits);
+    logger.info("visitSoftmaxCrossEntropy", node.id);
+
+    if (node.logits.isInvalid) {
+      node.logits.accept(this, params);
+    }
+
+    let labels = node.labels.value;
+    let logits = node.logits.value;
+    node.value = TensorMath.softmaxCrossEntropyWithLogits(labels, logits);
+    node.state = ExpressionState.EVALUATED;
   }
 
   // DONE
@@ -471,6 +526,8 @@ export default class EvaluationVisitor extends Visitor {
   }
 
   visitVariable(node, params) {
-    super.visitVariable(node, params);
+    logger.info("visitVariable", node.id);
+    // super.visitVariable(node, params);
+    node.state = ExpressionState.EVALUATED;
   }
 }
