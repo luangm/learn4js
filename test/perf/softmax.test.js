@@ -1,7 +1,7 @@
 import Tensor from "../../src/core/Tensor";
 import TensorMath from "../../src/core/util/TensorMath";
 
-test('test add', function() {
+test('test softmax', function() {
 
   console.log("--- Creating random arrays and Tensors ---");
 
@@ -82,7 +82,7 @@ test('test add', function() {
   now = new Date();
 
   for (let i = 0; i < EPOCH; i++) {
-    TensorMath.add(tensorA, tensorB, tensorX);
+    TensorMath.softmax2(tensorA, 1);
   }
 
   then = new Date();

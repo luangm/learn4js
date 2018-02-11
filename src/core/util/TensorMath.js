@@ -1,35 +1,36 @@
-import Tensor from "../Tensor";
+import {println} from "../../index";
 import Executor from "../executor/Executor";
-import SigmoidOp from "../op/transform/SigmoidOp";
-import SquareOp from "../op/transform/SquareOp";
-import SetOp from "../op/transform/SetOp";
-import TensorUtils from "../util/TensorUtils";
+import MaxIndexOp from "../op/index/MaxIndexOp";
 import AddOp from "../op/pairwise/AddOp";
-import NegateOp from "../op/transform/NegateOp";
-import MultiplyOp from "../op/pairwise/MultiplyOp";
 import DivideOp from "../op/pairwise/DivideOp";
-import MatMulOp from "../op/special/MatMulOp";
+import MultiplyOp from "../op/pairwise/MultiplyOp";
 import SubtractOp from "../op/pairwise/SubtractOp";
-import SigmoidGradOp from "../op/transform/SigmoidGradOp";
-import SumOp from "../op/reduction/SumOp";
 import MaxOp from "../op/reduction/MaxOp";
-import ReluOp from "../op/transform/ReluOp";
-import StepOp from "../op/transform/StepOp";
-import ExpOp from "../op/transform/ExpOp";
-import LogOp from "../op/transform/LogOp";
+import SumOp from "../op/reduction/SumOp";
+import MatMulOp from "../op/special/MatMulOp";
 import AbsOp from "../op/transform/AbsOp";
-import SineOp from "../op/transform/SineOp";
 import CosineOp from "../op/transform/CosineOp";
+import ExpOp from "../op/transform/ExpOp";
+import IndexSetOp from "../op/transform/IndexSetOp";
+import LogOp from "../op/transform/LogOp";
+import NegateOp from "../op/transform/NegateOp";
+import ReciprocalOp from "../op/transform/ReciprocalOp";
+import ReluOp from "../op/transform/ReluOp";
+import SetOp from "../op/transform/SetOp";
+import SigmoidGradOp from "../op/transform/SigmoidGradOp";
+import SigmoidOp from "../op/transform/SigmoidOp";
 import SignOp from "../op/transform/SignOp";
-import TanOp from "../op/transform/TanOp";
-import TanhOp from "../op/transform/TanhOp";
-import TanGradOp from "../op/transform/TanGradOp";
+import SineOp from "../op/transform/SineOp";
+import SoftmaxOp from "../op/transform/SoftmaxOp";
 import SqrtGradOp from "../op/transform/SqrtGradOp";
 import SqrtOp from "../op/transform/SqrtOp";
-import ReciprocalOp from "../op/transform/ReciprocalOp";
-import MaxIndexOp from "../op/index/MaxIndexOp";
-import IndexSetOp from "../op/transform/IndexSetOp";
-import {println} from "../../index";
+import SquareOp from "../op/transform/SquareOp";
+import StepOp from "../op/transform/StepOp";
+import TanGradOp from "../op/transform/TanGradOp";
+import TanhOp from "../op/transform/TanhOp";
+import TanOp from "../op/transform/TanOp";
+import Tensor from "../Tensor";
+import TensorUtils from "../util/TensorUtils";
 
 export default class TensorMath {
 
@@ -40,7 +41,6 @@ export default class TensorMath {
   }
 
   static add(left, right, result) {
-
     if (!result) {
       let resultShape = TensorUtils.broadcastShapes(left.shape, right.shape);
       result = new Tensor({shape: resultShape});
@@ -136,17 +136,23 @@ export default class TensorMath {
     return result;
   }
 
-  static divide(left, right) {
-    let resultShape = TensorUtils.broadcastShapes(left.shape, right.shape);
-    let result = new Tensor({shape: resultShape});
-    let newLeft = left.broadcast(resultShape);
-    let newRight = right.broadcast(resultShape);
-    Executor.instance.exec(new DivideOp(newLeft, newRight, result));
+  static divide(left, right, result) {
+    if (!result) {
+      let resultShape = TensorUtils.broadcastShapes(left.shape, right.shape);
+      result = new Tensor({shape: resultShape});
+      left = left.broadcast(resultShape);
+      right = right.broadcast(resultShape);
+    } else {
+      left = left.broadcast(result.shape);
+      right = right.broadcast(result.shape);
+    }
+
+    Executor.instance.exec(new DivideOp(left, right, result));
     return result;
   }
 
-  static exp(base) {
-    let result = new Tensor({shape: base.shape});
+  static exp(base, result) {
+    result = result || new Tensor({shape: base.shape});
     Executor.instance.exec(new ExpOp(base, null, result));
     return result;
   }
@@ -219,20 +225,26 @@ export default class TensorMath {
     return result;
   }
 
-  static multiply(left, right) {
-    let resultShape = TensorUtils.broadcastShapes(left.shape, right.shape);
-    let result = new Tensor({shape: resultShape});
-    let newLeft = left.broadcast(resultShape);
-    let newRight = right.broadcast(resultShape);
-    Executor.instance.exec(new MultiplyOp(newLeft, newRight, result));
+  static multiply(left, right, result) {
+    if (!result) {
+      let resultShape = TensorUtils.broadcastShapes(left.shape, right.shape);
+      result = new Tensor({shape: resultShape});
+      left = left.broadcast(resultShape);
+      right = right.broadcast(resultShape);
+    } else {
+      left = left.broadcast(result.shape);
+      right = right.broadcast(result.shape);
+    }
+
+    Executor.instance.exec(new MultiplyOp(left, right, result));
     return result;
   }
 
   // static multiply(left, right, result) {
   //   let newLeft = left.broadcast(resultShape);
   //   let newRight = right.broadcast(resultShape);
-    // Executor.instance.exec(new MultiplyOp(left, right, result));
-    // return result;
+  // Executor.instance.exec(new MultiplyOp(left, right, result));
+  // return result;
   // }
 
 
@@ -324,6 +336,11 @@ export default class TensorMath {
     return TensorMath.divide(exp, sum);
   }
 
+  static softmax2(base, dim, result) {
+    result = result || new Tensor({shape: base.shape});
+    Executor.instance.execAtDim(new SoftmaxOp(base, null, result), dim);
+  }
+
   static softmaxCrossEntropyGrad(labels, logits) {
     let softmax = TensorMath(logits);
     return TensorMath.subtract(softmax, labels);
@@ -378,11 +395,17 @@ export default class TensorMath {
     return result;
   }
 
-  static subtract(left, right) {
-    let resultShape = TensorUtils.broadcastShapes(left.shape, right.shape);
-    left = left.broadcast(resultShape);
-    right = right.broadcast(resultShape);
-    let result = new Tensor({shape: resultShape});
+  static subtract(left, right, result) {
+    if (!result) {
+      let resultShape = TensorUtils.broadcastShapes(left.shape, right.shape);
+      result = new Tensor({shape: resultShape});
+      left = left.broadcast(resultShape);
+      right = right.broadcast(resultShape);
+    } else {
+      left = left.broadcast(result.shape);
+      right = right.broadcast(result.shape);
+    }
+
     Executor.instance.exec(new SubtractOp(left, right, result));
     return result;
   }

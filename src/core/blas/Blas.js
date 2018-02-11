@@ -24,15 +24,16 @@ export function gemm(transA, transB, m, n, k, alpha, A, lda, B, ldb, beta, C, ld
     if (!transA) {
       // C = alpha * A * B + beta * C
       // C[i,j] = Sum(A[i,l] * B[l,j])
-      let cIndex = 0;
+      // let cIndex = 0;
       for (let i = 0; i < m; i++) {
         for (let j = 0; j < n; j++) {
           let temp = 0;
           for (let l = 0; l < k; l++) {
             temp += A[i * colsA + l] * B[l * colsB + j]; // k n
           }
+          let cIndex = i * colsA + j;
           C[cIndex] = alpha * temp + (beta !== 0 ? beta * C[cIndex] : 0);
-          cIndex++;
+          // cIndex++;
         }
       }
     } else {

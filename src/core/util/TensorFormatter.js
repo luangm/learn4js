@@ -54,7 +54,7 @@ export default class TensorFormatter {
   _formatNumber(number) {
     let result = number.toLocaleString('en-US', {
       useGrouping: false,
-      maximumFractionDigits: 3
+      maximumFractionDigits: 8
     });
 
     // let index = result.indexOf('.');

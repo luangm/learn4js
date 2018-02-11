@@ -36,6 +36,10 @@ export default class Operation {
     return this._result;
   }
 
+  get isSpecial() {
+    return false;
+  }
+
   get type() {
     throw new Error('should not call base class\'s type');
   }

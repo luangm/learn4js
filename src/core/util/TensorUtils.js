@@ -196,9 +196,9 @@ export default class TensorUtils {
 
     for (let i = 0; i < shape.length; i++) {
       let size = shape[i];
-      if (indices[i] >= size) {
-        throw new Error('Index out of bound');
-      }
+      // if (indices[i] >= size) {
+      //   throw new Error('Index out of bound');
+      // }
       if (size !== 1) {
         offset += indices[i] * strides[i];
       }

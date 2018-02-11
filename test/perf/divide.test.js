@@ -1,18 +1,16 @@
 import Tensor from "../../src/core/Tensor";
 import TensorMath from "../../src/core/util/TensorMath";
 
-test('test add', function() {
-
-  console.log("--- Creating random arrays and Tensors ---");
+test('test div', function() {
 
   let now = new Date();
   let EPOCH = 10000;
-  let SIZE = 10000;
+  let SIZE = 80000;
   let a = [];
   let b = [];
   let x = [];
 
-  let COLS = 100;
+  let COLS = 200;
   let ROWS = SIZE / COLS;
 
   for (let i = 0; i < SIZE; i++) {
@@ -26,23 +24,18 @@ test('test add', function() {
 
   let then = new Date();
 
-  console.log(">>> Finished in", then - now, "ms");
-
-  console.log("--- Establishing base js benchmark ---");
+  console.log(">>> Set Up", then - now, "ms");
 
   now = new Date();
 
   for (let i = 0; i < EPOCH; i++) {
     for (let j = 0; j < SIZE; j++) {
-      x[j] = a[j] + b[j];
+      x[j] = a[j] / b[j];
     }
   }
 
-
   then = new Date();
-  console.log(">>> Finished in", then - now, "ms");
-
-  console.log("--- Handwritten Performance ---");
+  console.log(">>> base js benchmark: ", then - now, "ms");
 
   now = new Date();
 
@@ -55,12 +48,6 @@ test('test add', function() {
 
   for (let i = 0; i < EPOCH; i++) {
 
-    // Without Offset Calcs
-    // for (let j = 0; j < SIZE; j++) {
-    //     arrayX[j] = arrayA[j] + arrayB[j];
-    // }
-
-    // With Offset Calcs
     for (let AA = 0; AA < ROWS; AA++) {
 
       for (let BB = 0; BB < COLS; BB++) {
@@ -68,23 +55,21 @@ test('test add', function() {
         let offsetB = AA * stridesB[0] + BB * stridesB[1];
         let offsetX = AA * stridesX[0] + BB * stridesX[1];
 
-        arrayX[offsetX] = arrayA[offsetA] + arrayB[offsetB];
+        arrayX[offsetX] = arrayA[offsetA] / arrayB[offsetB];
       }
     }
-
   }
 
   then = new Date();
-  console.log(">>> Finished in", then - now, "ms");
+  console.log(">>> Handwritten", then - now, "ms");
 
-  console.log("--- TensorMath Performance ---");
 
   now = new Date();
 
   for (let i = 0; i < EPOCH; i++) {
-    TensorMath.add(tensorA, tensorB, tensorX);
+    TensorMath.divide(tensorA, tensorB, tensorX);
   }
 
   then = new Date();
-  console.log(">>> Finished in", then - now, "ms");
+  console.log(">>> TensorMath", then - now, "ms");
 });

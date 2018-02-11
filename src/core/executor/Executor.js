@@ -1,5 +1,4 @@
 import IndexOp from "../op/index/IndexOp";
-import AddOp from "../op/pairwise/AddOp";
 import ReductionOp from "../op/reduction/ReductionOp";
 import SpecialOp from "../op/special/SpecialOp";
 import IndexSetOp from "../op/transform/IndexSetOp";
@@ -32,33 +31,29 @@ export default class Executor {
    * This function loops through the Tensor with consideration of buffer index
    */
   exec(op) {
-    // if (op instanceof MultiplyOp) {
-    //   this._execMul(op);
-    //   return;
-    // }
-    if (op instanceof AddOp) {
+
+    if (op.isSpecial) {
       op.exec();
       return;
     }
-    // if (op instanceof SubtractOp) {
-    //   this._execSub(op);
-    //   return;
-    // }
 
     if (op instanceof SpecialOp) {
       // Special Ops bypasses executor
       op.exec();
     } else if (op instanceof ReductionOp) {
-
       let accum = this._accumAtDim(op, 0);
       op.result.data[0] = op.getResult(accum);
-
     } else {
       this._execAtDim(op, 0);
     }
   }
 
   execAtDim(op, dim) {
+    if (op.isSpecial) {
+      op.exec(dim);
+      return;
+    }
+
     if (op instanceof ReductionOp) {
       this._accum(op, 0, dim, new Array(op.input.rank));
     }
@@ -143,6 +138,9 @@ export default class Executor {
    * Starts the execution from a certain dimension
    */
   _execAtDim(op, dim, indices) {
+
+    // console.log("***", indices);
+
     let rank = op.result.rank;
     if (dim >= rank) {
       return;

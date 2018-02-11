@@ -44,6 +44,8 @@ test('Neural Net', function() {
 
   let mm = Learn4js.matmul(x, W);
   let yHat = Learn4js.add(mm, b);
+
+
   let xen = Learn4js.loss.softmaxCrossEntropy(y, yHat);
   let loss = Learn4js.reduceSum(xen);
   // println("sum loss", loss.eval());
@@ -64,20 +66,39 @@ test('Neural Net', function() {
   let b_lr = Learn4js.multiply(lr5, b_grad);
   let b_mul = Learn4js.subtract(b, b_lr);
 
+
+  let softmax = Learn4js.softmax(yHat);
+  let sub = Learn4js.subtract(softmax, y);
+  let tile = Learn4js.constant(Tensor.ones([10, 10]), {name: 'tile'});
+  let yHatGrad = Learn4js.multiply(tile, sub);
+  let dL_dW = Learn4js.matmul(x, yHatGrad, true, false);
+  let dW = Learn4js.multiply(lr3, dL_dW);
+  let newW = Learn4js.subtract(W, dW);
+  let dL_db = Learn4js.reduceSum(yHatGrad, 0);
+
   let now = new Date();
 
-  for (let i = 0; i < 100000; i++) {
+  for (let i = 0; i < 10000; i++) {
     // W_grad.eval();
     // w_lr.eval();
 
     // mm.eval();
+    // yHat.eval();
+    softmax.eval();
+    // sub.eval();
+    // yHatGrad.eval();
+    // dL_dW.eval();
+    // dW.eval();
+    // newW.eval();
+    //
+    // dL_db.eval();
 
     // TensorMath.multiply(dd, f);
-    let w_new = w_mul.eval();
-    let b_new = b_mul.eval();
-
-    W.value = w_new;
-    b.value = b_new;
+    // let w_new = w_mul.eval();
+    // let b_new = b_mul.eval();
+    //
+    // W.value = w_new;
+    // b.value = b_new;
     //   let trainStep = optimizer.minimize(loss);
     //   trainStep.eval();
   }
