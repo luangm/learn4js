@@ -49,7 +49,7 @@ test('test matmul', function() {
   now = new Date();
 
   for (let i = 0; i < EPOCH; i++) {
-    TensorMath.matmul(tensorA, tensorB, false, false, tensorX);
+    TensorMath.matmul(tensorA, tensorB, false, true, tensorX);
   }
 
   then = new Date();

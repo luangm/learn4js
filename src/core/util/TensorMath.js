@@ -336,9 +336,13 @@ export default class TensorMath {
     return TensorMath.divide(exp, sum);
   }
 
-  static softmax2(base, dim, result) {
+  static softmax2(base, dim = -1, result) {
+    if (dim < 0) {
+      dim += base.rank;
+    }
     result = result || new Tensor({shape: base.shape});
     Executor.instance.execAtDim(new SoftmaxOp(base, null, result), dim);
+    return result;
   }
 
   static softmaxCrossEntropyGrad(labels, logits) {

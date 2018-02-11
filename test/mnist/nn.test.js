@@ -15,28 +15,25 @@ test('Neural Net', function() {
   let mnist = new Mnist({testImageUrl: './train-images-idx3-ubyte.gz'});
   mnist._processImages(fileBuffer.buffer);
 
-  let input = mnist.getNextTrainBatch(10);
-  let xData = input.input.reshape([10, 784]);
-  let yData = Tensor.create(
-    [[0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
-      [1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-      [0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-      [0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
-      [0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
-      [0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 1, 0, 0, 0, 0, 0]]
-  );
+  let BATCH = 10;
 
-  let x = Learn4js.variable([10, 784], {name: 'x'});
-  let y = Learn4js.variable([10, 10], {name: 'y'});
+  let input = mnist.getNextTrainBatch(BATCH);
+  let xData = input.input.reshape([BATCH, 784]);
+  let yArray = [];
+  for (let i = 0; i < BATCH; i++) {
+    for (let j = 0; j < 10; j++) {
+      yArray.push(j === 0 ? 1: 0);
+    }
+  }
+  let yData = Tensor.create(yArray).reshape([BATCH, 10]);
+
+  let x = Learn4js.variable([BATCH, 784], {name: 'x'});
+  let y = Learn4js.variable([BATCH, 10], {name: 'y'});
 
   let W = Learn4js.parameter(Tensor.ones([784, 10]), {name: 'W'});
   let b = Learn4js.parameter(Tensor.ones([1, 10]), {name: 'b'});
 
-  let aa = Learn4js.constant(Tensor.scalar(0.1), {name: "AAAA"});
+  // let aa = Learn4js.constant(Tensor.scalar(0.1), {name: "AAAA"});
   // let optimizer = Learn4js.optimizer.gradientDescent({learnRate: 0.001});
 
   x.value = xData;
@@ -44,8 +41,6 @@ test('Neural Net', function() {
 
   let mm = Learn4js.matmul(x, W);
   let yHat = Learn4js.add(mm, b);
-
-
   let xen = Learn4js.loss.softmaxCrossEntropy(y, yHat);
   let loss = Learn4js.reduceSum(xen);
   // println("sum loss", loss.eval());
@@ -69,12 +64,14 @@ test('Neural Net', function() {
 
   let softmax = Learn4js.softmax(yHat);
   let sub = Learn4js.subtract(softmax, y);
-  let tile = Learn4js.constant(Tensor.ones([10, 10]), {name: 'tile'});
+  let tile = Learn4js.constant(Tensor.ones([BATCH, 10]), {name: 'tile'});
   let yHatGrad = Learn4js.multiply(tile, sub);
   let dL_dW = Learn4js.matmul(x, yHatGrad, true, false);
   let dW = Learn4js.multiply(lr3, dL_dW);
   let newW = Learn4js.subtract(W, dW);
-  let dL_db = Learn4js.reduceSum(yHatGrad, 0);
+  let dL_db = Learn4js.reduceSum(yHatGrad, 1);
+  let db = Learn4js.multiply(lr5, dL_db);
+  let newB = Learn4js.subtract(b, db);
 
   let now = new Date();
 
@@ -82,16 +79,18 @@ test('Neural Net', function() {
     // W_grad.eval();
     // w_lr.eval();
 
-    // mm.eval();
-    // yHat.eval();
-    softmax.eval();
+    mm.eval();
+    yHat.eval();
+    // softmax.eval();
     // sub.eval();
     // yHatGrad.eval();
     // dL_dW.eval();
     // dW.eval();
     // newW.eval();
-    //
+    // //
     // dL_db.eval();
+    // db.eval();
+    // newB.eval();
 
     // TensorMath.multiply(dd, f);
     // let w_new = w_mul.eval();
@@ -108,6 +107,5 @@ test('Neural Net', function() {
   println("b", b);
   println("Took " + (then.getTime() - now.getTime()) + " ms");
   // println(W);
-  // println(b);
 
 });

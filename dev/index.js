@@ -54,28 +54,26 @@ async function testMnist() {
   await mnist.init();
   // mnist._processImages(fileBuffer.buffer);
 
-  let input = mnist.getNextTrainBatch(10);
-  let xData = input.input.reshape([10, 784]);
-  let yData = Tensor.create(
-    [[0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
-      [1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-      [0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-      [0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
-      [0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
-      [0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 1, 0, 0, 0, 0, 0]]
-  );
+  let BATCH = 100;
+  let EPOCH = 100000;
 
-  let x = Learn4js.variable([10, 784], {name: 'x'});
-  let y = Learn4js.variable([10, 10], {name: 'y'});
+  let input = mnist.getNextTrainBatch(BATCH);
+  let xData = input.input.reshape([BATCH, 784]);
+  let yArray = [];
+  for (let i = 0; i < BATCH; i++) {
+    for (let j = 0; j < 10; j++) {
+      yArray.push(j === 0 ? 1: 0);
+    }
+  }
+  let yData = Tensor.create(yArray).reshape([BATCH, 10]);
+
+  let x = Learn4js.variable([BATCH, 784], {name: 'x'});
+  let y = Learn4js.variable([BATCH, 10], {name: 'y'});
 
   let W = Learn4js.parameter(Tensor.ones([784, 10]), {name: 'W'});
   let b = Learn4js.parameter(Tensor.ones([1, 10]), {name: 'b'});
 
-  let aa = Learn4js.constant(Tensor.scalar(0.1), {name: "AAAA"});
+  // let aa = Learn4js.constant(Tensor.scalar(0.1), {name: "AAAA"});
   // let optimizer = Learn4js.optimizer.gradientDescent({learnRate: 0.001});
 
   x.value = xData;
@@ -106,16 +104,18 @@ async function testMnist() {
 
   let softmax = Learn4js.softmax(yHat);
   let sub = Learn4js.subtract(softmax, y);
-  let tile = Learn4js.constant(Tensor.ones([10, 10]), {name: 'tile'});
+  let tile = Learn4js.constant(Tensor.ones([BATCH, 10]), {name: 'tile'});
   let yHatGrad = Learn4js.multiply(tile, sub);
   let dL_dW = Learn4js.matmul(x, yHatGrad, true, false);
   let dW = Learn4js.multiply(lr3, dL_dW);
   let newW = Learn4js.subtract(W, dW);
-  let dL_db = Learn4js.reduceSum(yHatGrad, 0);
+  let dL_db = Learn4js.reduceSum(yHatGrad, 1);
+  let db = Learn4js.multiply(lr5, dL_db);
+  let newB = Learn4js.subtract(b, db);
 
   let now = new Date();
 
-  for (let i = 0; i < 10000; i++) {
+  for (let i = 0; i < EPOCH; i++) {
     // W_grad.eval();
     // w_lr.eval();
 
@@ -127,8 +127,10 @@ async function testMnist() {
     dL_dW.eval();
     dW.eval();
     newW.eval();
-    //
-    // dL_db.eval();
+    // //
+    dL_db.eval();
+    db.eval();
+    newB.eval();
 
     // TensorMath.multiply(dd, f);
     // let w_new = w_mul.eval();
@@ -296,12 +298,201 @@ function testMatmul() {
   then = new Date();
   console.log(">>> TensorMath", then - now, "ms");
 }
-// testWeblas();
-// testMnist();
-// testExp();
 
+function testSoftmax() {
+  console.log("--- Creating random arrays and Tensors ---");
+
+  let now = new Date();
+  let EPOCH = 10000;
+  let SIZE = 10000;
+  let a = [];
+  let b = [];
+  let x = [];
+
+  let COLS = 100;
+  let ROWS = SIZE / COLS;
+
+  for (let i = 0; i < SIZE; i++) {
+    a.push(Math.random());
+    b.push(Math.random());
+    x.push(0);
+  }
+  let tensorA = Tensor.create(a).reshape([ROWS, COLS]);
+  let tensorB = Tensor.create(b).reshape([ROWS, COLS]);
+  let tensorX = Tensor.create(x).reshape([ROWS, COLS]);
+
+  let then = new Date();
+
+  console.log(">>> Finished in", then - now, "ms");
+
+  console.log("--- Establishing base js benchmark ---");
+
+  now = new Date();
+
+  for (let i = 0; i < EPOCH; i++) {
+    for (let j = 0; j < SIZE; j++) {
+      x[j] = a[j] + b[j];
+    }
+  }
+
+
+  then = new Date();
+  console.log(">>> Finished in", then - now, "ms");
+
+  console.log("--- Handwritten Performance ---");
+
+  now = new Date();
+
+  let stridesA = tensorA.strides;
+  let stridesB = tensorB.strides;
+  let stridesX = tensorX.strides;
+  let arrayA = tensorA.data;
+  let arrayB = tensorB.data;
+  let arrayX = tensorX.data;
+
+  for (let i = 0; i < EPOCH; i++) {
+
+    // Without Offset Calcs
+    // for (let j = 0; j < SIZE; j++) {
+    //     arrayX[j] = arrayA[j] + arrayB[j];
+    // }
+
+    // With Offset Calcs
+    for (let AA = 0; AA < ROWS; AA++) {
+
+      for (let BB = 0; BB < COLS; BB++) {
+        let offsetA = AA * stridesA[0] + BB * stridesA[1];
+        let offsetB = AA * stridesB[0] + BB * stridesB[1];
+        let offsetX = AA * stridesX[0] + BB * stridesX[1];
+
+        arrayX[offsetX] = arrayA[offsetA] + arrayB[offsetB];
+      }
+    }
+
+  }
+
+  then = new Date();
+  console.log(">>> Finished in", then - now, "ms");
+
+  console.log("--- TensorMath Performance ---");
+
+  now = new Date();
+
+  for (let i = 0; i < EPOCH; i++) {
+    TensorMath.softmax2(tensorA, 1);
+  }
+
+  then = new Date();
+  console.log(">>> Finished in", then - now, "ms");
+}
+// testWeblas();
+testMnist();
+// testExp();
+// testSoftmax();
 // testMatmul();
 
+function testGemm() {
+  let EPOCH = 10;
+  let ROWS = 1024;
+  let COLS = 1024;
+  let SIZE = ROWS * COLS;
+  let LDA = COLS;
+  let LDB = COLS;
+  let LDC = COLS;
+  let M = ROWS;
+  let N = COLS;
+  let K = COLS;
+
+  let a = []; // A = m * k
+  let b = []; // B = k * n
+  let c = []; // C = m * n
+
+  for (let i = 0; i < SIZE; i++) {
+    a.push(Math.random());
+    b.push(Math.random());
+    c.push(0);
+  }
+
+  let now = new Date();
+
+  for (let e = 0; e < EPOCH; e++) {
+
+    for (let i = 0; i < M; i+=4) {
+      for (let j = 0; j < N; j+=4) {
+
+        let sum00 = 0;
+        let sum01 = 0;
+        let sum02 = 0;
+        let sum03 = 0;
+        let sum10 = 0;
+        let sum11 = 0;
+        let sum12 = 0;
+        let sum13 = 0;
+        let sum20 = 0;
+        let sum21 = 0;
+        let sum22 = 0;
+        let sum23 = 0;
+        let sum30 = 0;
+        let sum31 = 0;
+        let sum32 = 0;
+        let sum33 = 0;
+
+
+        for (let p = 0; p < K; p++) {
+          let a0 = a[i * LDA + p];
+          let a1 = a[(i+1) * LDA + p];
+          let a2 = a[(i+2) * LDA + p];
+          let a3 = a[(i+3) * LDA + p];
+
+          let b0 = b[p * LDB + j];
+          let b1 = b[p * LDB + j + 1];
+          let b2 = b[p * LDB + j + 2];
+          let b3 = b[p * LDB + j + 3];
+
+          sum00 += a0 * b0;
+          sum01 += a0 * b1;
+          sum02 += a0 * b2;
+          sum03 += a0 * b3;
+          sum10 += a1 * b0;
+          sum11 += a1 * b1;
+          sum12 += a1 * b2;
+          sum13 += a1 * b3;
+          sum20 += a2 * b0;
+          sum21 += a2 * b1;
+          sum22 += a2 * b2;
+          sum23 += a2 * b3;
+          sum30 += a3 * b0;
+          sum31 += a3 * b1;
+          sum32 += a3 * b2;
+          sum33 += a3 * b3;
+        }
+
+        c[i * LDC + j] += sum00;
+        c[i * LDC + j + 1] += sum01;
+        c[i * LDC + j + 2] += sum02;
+        c[i * LDC + j + 3] += sum03;
+        c[(i+1) * LDC + j] += sum10;
+        c[(i+1) * LDC + j + 1] += sum11;
+        c[(i+1) * LDC + j + 2] += sum12;
+        c[(i+1) * LDC + j + 3] += sum13;
+        c[(i+2) * LDC + j] += sum20;
+        c[(i+2) * LDC + j + 1] += sum21;
+        c[(i+2) * LDC + j + 2] += sum22;
+        c[(i+2) * LDC + j + 3] += sum23;
+        c[(i+3) * LDC + j] += sum30;
+        c[(i+3) * LDC + j + 1] += sum31;
+        c[(i+3) * LDC + j + 2] += sum32;
+        c[(i+3) * LDC + j + 3] += sum33;
+      }
+    }
+
+  }
+
+  let then = new Date();
+  console.log(">>> base js benchmark: ", then - now, "ms");
+}
+
+// testGemm();
 
 function createShader(gl, type, source) {
   var shader = gl.createShader(type);
@@ -448,4 +639,4 @@ function webgl() {
 
 }
 
-webgl();
+// webgl();

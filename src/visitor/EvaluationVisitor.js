@@ -384,7 +384,7 @@ export default class EvaluationVisitor extends Visitor {
     }
 
     let base = node.base.value;
-    node.value = TensorMath.softmax(base);
+    node.value = TensorMath.softmax2(base);
     node.state = ExpressionState.EVALUATED;
   }
 
