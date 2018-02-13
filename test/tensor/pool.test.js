@@ -1,6 +1,6 @@
 import {Tensor} from '../../src/index.js';
 import {println} from "../../src/index";
-import TensorMath from "../../src/core/util/TensorMath";
+import TensorMath from "../../src/core/TensorMath";
 
 test('maxpool', function() {
   let image = Tensor.linspace(1, 32, 32).reshape([2, 1, 4, 4]); // N, C, H, W

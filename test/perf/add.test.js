@@ -1,5 +1,5 @@
 import Tensor from "../../src/core/Tensor";
-import TensorMath from "../../src/core/util/TensorMath";
+import TensorMath from "../../src/core/TensorMath";
 
 test('test add', function() {
 

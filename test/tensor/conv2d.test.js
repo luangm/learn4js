@@ -1,7 +1,7 @@
 import {Tensor} from '../../src/index.js';
 import TensorUtils from "../../src/core/util/TensorUtils";
 import {println} from "../../src/index";
-import TensorMath from "../../src/core/util/TensorMath";
+import TensorMath from "../../src/core/TensorMath";
 
 test('conv2d', function() {
   let image = Tensor.linspace(1, 54, 54).reshape([2, 3, 3, 3]);

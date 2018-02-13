@@ -1,6 +1,6 @@
 import fs from "fs";
 import Tensor from "../../src/core/Tensor";
-import TensorMath from "../../src/core/util/TensorMath";
+import TensorMath from "../../src/core/TensorMath";
 import Learn4js, {Logger, println} from '../../src/index';
 import Mnist from "../../src/mnist/Mnist";
 

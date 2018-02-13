@@ -1,13 +1,11 @@
-import Shape from "./Shape";
 import Executor from "./executor/Executor";
-import AddOp from "./op/pairwise/AddOp";
 import SumOp from "./op/reduction/SumOp";
-import TensorMath from "./util/TensorMath";
-import TensorUtils from "./util/TensorUtils";
+import Shape from "./Shape";
+import TensorMath from "./TensorMath";
+import ArrayUtils from "./util/ArrayUtils";
 import TensorFactory from "./util/TensorFactory";
 import TensorFormatter from "./util/TensorFormatter";
-import ShapeUtils from "./util/ShapeUtils";
-import ArrayUtils from "./util/ArrayUtils";
+import TensorUtils from "./util/TensorUtils";
 
 /**
  * A Tensor is the basic data storage for N-Dimensional array.

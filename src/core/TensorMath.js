@@ -1,36 +1,35 @@
-import {println} from "../../index";
-import Executor from "../executor/Executor";
-import MaxIndexOp from "../op/index/MaxIndexOp";
-import AddOp from "../op/pairwise/AddOp";
-import DivideOp from "../op/pairwise/DivideOp";
-import MultiplyOp from "../op/pairwise/MultiplyOp";
-import SubtractOp from "../op/pairwise/SubtractOp";
-import MaxOp from "../op/reduction/MaxOp";
-import SumOp from "../op/reduction/SumOp";
-import MatMulOp from "../op/special/MatMulOp";
-import AbsOp from "../op/transform/AbsOp";
-import CosineOp from "../op/transform/CosineOp";
-import ExpOp from "../op/transform/ExpOp";
-import IndexSetOp from "../op/transform/IndexSetOp";
-import LogOp from "../op/transform/LogOp";
-import NegateOp from "../op/transform/NegateOp";
-import ReciprocalOp from "../op/transform/ReciprocalOp";
-import ReluOp from "../op/transform/ReluOp";
-import SetOp from "../op/transform/SetOp";
-import SigmoidGradOp from "../op/transform/SigmoidGradOp";
-import SigmoidOp from "../op/transform/SigmoidOp";
-import SignOp from "../op/transform/SignOp";
-import SineOp from "../op/transform/SineOp";
-import SoftmaxOp from "../op/transform/SoftmaxOp";
-import SqrtGradOp from "../op/transform/SqrtGradOp";
-import SqrtOp from "../op/transform/SqrtOp";
-import SquareOp from "../op/transform/SquareOp";
-import StepOp from "../op/transform/StepOp";
-import TanGradOp from "../op/transform/TanGradOp";
-import TanhOp from "../op/transform/TanhOp";
-import TanOp from "../op/transform/TanOp";
-import Tensor from "../Tensor";
-import TensorUtils from "../util/TensorUtils";
+import Executor from "./executor/Executor";
+import MaxIndexOp from "./op/index/MaxIndexOp";
+import AddOp from "./op/pairwise/AddOp";
+import DivideOp from "./op/pairwise/DivideOp";
+import MultiplyOp from "./op/pairwise/MultiplyOp";
+import SubtractOp from "./op/pairwise/SubtractOp";
+import MaxOp from "./op/reduction/MaxOp";
+import SumOp from "./op/reduction/SumOp";
+import MatMulOp from "./op/special/MatMulOp";
+import AbsOp from "./op/transform/AbsOp";
+import CosineOp from "./op/transform/CosineOp";
+import ExpOp from "./op/transform/ExpOp";
+import IndexSetOp from "./op/transform/IndexSetOp";
+import LogOp from "./op/transform/LogOp";
+import NegateOp from "./op/transform/NegateOp";
+import ReciprocalOp from "./op/transform/ReciprocalOp";
+import ReluOp from "./op/transform/ReluOp";
+import SetOp from "./op/transform/SetOp";
+import SigmoidGradOp from "./op/transform/SigmoidGradOp";
+import SigmoidOp from "./op/transform/SigmoidOp";
+import SignOp from "./op/transform/SignOp";
+import SineOp from "./op/transform/SineOp";
+import SoftmaxOp from "./op/transform/SoftmaxOp";
+import SqrtGradOp from "./op/transform/SqrtGradOp";
+import SqrtOp from "./op/transform/SqrtOp";
+import SquareOp from "./op/transform/SquareOp";
+import StepOp from "./op/transform/StepOp";
+import TanGradOp from "./op/transform/TanGradOp";
+import TanhOp from "./op/transform/TanhOp";
+import TanOp from "./op/transform/TanOp";
+import Tensor from "./Tensor";
+import TensorUtils from "./util/TensorUtils";
 
 export default class TensorMath {
 
@@ -91,7 +90,6 @@ export default class TensorMath {
   static conv2d(image, kernel) {
 
     let xCol = TensorUtils.im2col(image, kernel.shape);
-    println(xCol);
 
     let numImages = image.shape[0];
     let channels = image.shape[1];

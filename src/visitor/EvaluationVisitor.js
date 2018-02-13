@@ -1,5 +1,5 @@
 import Tensor from "../core/Tensor";
-import TensorMath from "../core/util/TensorMath";
+import TensorMath from "../core/TensorMath";
 import TensorUtils from "../core/util/TensorUtils";
 import ExpressionState from "../structure/constant/ExpressionState";
 import Logger from "../util/Logger";

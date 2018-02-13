@@ -1,5 +1,5 @@
 import Tensor from "../../src/core/Tensor";
-import TensorMath from "../../src/core/util/TensorMath";
+import TensorMath from "../../src/core/TensorMath";
 
 test('test mul', function() {
 
@@ -30,7 +30,7 @@ test('test mul', function() {
 
   for (let i = 0; i < EPOCH; i++) {
     for (let j = 0; j < SIZE; j++) {
-      x[j] = a[j] * b[j];
+      x[j] = a[j] * 0.01;
     }
   }
 
@@ -52,10 +52,10 @@ test('test mul', function() {
 
       for (let BB = 0; BB < COLS; BB++) {
         let offsetA = AA * stridesA[0] + BB * stridesA[1];
-        let offsetB = AA * stridesB[0] + BB * stridesB[1];
-        let offsetX = AA * stridesX[0] + BB * stridesX[1];
+        // let offsetB = AA * stridesB[0] + BB * stridesB[1];
+        // let offsetX = AA * stridesX[0] + BB * stridesX[1];
 
-        arrayX[offsetX] = arrayA[offsetA] * arrayB[offsetB];
+        arrayX[offsetA] = arrayA[offsetA] * 0.01;
       }
     }
   }

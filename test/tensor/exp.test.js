@@ -1,7 +1,7 @@
 import {Tensor} from '../../src/index.js';
 import TensorUtils from "../../src/core/util/TensorUtils";
 import {println} from "../../src/index";
-import TensorMath from "../../src/core/util/TensorMath";
+import TensorMath from "../../src/core/TensorMath";
 
 test('exp', function() {
   let a = Tensor.linspace(1.0, 4.0, 4);

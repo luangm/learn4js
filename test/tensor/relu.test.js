@@ -1,6 +1,6 @@
 import {Tensor} from '../../src/index.js';
 import {println} from "../../src/index";
-import TensorMath from "../../src/core/util/TensorMath";
+import TensorMath from "../../src/core/TensorMath";
 
 test('relu', function() {
   let image = Tensor.rand([1, 1, 4, 4]);

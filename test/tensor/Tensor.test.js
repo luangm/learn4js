@@ -1,5 +1,5 @@
 import {Tensor} from '../../src/index.js';
-import TensorMath from "../../src/core/util/TensorMath";
+import TensorMath from "../../src/core/TensorMath";
 
 test('add', function() {
   let tensor = new Tensor({data: [1, 2, 3, 4, 5, 6], shape: [2, 3]});

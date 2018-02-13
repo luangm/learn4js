@@ -1,6 +1,6 @@
 import {Tensor} from '../../src/index.js';
 import {println} from "../../src/index";
-import TensorMath from "../../src/core/util/TensorMath";
+import TensorMath from "../../src/core/TensorMath";
 
 test('softmax', function() {
   let logits = Tensor.create([[1, 2, 3, 4], [5, 6, 7, 8]]);

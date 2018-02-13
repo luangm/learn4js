@@ -1,8 +1,80 @@
+import TensorMath from "../src/core/TensorMath";
+import Axpy from "../src/core/webgl/blas/Axpy";
+import WebGL from "../src/core/webgl/WebGL";
+import WebGLTexture from "../src/core/webgl/WebGLTexture";
 import Learn4js, {Logger, println, Tensor} from '../src/index';
 import Mnist from '../src/mnist/Mnist';
-import TensorMath from "../src/core/util/TensorMath";
 
-// import weblas from 'weblas';
+function testWebgl() {
+
+  let a = 2.0;
+  let x = new Float32Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]);
+  let y = new Float32Array([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]);
+  let zeros = new Float32Array(10000);
+  let zeros2 = new Float32Array(10000);
+  let out = new Float32Array(10000);
+  let M = 4;
+  let N = 4;
+  let EPOCH = 1;
+
+  let now = new Date();
+
+  for (let i = 0; i < EPOCH; i++) {
+    for (let m = 0; m < M; m++) {
+      for (let n = 0; n < N; n++) {
+        out[m * N + n] = zeros[m * N + n] + zeros2[m * N + n];
+      }
+    }
+  }
+
+  let then = new Date();
+
+  console.log("JS Run:", then - now);
+
+  let webgl = new WebGL({
+    canvas: document.getElementById('c')
+  });
+
+  let axpy = new Axpy(webgl);
+  console.log(axpy);
+
+  let texture0 = new WebGLTexture(x, [M, N], webgl); // webgl.createDataTexture(x, [M, N]);
+  let texture1 = new WebGLTexture(y, [M, N], webgl); // webgl.createDataTexture(y, [M, N]);
+  let outputTexture = webgl.createOutputTexture(M, N);
+
+  webgl.useProgram(axpy);
+
+  webgl.texture0 = texture0;
+  webgl.texture1 = texture1;
+  webgl.bindOutputTexture(M, N, outputTexture);
+
+  axpy.X.value = 0;
+  axpy.Y.value = 1;
+  axpy.N.value = N;
+  axpy.a.value = a;
+
+  console.log("-------");
+  // webgl.useProgram(); // Activates the program
+
+  // webgl.texture0 = texture0;
+  // webgl.texture1 = texture1;
+  // webgl.setUniformIntValue(webgl._program, 'X', 0);
+  // webgl.setUniformIntValue(webgl._program, 'Y', 1);
+  // webgl.setUniformIntValue(webgl._program, 'N', N);
+  // webgl.setUniformFloatValue(webgl._program, 'a', a);
+
+  webgl.render();
+
+  let then2 = new Date();
+  console.log("Webgl Run:", then2 - then);
+
+  let rawBuffer2 = webgl.readData(M, N);
+  let outArray = new Float32Array(rawBuffer2);
+  console.log(outArray);
+
+}
+
+testWebgl();
 
 function testWeblas() {
   var h1 = 784, w1 = 10,
@@ -31,7 +103,7 @@ function testWeblas() {
   // console.log(context);
 
   let now = new Date();
-  for (let  i = 0; i < 10000; i++){
+  for (let i = 0; i < 10000; i++) {
     let result = weblas.sgemm(M, N, K, alpha, A, B, beta, C);
   }
   // console.log(result);
@@ -62,7 +134,7 @@ async function testMnist() {
   let yArray = [];
   for (let i = 0; i < BATCH; i++) {
     for (let j = 0; j < 10; j++) {
-      yArray.push(j === 0 ? 1: 0);
+      yArray.push(j === 0 ? 1 : 0);
     }
   }
   let yData = Tensor.create(yArray).reshape([BATCH, 10]);
@@ -385,8 +457,9 @@ function testSoftmax() {
   then = new Date();
   console.log(">>> Finished in", then - now, "ms");
 }
+
 // testWeblas();
-testMnist();
+//testMnist();
 // testExp();
 // testSoftmax();
 // testMatmul();
@@ -417,8 +490,8 @@ function testGemm() {
 
   for (let e = 0; e < EPOCH; e++) {
 
-    for (let i = 0; i < M; i+=4) {
-      for (let j = 0; j < N; j+=4) {
+    for (let i = 0; i < M; i += 4) {
+      for (let j = 0; j < N; j += 4) {
 
         let sum00 = 0;
         let sum01 = 0;
@@ -440,9 +513,9 @@ function testGemm() {
 
         for (let p = 0; p < K; p++) {
           let a0 = a[i * LDA + p];
-          let a1 = a[(i+1) * LDA + p];
-          let a2 = a[(i+2) * LDA + p];
-          let a3 = a[(i+3) * LDA + p];
+          let a1 = a[(i + 1) * LDA + p];
+          let a2 = a[(i + 2) * LDA + p];
+          let a3 = a[(i + 3) * LDA + p];
 
           let b0 = b[p * LDB + j];
           let b1 = b[p * LDB + j + 1];
@@ -471,18 +544,18 @@ function testGemm() {
         c[i * LDC + j + 1] += sum01;
         c[i * LDC + j + 2] += sum02;
         c[i * LDC + j + 3] += sum03;
-        c[(i+1) * LDC + j] += sum10;
-        c[(i+1) * LDC + j + 1] += sum11;
-        c[(i+1) * LDC + j + 2] += sum12;
-        c[(i+1) * LDC + j + 3] += sum13;
-        c[(i+2) * LDC + j] += sum20;
-        c[(i+2) * LDC + j + 1] += sum21;
-        c[(i+2) * LDC + j + 2] += sum22;
-        c[(i+2) * LDC + j + 3] += sum23;
-        c[(i+3) * LDC + j] += sum30;
-        c[(i+3) * LDC + j + 1] += sum31;
-        c[(i+3) * LDC + j + 2] += sum32;
-        c[(i+3) * LDC + j + 3] += sum33;
+        c[(i + 1) * LDC + j] += sum10;
+        c[(i + 1) * LDC + j + 1] += sum11;
+        c[(i + 1) * LDC + j + 2] += sum12;
+        c[(i + 1) * LDC + j + 3] += sum13;
+        c[(i + 2) * LDC + j] += sum20;
+        c[(i + 2) * LDC + j + 1] += sum21;
+        c[(i + 2) * LDC + j + 2] += sum22;
+        c[(i + 2) * LDC + j + 3] += sum23;
+        c[(i + 3) * LDC + j] += sum30;
+        c[(i + 3) * LDC + j + 1] += sum31;
+        c[(i + 3) * LDC + j + 2] += sum32;
+        c[(i + 3) * LDC + j + 3] += sum33;
       }
     }
 
@@ -506,6 +579,7 @@ function createShader(gl, type, source) {
   console.log(gl.getShaderInfoLog(shader));
   gl.deleteShader(shader);
 }
+
 // Returns a random integer from 0 to range - 1.
 function randomInt(range) {
   return Math.floor(Math.random() * range);
@@ -532,6 +606,7 @@ function setRectangle(gl, x, y, width, height) {
     x2, y1,
     x2, y2]), gl.STATIC_DRAW);
 }
+
 function createProgram(gl, vertexShader, fragmentShader) {
   var program = gl.createProgram();
   gl.attachShader(program, vertexShader);
@@ -574,7 +649,6 @@ function webgl() {
   //   0.7, 0,
   // ];
   // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
-
 
 
   var resolutionUniformLocation = gl.getUniformLocation(program, "u_resolution");

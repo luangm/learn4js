@@ -3,6 +3,11 @@ import Tensor from "../src/core/Tensor";
 import Executor from "../src/core/executor/Executor";
 import SumOp from "../src/core/op/reduction/SumOp";
 
+test('console_log', function() {
+  let a = Tensor.create([1, 2, 3]);
+  console.log(a);
+});
+
 test('two arrays of different size', function() {
   let a = [2, 3];
   let b = [1, 2, 1];
