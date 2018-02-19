@@ -3,28 +3,47 @@ import WebGLFragmentShader from "./WebGLFragmentShader";
 import WebGLUniform from "./WebGLUniform";
 import WebGLVertexShader from "./WebGLVertexShader";
 
+const POS_ATTRIBUTE_NAME = 'pos';
+const TEX_ATTRIBUTE_NAME = 'tex';
+
 /**
  * A WebGLProgram caches the actual WebGLProgram object (same name),
  * it's attribute and uniform locations and types
  */
 export default class WebGLProgram {
 
-  constructor(vertexShaderString, fragmentShaderString, webgl) {
-    this._context = webgl.context;
-    let vertexShader = new WebGLVertexShader(vertexShaderString, webgl);
-    let fragShader = new WebGLFragmentShader(fragmentShaderString, webgl);
+  /**
+   * @param vertexShaderString
+   * @param fragmentShaderString
+   * @param context {WebGLContext}
+   */
+  constructor(vertexShaderString, fragmentShaderString, context) {
+    let gl = context.context;
+    let vertexShader = new WebGLVertexShader(vertexShaderString, context);
+    let fragShader = new WebGLFragmentShader(fragmentShaderString, context);
+
+    this._context = context;
     this._program = this._createProgram(vertexShader, fragShader);
-    this._context.useProgram(this._program);
+    gl.useProgram(this._program.program);
     this._attributes = this._cacheAttributes();
     this._uniforms = this._cacheUniforms();
+    this._bindVertices();
   }
 
   get attributes() {
     return this._attributes;
   }
 
+  /**
+   * WebGLContext
+   * @returns {WebGLContext}
+   */
   get context() {
     return this._context;
+  }
+
+  get isActive() {
+    return this.context.program === this;
   }
 
   get program() {
@@ -35,8 +54,68 @@ export default class WebGLProgram {
     return this._uniforms;
   }
 
+  activate() {
+    if (!this.isActive) {
+      this.context.program = this;
+    }
+  }
+
+  /**
+   * Executes this program
+   */
+  exec() {
+    this.activate();
+    let gl = this.context.context;
+    gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
+  }
+
+  /**
+   * Binds Vertices to vertex shader
+   * @private
+   */
+  _bindVertices() {
+    let gl = this.context.context;
+
+    // bind vertices
+    let position = this.attributes[POS_ATTRIBUTE_NAME].location;
+    gl.enableVertexAttribArray(position);
+
+    var vertexBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+
+    // define a square that covers the screen
+    var vertices = [-1.0, -1.0, 0.0,	// bottom left
+      1.0, -1.0, 0.0,	// bottom right
+      1.0, 1.0, 0.0,	// top right
+      -1.0, 1.0, 0.0];	// top left
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+    gl.vertexAttribPointer(position, /*item size*/3, gl.FLOAT, false, 0, 0);
+
+
+    // bind texture cords
+    var texture = this.attributes[TEX_ATTRIBUTE_NAME].location;
+    var texCoords = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, texCoords);
+    var textureCoords = [0.0, 0.0,
+      1.0, 0.0,
+      1.0, 1.0,
+      0.0, 1.0];
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoords), gl.STATIC_DRAW);
+    gl.vertexAttribPointer(texture, /*item size*/2, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(texture);
+
+    // index to vertices
+    var indices = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indices);
+    // tesselate square into triangles
+    // indeces into vertex array creating triangles, with counter-clockwise winding
+    var vertexIndices = [0, 1, 2,	// bottom right triangle
+      0, 2, 3];	// top left triangle
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(vertexIndices), gl.STATIC_DRAW);
+  }
+
   _cacheAttributes() {
-    let gl = this.context;
+    let gl = this.context.context;
 
     let attributes = {};
     let n = gl.getProgramParameter(this._program, gl.ACTIVE_ATTRIBUTES);
@@ -50,7 +129,7 @@ export default class WebGLProgram {
   }
 
   _cacheUniforms() {
-    let gl = this.context;
+    let gl = this.context.context;
 
     let uniforms = {};
     let n = gl.getProgramParameter(this._program, gl.ACTIVE_UNIFORMS);
@@ -64,7 +143,7 @@ export default class WebGLProgram {
   }
 
   _createProgram(vertexShader, fragmentShader) {
-    let gl = this.context;
+    let gl = this.context.context;
 
     let program = gl.createProgram();
 

@@ -9,26 +9,60 @@ export default class Scal extends WebGLProgram {
   }
 
   get N() {
-    return this.uniforms['N'];
+    return this._N;
   }
 
+  set N(value) {
+    this.activate();
+    this._N = value;
+    this.uniforms['N'].value = value;
+  }
+
+  /**
+   * @returns {WebGLTensor}
+   */
   get X() {
-    return this.uniforms['X'];
+    return this.context.input0;
   }
 
+  /**
+   * @param tensor {WebGLTensor}
+   */
+  set X(tensor) {
+    this.activate();
+    this.context.input0 = tensor;
+    this.uniforms['X'].value = 0;
+  }
+
+  /**
+   * @returns {Number}
+   */
   get a() {
-    return this.uniforms['a'];
+    return this._a;
   }
 
+  /**
+   * @param value {Number}
+   */
+  set a(value) {
+    this.activate();
+    this._a = value;
+    this.uniforms['a'].value = value;
+  }
+
+  /**
+   * @returns {Number}
+   */
   get b() {
-    return this.uniforms['a'];
+    return this._b;
   }
 
-  get pos() {
-    return this.attributes['pos'];
-  }
-
-  get tex() {
-    return this.attributes['tex'];
+  /**
+   * @param value {Number}
+   */
+  set b(value) {
+    this.activate();
+    this._b = value;
+    this.uniforms['b'].value = value;
   }
 }

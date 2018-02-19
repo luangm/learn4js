@@ -50,4 +50,7 @@ export default class WebGLTensor {
     return result;
   }
 
+  _createOutputTexture() {
+
+  }
 }

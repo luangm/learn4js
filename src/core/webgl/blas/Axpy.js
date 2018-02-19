@@ -9,26 +9,61 @@ export default class Axpy extends WebGLProgram {
   }
 
   get N() {
-    return this.uniforms['N'];
+    return this._N;
   }
 
+  set N(value) {
+    this.activate();
+    this._N = value;
+    this.uniforms['N'].value = value;
+  }
+
+  /**
+   * @returns {WebGLTensor}
+   */
   get X() {
-    return this.uniforms['X'];
+    return this.context.input0;
   }
 
+  /**
+   * @param tensor {WebGLTensor}
+   */
+  set X(tensor) {
+    this.activate();
+    this.context.input0 = tensor;
+    this.uniforms['X'].value = 0;
+  }
+
+  /**
+   * @returns {WebGLTensor}
+   */
   get Y() {
-    return this.uniforms['Y'];
+    return this.context.input1;
   }
 
+  /**
+   * @param tensor {WebGLTensor}
+   */
+  set Y(tensor) {
+    this.activate();
+    this.context.input1 = tensor;
+    this.uniforms['Y'].value = 1;
+  }
+
+  /**
+   * @returns {Number}
+   */
   get a() {
-    return this.uniforms['a'];
+    return this._a;
   }
 
-  get pos() {
-    return this.attributes['pos'];
+  /**
+   * @param value {Number}
+   */
+  set a(value) {
+    this.activate();
+    this._a = value;
+    this.uniforms['a'].value = value;
   }
 
-  get tex() {
-    return this.attributes['tex'];
-  }
 }

@@ -1,18 +1,19 @@
 export default class WebGLShader {
 
-  constructor(type, source, webgl) {
+  /**
+   * @param type
+   * @param source
+   * @param context {WebGLContext}
+   */
+  constructor(type, source, context) {
     this._type = type;
-    this._context = webgl.context;
-    let gl = this._context;
-    this._shader = gl.createShader(type);
-    gl.shaderSource(this._shader, source);
-    gl.compileShader(this._shader);
-
-    if (!gl.getShaderParameter(this._shader, gl.COMPILE_STATUS)) {
-      throw new Error('Could not compile shader: ' + gl.getShaderInfoLog(this._shader));
-    }
+    this._context = context;
+    this._shader = this._createShader(type, source);
   }
 
+  /**
+   * @returns {WebGLContext}
+   */
   get context() {
     return this._context;
   }
@@ -23,6 +24,22 @@ export default class WebGLShader {
 
   get type() {
     return this._type;
+  }
+
+  /**
+   * @private
+   */
+  _createShader(type, source) {
+    let gl = this.context.context;
+    let shader = gl.createShader(type);
+    gl.shaderSource(shader, source);
+    gl.compileShader(shader);
+
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+      throw new Error('Could not compile shader: ' + gl.getShaderInfoLog(shader));
+    }
+
+    return shader;
   }
 
 }
