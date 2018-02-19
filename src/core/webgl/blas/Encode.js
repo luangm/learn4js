@@ -1,11 +1,11 @@
-import SAXPY_STRING from '../glsl/saxpy_1.glsl';
+import ENCODE_STRING from '../glsl/encode.glsl';
 import VERTEX_SHADER_STRING from '../glsl/vertexShader.vert';
 import WebGLProgram from "../WebGLProgram";
 
-export default class Axpy extends WebGLProgram {
+export default class Encode extends WebGLProgram {
 
   constructor(webgl) {
-    super(VERTEX_SHADER_STRING, SAXPY_STRING, webgl);
+    super(VERTEX_SHADER_STRING, ENCODE_STRING, webgl);
   }
 
   get N() {
@@ -14,14 +14,6 @@ export default class Axpy extends WebGLProgram {
 
   get X() {
     return this.uniforms['X'];
-  }
-
-  get Y() {
-    return this.uniforms['Y'];
-  }
-
-  get a() {
-    return this.uniforms['a'];
   }
 
   get pos() {

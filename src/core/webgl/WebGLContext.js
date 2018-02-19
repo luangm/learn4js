@@ -1,7 +1,10 @@
 /**
- * Wrapper around WebGL
+ * Wrapper around WebGL Context
+ *
  */
-export default class WebGL {
+import Encode from "./blas/Encode";
+
+export default class WebGLContext {
 
   static COMPONENT_PER_TEXEL = 4;
 
@@ -17,8 +20,6 @@ export default class WebGL {
       throw new Error("WebGL not supported");
     }
 
-    console.log(gl.canvas.width, gl.canvas.height);
-
     // Tell WebGL how to convert from clip space to pixels
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
@@ -33,6 +34,7 @@ export default class WebGL {
     this._highp = gl.getShaderPrecisionFormat(gl.FRAGMENT_SHADER, gl.HIGH_FLOAT);
 
 
+    this._encode = new Encode(this);
     // this._program = new WebGLProgram(VERTEX_SHADER_STRING, SAXPY_STRING, gl);
 
     // console.log(this._program);
@@ -48,6 +50,64 @@ export default class WebGL {
 
   get hasFloat() {
     return this._floatExt != null;
+  }
+
+  /**
+   * This is first input tensor
+   */
+  get input0() {
+    return this._input0;
+  }
+
+  /**
+   * Binds the first tensor
+   * @param tensor
+   */
+  set input0(tensor) {
+    this._input0 = tensor;
+    let gl = this.context;
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, tensor.texture.texture);
+  }
+
+  get input1() {
+    return this._input1;
+  }
+
+  set input1(tensor) {
+    this._input1 = tensor;
+    let gl = this.context;
+    gl.activeTexture(gl.TEXTURE1);
+    gl.bindTexture(gl.TEXTURE_2D, tensor.texture.texture);
+  }
+
+  get input2() {
+    return this._input2;
+  }
+
+  get output() {
+    return this._output;
+  }
+
+  /**
+   * Binds a Tensor to the output
+   * @param tensor The output tensor
+   */
+  set output(tensor) {
+    this._output = tensor;
+    let gl = this.context;
+
+    let M = tensor.shape[0];
+    let N = tensor.shape[1];
+    this.canvas.height = M;
+    this.canvas.width = N;
+    gl.viewport(0, 0, N, M);
+
+    if (!this.framebuffer) {
+      this.framebuffer = this.framebuffer || gl.createFramebuffer();
+      gl.bindFramebuffer(gl.FRAMEBUFFER, this.framebuffer);
+    }
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tensor.texture.texture, /*level*/0);
   }
 
   get texture0() {
@@ -84,17 +144,6 @@ export default class WebGL {
     let gl = this.context;
     gl.activeTexture(gl.TEXTURE2);
     gl.bindTexture(gl.TEXTURE_2D, texture.texture);
-  }
-
-  bindInputTexture(program, name, textureUnit, texture, context) {
-    let gl = context || this.context;
-
-    gl.activeTexture(textureUnit);
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-
-    var sampler = gl.getUniformLocation(program, name);
-    gl.uniform1i(sampler, textureUnit - gl.TEXTURE0);
-
   }
 
   bindOutputTexture(M, N, texture) {
@@ -192,42 +241,6 @@ export default class WebGL {
   };
 
   /**
-   * Create a texture using the supplied data and shape.
-   * If the shape's side is not Power of 4, the texture is padded with 0s
-   *
-   * @param data a Float32Array
-   * @param shape 2d array [H, W]
-   * @param context
-   */
-  createDataTexture(data, shape, context) {
-    let gl = context || this.context;
-
-    let width = shape[1];
-    let height = shape[0];
-
-    let texture = gl.createTexture();
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-
-    // No Need to pad
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width / WebGL.COMPONENT_PER_TEXEL, height, 0, gl.RGBA, gl.FLOAT, data);
-
-    // TODO: PAdding
-
-    // clamp to edge to support non-power of two textures
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-
-    // don't interpolate when getting data from texture
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-
-    // we're done with setup, so unbind current texture
-    gl.bindTexture(gl.TEXTURE_2D, null);
-
-    return texture;
-  }
-
-  /**
    * Create a (padded) texture suitable for reading into an array with readPixels.
    * UNSIGNED_BYTE
    * can be passed to bindDestinationTexture.
@@ -260,6 +273,28 @@ export default class WebGL {
 
     return destTexture;
   };
+
+
+  /**
+   * Executes a program to encode a tensor to output texture
+   * @param tensor
+   * @param out
+   */
+  encode(tensor, out) {
+    let gl = this.context;
+    let M = tensor.shape[0];
+    let N = tensor.shape[1];
+    this.useProgram(this._encode);
+    this.input0 = tensor;
+    this._encode.X.value = 0;
+    this._encode.N.value = N;
+
+    this.bindOutputTexture(M, N, out);
+
+    gl.drawElements(gl.TRIANGLES, /*num items*/6, gl.UNSIGNED_SHORT, 0);
+
+    // this.unbindInputTexture(gl.TEXTURE0);
+  }
 
 
   /* Read data out as unsigned bytes */

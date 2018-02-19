@@ -60,18 +60,18 @@ test('Neural Net', function() {
   let w_mul = Learn4js.subtract(W, w_lr);
   let b_lr = Learn4js.multiply(lr5, b_grad);
   let b_mul = Learn4js.subtract(b, b_lr);
-
-
-  let softmax = Learn4js.softmax(yHat);
-  let sub = Learn4js.subtract(softmax, y);
-  let tile = Learn4js.constant(Tensor.ones([BATCH, 10]), {name: 'tile'});
-  let yHatGrad = Learn4js.multiply(tile, sub);
-  let dL_dW = Learn4js.matmul(x, yHatGrad, true, false);
-  let dW = Learn4js.multiply(lr3, dL_dW);
-  let newW = Learn4js.subtract(W, dW);
-  let dL_db = Learn4js.reduceSum(yHatGrad, 1);
-  let db = Learn4js.multiply(lr5, dL_db);
-  let newB = Learn4js.subtract(b, db);
+  //
+  //
+  // let softmax = Learn4js.softmax(yHat);
+  // let sub = Learn4js.subtract(softmax, y);
+  // let tile = Learn4js.constant(Tensor.ones([BATCH, 10]), {name: 'tile'});
+  // let yHatGrad = Learn4js.multiply(tile, sub);
+  // let dL_dW = Learn4js.matmul(x, yHatGrad, true, false);
+  // let dW = Learn4js.multiply(lr3, dL_dW);
+  // let newW = Learn4js.subtract(W, dW);
+  // let dL_db = Learn4js.reduceSum(yHatGrad, 1);
+  // let db = Learn4js.multiply(lr5, dL_db);
+  // let newB = Learn4js.subtract(b, db);
 
   let now = new Date();
 
@@ -79,8 +79,8 @@ test('Neural Net', function() {
     // W_grad.eval();
     // w_lr.eval();
 
-    mm.eval();
-    yHat.eval();
+    // mm.eval();
+    // yHat.eval();
     // softmax.eval();
     // sub.eval();
     // yHatGrad.eval();
@@ -93,11 +93,11 @@ test('Neural Net', function() {
     // newB.eval();
 
     // TensorMath.multiply(dd, f);
-    // let w_new = w_mul.eval();
-    // let b_new = b_mul.eval();
+    let w_new = w_mul.eval();
+    let b_new = b_mul.eval();
     //
-    // W.value = w_new;
-    // b.value = b_new;
+    W.value = w_new;
+    b.value = b_new;
     //   let trainStep = optimizer.minimize(loss);
     //   trainStep.eval();
   }

@@ -5,7 +5,7 @@ vec4 encode_float(float val) {
 	// http://www.2ality.com/2012/04/number-encoding.html
 	float a = abs(val);                           // encode absolute value + sign
 	float exp = floor(log2(a));                 // number of powers of 2
-	float mant = pow(2.,log2(a)-exp) * 8388608.;  // multiply to fill 24 bits (implied leading 1)
+	float mant = pow(2.,log2(a)-exp) * 8388608;  // multiply to fill 24 bits (implied leading 1)
 	float mant1 = floor(mant / 256. / 256.);    // first 8 bits of mantissa
 	float mant2 = mod(floor(mant / 256.),256.); // second 8 bits
 	float mant3 = mod(mant,256.);               // third 8 bits

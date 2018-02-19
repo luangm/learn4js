@@ -1,7 +1,8 @@
 import TensorMath from "../src/core/TensorMath";
 import Axpy from "../src/core/webgl/blas/Axpy";
-import WebGL from "../src/core/webgl/WebGL";
-import WebGLTexture from "../src/core/webgl/WebGLTexture";
+import Scal from "../src/core/webgl/blas/Scal";
+import WebGL from "../src/core/webgl/WebGLContext";
+import WebGLTensor from "../src/core/webgl/WebGLTensor";
 import Learn4js, {Logger, println, Tensor} from '../src/index';
 import Mnist from '../src/mnist/Mnist';
 
@@ -31,46 +32,42 @@ function testWebgl() {
 
   console.log("JS Run:", then - now);
 
-  let webgl = new WebGL({
-    canvas: document.getElementById('c')
-  });
+  let webgl = new WebGL();
+
+  let tensor0 = new WebGLTensor(x, [M, N], webgl);
+  let tensor1 = new WebGLTensor(y, [M, N], webgl);
+  let output = new WebGLTensor(null, [M, N], webgl);
+  let output2 = new WebGLTensor(null, [M, N], webgl);
 
   let axpy = new Axpy(webgl);
-  console.log(axpy);
-
-  let texture0 = new WebGLTexture(x, [M, N], webgl); // webgl.createDataTexture(x, [M, N]);
-  let texture1 = new WebGLTexture(y, [M, N], webgl); // webgl.createDataTexture(y, [M, N]);
-  let outputTexture = webgl.createOutputTexture(M, N);
-
   webgl.useProgram(axpy);
 
-  webgl.texture0 = texture0;
-  webgl.texture1 = texture1;
-  webgl.bindOutputTexture(M, N, outputTexture);
+  webgl.input0 = tensor0;
+  webgl.input1 = tensor1;
+  webgl.output = output;
 
   axpy.X.value = 0;
   axpy.Y.value = 1;
   axpy.N.value = N;
   axpy.a.value = a;
 
-  console.log("-------");
-  // webgl.useProgram(); // Activates the program
-
-  // webgl.texture0 = texture0;
-  // webgl.texture1 = texture1;
-  // webgl.setUniformIntValue(webgl._program, 'X', 0);
-  // webgl.setUniformIntValue(webgl._program, 'Y', 1);
-  // webgl.setUniformIntValue(webgl._program, 'N', N);
-  // webgl.setUniformFloatValue(webgl._program, 'a', a);
-
   webgl.render();
 
-  let then2 = new Date();
-  console.log("Webgl Run:", then2 - then);
+  ////--------------------/////
 
-  let rawBuffer2 = webgl.readData(M, N);
-  let outArray = new Float32Array(rawBuffer2);
-  console.log(outArray);
+  let scal = new Scal(webgl);
+  webgl.useProgram(scal);
+  webgl.input0 = output;
+  webgl.output = output2;
+  scal.X.value = 0;
+  scal.N.value = N;
+  scal.a.value = a;
+  webgl.render();
+
+  let result = output.transfer();
+  console.log(result);
+  let result2 = output2.transfer();
+  console.log(result2);
 
 }
 

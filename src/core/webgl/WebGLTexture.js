@@ -24,6 +24,10 @@ export default class WebGLTexture {
     return this._shape[1];
   }
 
+  /**
+   * Create a texture using the supplied data and shape.
+   * If the shape's side is not Power of 4, the texture is padded with 0s
+   */
   _createTexture(data) {
     let gl = this.context;
 
@@ -31,7 +35,7 @@ export default class WebGLTexture {
     gl.bindTexture(gl.TEXTURE_2D, texture);
 
     // No Need to pad
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, this.width / COMPONENT_PER_TEXEL, this.height, 0, gl.RGBA, gl.FLOAT, data);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, this.width / COMPONENT_PER_TEXEL, this.height, 0, gl.RGBA, gl.FLOAT, data || null);
 
     // TODO: PAdding
 
