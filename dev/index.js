@@ -40,19 +40,17 @@ function testWebgl() {
   let output2 = new WebGLTensor(null, [M, N], webgl);
 
   let axpy = new Axpy(webgl);
-  webgl.output = output;
   axpy.X = tensor0;
   axpy.Y = tensor1;
-  axpy.N = N;
+  axpy.Z = output;
   axpy.a = a;
   axpy.exec();
 
   ////--------------------/////
 
   let scal = new Scal(webgl);
-  webgl.output = output2;
   scal.X = output;
-  scal.N = N;
+  scal.Z = output2;
   scal.a = a;
   scal.exec();
 

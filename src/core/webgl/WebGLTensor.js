@@ -6,11 +6,12 @@ export default class WebGLTensor {
    * @param data Float32Array
    * @param shape [M, N]
    * @param context WebGLContext
+   * @param isOutput if the tensor should be an output tensor, for encoding
    */
-  constructor(data, shape, context) {
+  constructor(data, shape, context, {isOutput} = {}) {
     this._context = context;
     this._shape = shape;
-    this._texture = new WebGLTexture(data, shape, context);
+    this._texture = new WebGLTexture(data, shape, context, {isOutput});
   }
 
   /**
@@ -37,20 +38,6 @@ export default class WebGLTensor {
   }
 
   transfer() {
-    let gl = this.context.context;
-
-    let M = this.shape[0];
-    let N = this.shape[1];
-    let out = this.context.createOutputTexture(M, N);
-    console.log(this);
-    this.context.encode(this, out);
-
-    let result = new Float32Array(this.context.readData(M, N));
-
-    return result;
-  }
-
-  _createOutputTexture() {
-
+    return this.context.encode(this);
   }
 }

@@ -24,10 +24,70 @@ export default class WebGLProgram {
 
     this._context = context;
     this._program = this._createProgram(vertexShader, fragShader);
-    gl.useProgram(this._program.program);
+    context.program = this;
     this._attributes = this._cacheAttributes();
     this._uniforms = this._cacheUniforms();
     this._bindVertices();
+  }
+
+  get N() {
+    return this._N;
+  }
+
+  set N(value) {
+    this.activate();
+    this._N = value;
+    this.uniforms['N'].value = value;
+  }
+
+  /**
+   * @returns {WebGLTensor}
+   */
+  get X() {
+    return this.context.input0;
+  }
+
+  /**
+   * @param tensor {WebGLTensor}
+   */
+  set X(tensor) {
+    this.activate();
+    this.context.input0 = tensor;
+    this.uniforms['X'].value = 0;
+  }
+
+  /**
+   * @returns {WebGLTensor}
+   */
+  get Y() {
+    return this.context.input1;
+  }
+
+  /**
+   * @param tensor {WebGLTensor}
+   */
+  set Y(tensor) {
+    this.activate();
+    this.context.input1 = tensor;
+    this.uniforms['Y'].value = 1;
+  }
+
+  /**
+   * The result tensor
+   * @returns {WebGLTensor}
+   */
+  get Z() {
+    return this.context.output;
+  }
+
+  /**
+   * Sets the result tensor
+   * @param tensor {WebGLTensor}
+   */
+  set Z(tensor) {
+    this.activate();
+    this.context.output = tensor;
+    this.N = tensor.shape[1];
   }
 
   get attributes() {

@@ -4,34 +4,8 @@ import WebGLProgram from "../WebGLProgram";
 
 export default class Scal extends WebGLProgram {
 
-  constructor(webgl) {
-    super(VERTEX_SHADER_STRING, SCAL_STRING, webgl);
-  }
-
-  get N() {
-    return this._N;
-  }
-
-  set N(value) {
-    this.activate();
-    this._N = value;
-    this.uniforms['N'].value = value;
-  }
-
-  /**
-   * @returns {WebGLTensor}
-   */
-  get X() {
-    return this.context.input0;
-  }
-
-  /**
-   * @param tensor {WebGLTensor}
-   */
-  set X(tensor) {
-    this.activate();
-    this.context.input0 = tensor;
-    this.uniforms['X'].value = 0;
+  constructor(context) {
+    super(VERTEX_SHADER_STRING, SCAL_STRING, context);
   }
 
   /**

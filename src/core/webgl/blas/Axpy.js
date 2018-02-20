@@ -4,50 +4,8 @@ import WebGLProgram from "../WebGLProgram";
 
 export default class Axpy extends WebGLProgram {
 
-  constructor(webgl) {
-    super(VERTEX_SHADER_STRING, SAXPY_STRING, webgl);
-  }
-
-  get N() {
-    return this._N;
-  }
-
-  set N(value) {
-    this.activate();
-    this._N = value;
-    this.uniforms['N'].value = value;
-  }
-
-  /**
-   * @returns {WebGLTensor}
-   */
-  get X() {
-    return this.context.input0;
-  }
-
-  /**
-   * @param tensor {WebGLTensor}
-   */
-  set X(tensor) {
-    this.activate();
-    this.context.input0 = tensor;
-    this.uniforms['X'].value = 0;
-  }
-
-  /**
-   * @returns {WebGLTensor}
-   */
-  get Y() {
-    return this.context.input1;
-  }
-
-  /**
-   * @param tensor {WebGLTensor}
-   */
-  set Y(tensor) {
-    this.activate();
-    this.context.input1 = tensor;
-    this.uniforms['Y'].value = 1;
+  constructor(context) {
+    super(VERTEX_SHADER_STRING, SAXPY_STRING, context);
   }
 
   /**
