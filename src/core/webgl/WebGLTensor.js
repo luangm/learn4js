@@ -11,6 +11,7 @@ export default class WebGLTensor {
   constructor(data, shape, context, {isOutput} = {}) {
     this._context = context;
     this._shape = shape;
+    this._isOutput = isOutput || false;
     this._texture = new WebGLTexture(data, shape, context, {isOutput});
   }
 
@@ -20,6 +21,13 @@ export default class WebGLTensor {
    */
   get context() {
     return this._context;
+  }
+
+  /**
+   * Checks if the tensor is an output to CPU tensor
+   */
+  get isOutput() {
+    return this._isOutput;
   }
 
   /**

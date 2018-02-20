@@ -1,11 +1,14 @@
 import SCAL_STRING from '../glsl/scal_1.glsl';
-import VERTEX_SHADER_STRING from '../glsl/vertexShader.vert';
 import WebGLProgram from "../WebGLProgram";
 
 export default class Scal extends WebGLProgram {
 
   constructor(context) {
-    super(VERTEX_SHADER_STRING, SCAL_STRING, context);
+    super(SCAL_STRING, context);
+  }
+
+  get type() {
+    return 'scal';
   }
 
   /**

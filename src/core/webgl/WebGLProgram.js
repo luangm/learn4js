@@ -1,3 +1,4 @@
+import VERTEX_SHADER_STRING from './glsl/vertexShader.vert';
 import WebGLAttribute from "./WebGLAttribute";
 import WebGLFragmentShader from "./WebGLFragmentShader";
 import WebGLUniform from "./WebGLUniform";
@@ -13,13 +14,11 @@ const TEX_ATTRIBUTE_NAME = 'tex';
 export default class WebGLProgram {
 
   /**
-   * @param vertexShaderString
    * @param fragmentShaderString
    * @param context {WebGLContext}
    */
-  constructor(vertexShaderString, fragmentShaderString, context) {
-    let gl = context.context;
-    let vertexShader = new WebGLVertexShader(vertexShaderString, context);
+  constructor(fragmentShaderString, context) {
+    let vertexShader = new WebGLVertexShader(VERTEX_SHADER_STRING, context);
     let fragShader = new WebGLFragmentShader(fragmentShaderString, context);
 
     this._context = context;
@@ -37,7 +36,7 @@ export default class WebGLProgram {
   set N(value) {
     this.activate();
     this._N = value;
-    this.uniforms['N'].value = value;
+    this.setUniformValue('N', value);
   }
 
   /**
@@ -126,7 +125,15 @@ export default class WebGLProgram {
   exec() {
     this.activate();
     let gl = this.context.context;
+    console.log(">>> exec", this.type, gl.drawingBufferWidth, gl.drawingBufferHeight);
     gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
+  }
+
+  setUniformValue(name, value) {
+    let uniform = this.uniforms[name];
+    if (uniform) {
+      uniform.value = value;
+    }
   }
 
   /**

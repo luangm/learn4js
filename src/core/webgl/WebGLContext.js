@@ -104,9 +104,16 @@ export default class WebGLContext {
 
     let M = tensor.shape[0];
     let N = tensor.shape[1];
+
     this.canvas.height = M;
-    this.canvas.width = N;
-    gl.viewport(0, 0, N, M);
+
+    if (tensor.isOutput) {
+      this.canvas.width = N;
+      gl.viewport(0, 0, N, M);
+    } else {
+      this.canvas.width = N / 4;
+      gl.viewport(0, 0, N / 4, M);
+    }
 
     if (!this.framebuffer) {
       this.framebuffer = this.framebuffer || gl.createFramebuffer();

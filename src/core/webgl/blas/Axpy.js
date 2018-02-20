@@ -1,11 +1,14 @@
 import SAXPY_STRING from '../glsl/saxpy_1.glsl';
-import VERTEX_SHADER_STRING from '../glsl/vertexShader.vert';
 import WebGLProgram from "../WebGLProgram";
 
 export default class Axpy extends WebGLProgram {
 
   constructor(context) {
-    super(VERTEX_SHADER_STRING, SAXPY_STRING, context);
+    super(SAXPY_STRING, context);
+  }
+
+  get type() {
+    return 'axpy';
   }
 
   /**

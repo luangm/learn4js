@@ -1,3 +1,6 @@
+import AddProgram from "../src/core/glop/pairwise/AddProgram";
+import AbsProgram from "../src/core/glop/transform/AbsProgram";
+import ExpProgram from "../src/core/glop/transform/ExpProgram";
 import TensorMath from "../src/core/TensorMath";
 import Axpy from "../src/core/webgl/blas/Axpy";
 import Scal from "../src/core/webgl/blas/Scal";
@@ -9,7 +12,7 @@ import Mnist from '../src/mnist/Mnist';
 function testWebgl() {
 
   let a = 2.0;
-  let x = new Float32Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]);
+  let x = new Float32Array([1, -2, 3, -4, 5, -6, 7, -8, 9, -10, 11, -12, 13, -14, 15, -16]);
   let y = new Float32Array([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]);
   let zeros = new Float32Array(10000);
   let zeros2 = new Float32Array(10000);
@@ -38,6 +41,27 @@ function testWebgl() {
   let tensor1 = new WebGLTensor(y, [M, N], webgl);
   let output = new WebGLTensor(null, [M, N], webgl);
   let output2 = new WebGLTensor(null, [M, N], webgl);
+  let output3 = new WebGLTensor(null, [M, N], webgl);
+  let absOut = new WebGLTensor(null, [M, N], webgl);
+  let expOut = new WebGLTensor(null, [M, N], webgl);
+
+  let add = new AddProgram(webgl);
+  add.X = tensor0;
+  add.Y = tensor1;
+  add.Z = output3;
+  add.exec();
+
+  let exp = new ExpProgram(webgl);
+  exp.X = tensor0;
+  exp.Z = expOut;
+  exp.exec();
+
+  let abs = new AbsProgram(webgl);
+  abs.X = tensor0;
+  abs.Z = absOut;
+  abs.exec();
+  let absResult = absOut.transfer();
+  console.log(absResult);
 
   let axpy = new Axpy(webgl);
   axpy.X = tensor0;
@@ -58,7 +82,11 @@ function testWebgl() {
   console.log(result);
   let result2 = output2.transfer();
   console.log(result2);
+  let result3 = output3.transfer();
+  console.log(result3);
 
+  let expResult = expOut.transfer();
+  console.log(expResult);
 }
 
 testWebgl();
