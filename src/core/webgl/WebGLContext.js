@@ -95,7 +95,8 @@ export default class WebGLContext {
   }
 
   /**
-   * Binds a Tensor to the output
+   * Binds a Tensor to the output.
+   * Exec depends on the correct binding of output
    * @param tensor The output tensor
    */
   set output(tensor) {
@@ -108,7 +109,7 @@ export default class WebGLContext {
     this.canvas.height = M;
 
     if (tensor.isOutput) {
-      this.canvas.width = N;
+      this.canvas.width = N / 4;
       gl.viewport(0, 0, N, M);
     } else {
       this.canvas.width = N / 4;
