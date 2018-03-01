@@ -285,7 +285,7 @@ export default class EvaluationVisitor extends Visitor {
 
   // DONE
   visitReduceSum(node, params) {
-    logger.info("visitRelu", node.id);
+    logger.info("visitReduceSum", node.id);
 
     if (node.base.isInvalid) {
       node.base.accept(this, params);

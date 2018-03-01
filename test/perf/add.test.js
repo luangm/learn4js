@@ -32,9 +32,11 @@ test('test add', function() {
 
   now = new Date();
 
-  for (let i = 0; i < EPOCH; i++) {
-    for (let j = 0; j < SIZE; j++) {
-      x[j] = a[j] + b[j];
+  for (let k = 0; k < EPOCH; k++) {
+    for (let i = 0; i < ROWS; i++) {
+      for (let j = 0; j < COLS; j++) {
+        x[i * COLS + j] = a[i * COLS + j] + b[i * COLS + j];
+      }
     }
   }
 

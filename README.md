@@ -1,6 +1,6 @@
 # learn4js
 The GPU-accelerated, Imperative Machine Learning Framework for Javascript.
-For other languages, see [Learn4j](Java)(Java) [Learn4i](iOS)(iOS) and [Learn4N](.NET)(.NET)
+For other languages, see [Learn4j](Java)(Java) [Learn4iOS](iOS)(iOS) and [Learn4N](.NET)(.NET)
 
 ## Quickstart
 
@@ -58,7 +58,7 @@ let loss = Learn4js.sumSquaredError(y, yHat);
 | Tanh          | Y     |       |
 | Conv2d        | Y     | Y     |
 | MaxPool       | Y     | Y     |
-| Receprocal    | Y     |       |
+| Reciprocal    | Y     |       |
 | Softmax       | Y     | Y     |
 | LogSumExp     | Y     |       |
 | AddN          | Y     |       |
