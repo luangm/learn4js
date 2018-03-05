@@ -43,6 +43,17 @@ export default class TensorMath {
     if (!result) {
       let resultShape = TensorUtils.broadcastShapes(left.shape, right.shape);
       result = new Tensor({shape: resultShape});
+    }
+
+    Executor.instance.exec(new AddOp(left, right, result));
+    return result;
+  }
+
+  // TODO: Remove
+  static add_OLD(left, right, result) {
+    if (!result) {
+      let resultShape = TensorUtils.broadcastShapes(left.shape, right.shape);
+      result = new Tensor({shape: resultShape});
       left = left.broadcast(resultShape);
       right = right.broadcast(resultShape);
     } else {

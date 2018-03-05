@@ -3,6 +3,7 @@ import Tensor from "../Tensor";
 export default class TensorUtils {
 
 
+
   static broadcastShapes(a, b) {
     let rank = a.length;
     let result = Array.from(a);

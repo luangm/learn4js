@@ -1,9 +1,10 @@
 import PairwiseOp from "./PairwiseOp";
+import ShapeUtils from "../../util/ShapeUtils";
 
 export default class AddOp extends PairwiseOp {
 
-  constructor(input, other, result) {
-    super(input, other, result);
+  constructor(input, other, result, params = {}) {
+    super(input, other, result, params);
   }
 
   get isSpecial() {
@@ -27,53 +28,59 @@ export default class AddOp extends PairwiseOp {
     let otherStrides = this.other.strides;
     let resultStrides = this.result.strides;
 
+    let inputBroadDims = ShapeUtils.getBroadcastedDimensions(this.input.shape, this.result.shape);
+    let otherBroadDims = ShapeUtils.getBroadcastedDimensions(this.other.shape, this.result.shape);
+
+    let inputPointer = 0;
+    let otherPointer = 0;
+    let resultPointer = 0;
+
     let shape = this.result.shape;
     let rank = shape.length;
+    let slots = new Array(rank).fill(0);
 
-    let slots = [];
-    for (let i = 0; i < shape.length; i++) {
-      slots.push(0);
-    }
+    while (true) {
 
-    let pointer = 0; // This points to the current index
+      // Calc
+      result[resultPointer] = input[inputPointer] + other[otherPointer];
 
-    while(true) {
+      let r = rank - 1;
+      for (; r >= 0; r--) {
+        slots[r]++;
 
-      console.log("***", slots, pointer);
+        if (!inputBroadDims[r]) {
+          inputPointer += inputStrides[r];
+        }
 
-      // TODO: Handle calcs
+        if (!otherBroadDims[r]) {
+          otherPointer += otherStrides[r];
+        }
 
-      // let i = slots[0];
-      // let j = slots[1];
-      //
-      // let inputOffset = i * inputStride[0] + j * inputStride[1];
-      // let otherOffset = i * otherStride[0] + j * otherStride[1];
-      // let resultOffset = i * resultStride[0] + j * resultStride[1];
-      // result[pointer] = input[pointer] + other[pointer];
+        resultPointer += resultStrides[r];
 
-      // -- iterator
-
-      let index = rank - 1;
-      while (index >= 0) {
-        slots[index]++;
-        pointer += inputStrides[index];
-
-        if (slots[index] === shape[index]) {
-          // Reached dimension for that slot
-          slots[index] = 0;
-          pointer -= inputStrides[index] * shape[index];
-          index--;
-        } else {
+        if (slots[r] < shape[r]) {
           break;
         }
+
+        slots[r] = 0;
+
+        if (!inputBroadDims[r]) {
+          inputPointer -= inputStrides[r] * shape[r];
+        }
+
+        if (!otherBroadDims[r]) {
+          otherPointer -= otherStrides[r] * shape[r];
+        }
+
+        resultPointer -= resultStrides[r] * shape[r];
       }
 
       // Overflown
-      if (index < 0) {
+      if (r < 0) {
         break;
       }
-
     }
+
   }
 
   exec2() {

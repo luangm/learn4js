@@ -1,5 +1,49 @@
 export default class ShapeUtils {
 
+  /**
+   * Broadcast two shapes, return broadcasted shape
+   * @param a {Array}
+   * @param b {Array}
+   * @returns {Array}
+   */
+  static broadcastShapes(a, b) {
+    let rank = Math.max(a.length, b.length);
+    let result = new Array(rank); //uninitialized
+
+    let aIndex = a.length - 1;
+    let bIndex = b.length - 1;
+
+    for (let dim = rank - 1; dim >= 0; dim--) {
+      let left = aIndex >= 0 ? a[aIndex] : 1;
+      let right = bIndex >= 0 ? b[bIndex] : 1;
+
+      if (left !== 1 && right !== 1 && left !== right) {
+        throw new Error('cannot broadcast shapes. not compatible');
+      }
+
+      result[dim] = Math.max(left, right);
+      aIndex--;
+      bIndex--;
+    }
+
+    return result;
+  }
+
+  /**
+   * get dimensions that need to be broadcasted
+   * @param input {Array}
+   * @param result {Array} the broadcasted shape, could be of different length from input
+   * @returns {Array} boolean
+   */
+  static getBroadcastedDimensions(input, result) {
+    let dims = new Array(input.length);
+    let resIndex = result.length - 1;
+    for (let i = dims.length - 1; i >= 0; i--, resIndex--) {
+      dims[i] = (input[i] === 1 && result[resIndex] !== 1);
+    }
+    return dims;
+  }
+
   static getLength(shape) {
     let mul = 1;
     for (let dim of shape) {

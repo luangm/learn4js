@@ -1,8 +1,11 @@
 import IndexOp from "../op/index/IndexOp";
+import PairwiseOp from "../op/pairwise/PairwiseOp";
 import ReductionOp from "../op/reduction/ReductionOp";
 import SpecialOp from "../op/special/SpecialOp";
 import IndexSetOp from "../op/transform/IndexSetOp";
+import TransformOp from "../op/transform/TransformOp";
 import Tensor from "../Tensor";
+import ShapeUtils from "../util/ShapeUtils";
 import TensorUtils from "../util/TensorUtils";
 
 const singleton = Symbol();
@@ -32,10 +35,21 @@ export default class Executor {
    */
   exec(op) {
 
+    if (op instanceof PairwiseOp) {
+      this._execPairwise(op);
+      return;
+    }
+
+    if (op instanceof TransformOp) {
+      this._execTransform(op);
+      return;
+    }
+
     if (op.isSpecial) {
       op.exec();
       return;
     }
+
 
     if (op instanceof SpecialOp) {
       // Special Ops bypasses executor
@@ -177,21 +191,185 @@ export default class Executor {
     }
   }
 
-  _execMul(op) {
-    let input = op.input.data;
-    let other = op.other.data;
-    let result = op.result.data;
-    for (let i = 0; i < op.input.data.length; i++) {
-      result[i] = input[i] * other[i];
+  _execPairwise(op) {
+    let shape = op.result.shape;
+    if (shape.length === 2) {
+      this._execPairwise2D(op);
+    } else {
+      this._execPairwiseGeneral(op);
     }
   }
 
-  _execSub(op) {
+  _execPairwise2D(op) {
     let input = op.input.data;
     let other = op.other.data;
     let result = op.result.data;
-    for (let i = 0; i < op.input.data.length; i++) {
-      result[i] = input[i] - other[i];
+
+    let inputStrides = op.input.strides;
+    let otherStrides = op.other.strides;
+    let resultStrides = op.result.strides;
+
+    let inputShape = op.input.shape;
+    let otherShape = op.other.shape;
+    let shape = op.result.shape;
+
+    let inputBroadDims = ShapeUtils.getBroadcastedDimensions(inputShape, shape);
+    let otherBroadDims = ShapeUtils.getBroadcastedDimensions(otherShape, shape);
+
+
+    for (let i = 0; i < shape[0]; i++) {
+      for (let j = 0; j < shape[1]; j++) {
+        let inputPointer = inputBroadDims[0] ? 0 : i * inputStrides[0];
+        inputPointer += inputBroadDims[1] ? 0 : j * inputStrides[1];
+
+        let otherPointer = otherBroadDims[0] ? 0 : i * otherStrides[0];
+        otherPointer += otherBroadDims[1] ? 0 : j * otherStrides[1];
+
+        let resultPointer = i * resultStrides[0] + j * resultStrides[1];
+
+        result[resultPointer] = op.body(input[inputPointer] + other[otherPointer]);
+      }
+    }
+  }
+
+  /**
+   * Generalized pairwise ops.
+   * @param op {PairwiseOp}
+   * @private
+   */
+  _execPairwiseGeneral(op) {
+    let input = op.input.data;
+    let other = op.other.data;
+    let result = op.result.data;
+
+    let inputStrides = op.input.strides;
+    let otherStrides = op.other.strides;
+    let resultStrides = op.result.strides;
+
+    let inputShape = op.input.shape;
+    let otherShape = op.other.shape;
+    let shape = op.result.shape;
+
+    let inputBroadDims = ShapeUtils.getBroadcastedDimensions(inputShape, shape);
+    let otherBroadDims = ShapeUtils.getBroadcastedDimensions(otherShape, shape);
+
+    let inputPointer = 0;
+    let otherPointer = 0;
+    let resultPointer = 0;
+
+    let rank = shape.length;
+    let slots = new Array(rank).fill(0);
+
+    while (true) {
+
+      // Calc
+      result[resultPointer] = op.body(input[inputPointer], other[otherPointer]);
+
+      let r = rank - 1;
+      for (; r >= 0; r--) {
+        slots[r]++;
+
+        if (!inputBroadDims[r]) {
+          inputPointer += inputStrides[r];
+        }
+
+        if (!otherBroadDims[r]) {
+          otherPointer += otherStrides[r];
+        }
+
+        resultPointer += resultStrides[r];
+
+        if (slots[r] < shape[r]) {
+          break;
+        }
+
+        slots[r] = 0;
+
+        if (!inputBroadDims[r]) {
+          inputPointer -= inputStrides[r] * shape[r];
+        }
+
+        if (!otherBroadDims[r]) {
+          otherPointer -= otherStrides[r] * shape[r];
+        }
+
+        resultPointer -= resultStrides[r] * shape[r];
+      }
+
+      // Overflown
+      if (r < 0) {
+        break;
+      }
+    }
+  }
+
+  _execTransform(op) {
+    let shape = op.result.shape;
+    if (shape.length === 2) {
+      this._execTransform2D(op);
+    } else {
+      this._execTransformGeneral(op);
+    }
+  }
+
+  _execTransform2D(op) {
+    let input = op.input.data;
+    let result = op.result.data;
+
+    let inputStrides = op.input.strides;
+    let resultStrides = op.result.strides;
+
+    let shape = op.result.shape;
+
+    for (let i = 0; i < shape[0]; i++) {
+      for (let j = 0; j < shape[1]; j++) {
+        let inputPointer = i * inputStrides[0] + j * inputStrides[1];
+        let resultPointer = i * resultStrides[0] + j * resultStrides[1];
+
+        result[resultPointer] = op.body(input[inputPointer]);
+      }
+    }
+  }
+
+  _execTransformGeneral(op) {
+    let input = op.input.data;
+    let result = op.result.data;
+
+    let inputStrides = op.input.strides;
+    let resultStrides = op.result.strides;
+
+    let shape = op.result.shape;
+
+    let inputPointer = 0;
+    let resultPointer = 0;
+
+    let rank = shape.length;
+    let slots = new Array(rank).fill(0);
+
+    while (true) {
+
+      // Calc
+      result[resultPointer] = op.body(input[inputPointer]);
+
+      let r = rank - 1;
+      for (; r >= 0; r--) {
+        slots[r]++;
+        inputPointer += inputStrides[r];
+        resultPointer += resultStrides[r];
+
+        if (slots[r] < shape[r]) {
+          break;
+        }
+
+        slots[r] = 0;
+        inputPointer -= inputStrides[r] * shape[r];
+        resultPointer -= resultStrides[r] * shape[r];
+      }
+
+      // Overflown
+      if (r < 0) {
+        break;
+      }
     }
   }
 
