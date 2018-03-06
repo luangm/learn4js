@@ -1,10 +1,10 @@
-import Expression from "../../Expression";
 import Tensor from "../../../core/Tensor";
+import Expression from "../../Expression";
 
 export default class Constant extends Expression {
 
-  constructor(value, {name, scope} = {}) {
-    super({name, scope});
+  constructor(value, {name, graph, scope} = {}) {
+    super({name, graph, scope});
     this._value = Tensor.create(value);
   }
 

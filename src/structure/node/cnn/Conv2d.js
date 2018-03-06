@@ -3,8 +3,8 @@ import TensorUtils from "../../../core/util/TensorUtils";
 
 export default class Conv2d extends Expression {
 
-  constructor(image, kernel, {name, scope} = {}) {
-    super(name);
+  constructor(image, kernel, {name, graph, scope} = {}) {
+    super({name, graph, scope});
     this._image = image;
     this._kernel = kernel;
     this._shape = TensorUtils.computeConv2dShape(image, kernel);

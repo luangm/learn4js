@@ -2,7 +2,7 @@ import TransformExpression from "./TransformExpression";
 
 export default class Logarithm extends TransformExpression {
 
-  constructor(base, {name, scope} = {}) {
+  constructor(base, {name, graph, scope} = {}) {
     super(base, {name, scope});
   }
 

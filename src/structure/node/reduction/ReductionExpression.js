@@ -8,8 +8,8 @@ import ShapeUtils from "../../../core/util/ShapeUtils";
  */
 export default class ReductionExpression extends Expression {
 
-  constructor(base, dimension = -1, {name, scope} = {}) {
-    super({name, scope});
+  constructor(base, dimension = -1, {name, graph, scope} = {}) {
+    super({name, graph, scope});
     this._base = base;
     this._dimension = dimension;
     this._shape = ShapeUtils.reduce(base.shape, dimension);

@@ -10,8 +10,8 @@ import Expression from "../../Expression";
  */
 export default class Variable extends Expression {
 
-  constructor(shape, {name, scope} = {}) {
-    super({name, scope});
+  constructor(shape, {name, graph, scope} = {}) {
+    super({name, graph, scope});
     this._shape = shape;
   }
 

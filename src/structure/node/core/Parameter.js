@@ -1,5 +1,5 @@
-import Expression from "../../Expression";
 import Tensor from "../../../core/Tensor";
+import Expression from "../../Expression";
 
 /**
  * A parameter expression is one that need to be modified in order to minimize a loss
@@ -10,8 +10,8 @@ export default class Parameter extends Expression {
   /**
    * Value can be a tensor or an array
    */
-  constructor(value, {name, scope} = {}) {
-    super({name, scope});
+  constructor(value, {name, graph, scope} = {}) {
+    super({name, graph, scope});
     this._value = Tensor.create(value);
   }
 

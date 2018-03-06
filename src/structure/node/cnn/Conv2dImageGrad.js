@@ -2,8 +2,8 @@ import Expression from "../../Expression";
 
 export default class Conv2dImageGrad extends Expression {
 
-  constructor(image, kernel, grad, {name, scope} = {}) {
-    super({name, scope});
+  constructor(image, kernel, grad, {name, graph, scope} = {}) {
+    super({name, graph, scope});
     this._image = image;
     this._kernel = kernel;
     this._grad = grad;

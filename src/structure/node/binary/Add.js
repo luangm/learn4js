@@ -3,8 +3,8 @@ import TensorUtils from "../../../core/util/TensorUtils";
 
 export default class Add extends BinaryExpression {
 
-  constructor(left, right, {name, scope} = {}) {
-    super(left, right, {name, scope});
+  constructor(left, right, {name, graph, scope} = {}) {
+    super(left, right, {name, graph, scope});
 
     this._shape = TensorUtils.broadcastShapes(left.shape, right.shape);
   }

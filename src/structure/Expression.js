@@ -1,5 +1,3 @@
-import ExpressionState from './constant/ExpressionState';
-
 /**
  * Default class for expression.
  * The ID is auto-generated and guaranteed to be unique.
@@ -8,17 +6,22 @@ import ExpressionState from './constant/ExpressionState';
  */
 export default class Expression {
 
-  constructor({name, scope} = {}) {
+  /**
+   * base constructor
+   * @param graph the graph to attach to. Required
+   * @param name the name of the node, optional
+   * @param scope the scope of the node, for collapsing node graph, optional
+   */
+  constructor({name, graph, scope} = {}) {
     this._id = Expression.ID_COUNTER++;
-    this._state = ExpressionState.DETACHED;
-    if (name) {
-      this._name = name;
-    }
+    this._graph = graph;
+    this._name = name || null;
     this._observers = [];
-    this._graph = null;
-    // this._value = null;
-    // this._scope = scope;
-    // this._gradients = null; // key = target.id, value = [gradient].
+    this._gradients = null; // key = target.id, value = [gradient].
+  }
+
+  get factory() {
+    return this.graph.expressionFactory;
   }
 
   get gradientMap() {
@@ -33,11 +36,6 @@ export default class Expression {
     return this._id;
   }
 
-  get isInvalid() {
-    // return true;
-    return this._state !== ExpressionState.EVALUATED;
-  }
-
   /**
    * Make a distinction between an assigned name and default generated name
    */
@@ -47,6 +45,10 @@ export default class Expression {
 
   set name(value) {
     this._name = value;
+  }
+
+  get observers() {
+    return this._observers;
   }
 
   /**
@@ -76,25 +78,21 @@ export default class Expression {
     throw new Error('Expression.shape should not be called from base Expression');
   }
 
-  get state() {
-    return this._state;
-  }
-
-  set state(value) {
-    this._state = value;
-  }
-
   get type() {
     throw new Error('Expression.type should not be called from base Expression');
   }
 
   /**
    * Returns the current value of this expression.
-   * In Interactive mode, the value is immediately available after Node creation.
-   * In Normal mode, the value will be null. Should call eval() first before calling value.
+   * If a value is not evaluated, it is evaluated at the time of the call.
+   *
    */
   get value() {
-    return this.graph.session.getValue(this);
+    let session = this.graph.session;
+    if (!session.isValid(this)) {
+      return session.eval(this);
+    }
+    return session.getValue(this);
   }
 
   /**
@@ -103,8 +101,6 @@ export default class Expression {
    */
   set value(val) {
     this.graph.session.setValue(this, val);
-    this.state = ExpressionState.MODIFIED;
-    this.notifyValueChanged();
   }
 
   /**
@@ -115,39 +111,32 @@ export default class Expression {
     throw new Error('Not Supported');
   }
 
+  add(other) {
+    return this.factory.add(this, other);
+  }
+
   addObserver(observer) {
     this._observers.push(observer);
   }
 
-  attach(graph) {
-    this._graph = graph;
-    this._state = ExpressionState.ATTACHED;
+  divide(other) {
+    return this.factory.divide(this, other);
   }
 
   eval() {
-    if (this.graph == null) {
-      throw new Error('Must attach first');
-    }
-
     return this.graph.session.eval(this);
+  }
+
+  exp() {
+    return this.factory.exp(this);
   }
 
   getGradient(target) {
     return this._gradients ? this._gradients[target.id] : null;
   }
 
-  notifyValueChanged() {
-    for (let id in this._observers) {
-      let observer = this._observers[id];
-      observer.onEvent();
-    }
-  }
-
-  onEvent() {
-    if (this.state === ExpressionState.EVALUATED) {
-      this.state = ExpressionState.MODIFIED;
-      this.notifyValueChanged();
-    }
+  multiply(other) {
+    return this.factory.multiply(this, other);
   }
 
   setGradient(targetId, grad) {
@@ -155,6 +144,10 @@ export default class Expression {
       this._gradients = {};
     }
     this._gradients[targetId] = grad;
+  }
+
+  subtract(other) {
+    return this.factory.subtract(this, other);
   }
 
   toString() {

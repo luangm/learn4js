@@ -2,8 +2,8 @@ import Expression from "../Expression";
 
 export default class Group extends Expression {
 
-  constructor(list, {name} = {}) {
-    super({name});
+  constructor(list, {name, graph, scope} = {}) {
+    super({name, graph, scope});
     this._list = list;
   }
 

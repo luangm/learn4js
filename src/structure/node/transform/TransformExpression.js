@@ -5,8 +5,8 @@ import Expression from "../../Expression";
  */
 export default class TransformExpression extends Expression {
 
-  constructor(base, {name, scope} = {}) {
-    super({name, scope});
+  constructor(base, {name, graph, scope} = {}) {
+    super({name, graph, scope});
     this._base = base;
   }
 

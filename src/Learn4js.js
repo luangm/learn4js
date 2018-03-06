@@ -1,10 +1,9 @@
-import LossFactory from "./LossFactory";
-import OptimizerFactory from "./OptimizerFactory";
+// import LossFactory from "./LossFactory";
+// import OptimizerFactory from "./OptimizerFactory";
 import Session from "./session/Session";
-import ExpressionFactory from "./structure/factory/ExpressionFactory";
 import Graph from "./structure/Graph";
-import MaxPool from "./structure/node/cnn/MaxPool";
-import ReverseGradientVisitor from "./visitor/ReverseGradientVisitor";
+// import MaxPool from "./structure/node/cnn/MaxPool";
+// import ReverseGradientVisitor from "./visitor/ReverseGradientVisitor";
 
 /**
  * This is main Utility class for this library.
@@ -24,29 +23,31 @@ class Learn4js {
 
   constructor() {
     this._interactive = false;
-    this._loss = LossFactory;
-    this._optimizer = OptimizerFactory;
-    this._factory = new ExpressionFactory(this.activeGraph);
+    // this._loss = LossFactory;
+    // this._optimizer = OptimizerFactory;
+    this._graph = new Graph('Default');
+    this._session = new Session(this._graph);
+    this._graph.session = this._session;
   }
 
   get activeGraph() {
-    return Graph.active;
+    return this._graph;
   }
 
   set activeGraph(value) {
-    Graph.active = value;
+    this._graph = value;
   }
 
   get activeSession() {
-    return Session.active;
+    return this._session;
   }
 
   set activeSession(value) {
-    Session.active = value;
+    this._session = value;
   }
 
   get factory() {
-    return this._factory;
+    return this._graph.expressionFactory;
   }
 
   get interactive() {
@@ -112,21 +113,21 @@ class Learn4js {
    * This is only a graph building step, does not do any computation.
    * The result is the gradients wrt each of the nodes.
    */
-  gradients(target, nodes) {
-
-    let visitor = new ReverseGradientVisitor(this.activeGraph);
-    visitor.visit(target);
-
-    let gradients = [];
-    for (let node of nodes) {
-      let grad = target.getGradient(node);
-      if (this.interactive) {
-        grad.eval();
-      }
-      gradients.push(grad);
-    }
-    return gradients;
-  }
+  // gradients(target, nodes) {
+  //
+  //   let visitor = new ReverseGradientVisitor(this.activeGraph);
+  //   visitor.visit(target);
+  //
+  //   let gradients = [];
+  //   for (let node of nodes) {
+  //     let grad = target.getGradient(node);
+  //     if (this.interactive) {
+  //       grad.eval();
+  //     }
+  //     gradients.push(grad);
+  //   }
+  //   return gradients;
+  // }
 
   graph(func) {
     func();
@@ -140,11 +141,11 @@ class Learn4js {
     return this.factory.matmul(left, right, transposeLeft, transposeRight, {name});
   }
 
-  maxPool({name, image, kernelShape, strideWidth, strideHeight}) {
-    let node = new MaxPool({name, image, kernelShape, strideWidth, strideHeight});
-    this.activeGraph.add(node);
-    return node;
-  }
+  // maxPool({name, image, kernelShape, strideWidth, strideHeight}) {
+  //   let node = new MaxPool({name, image, kernelShape, strideWidth, strideHeight});
+  //   this.activeGraph.add(node);
+  //   return node;
+  // }
 
   multiply(left, right, {name} = {}) {
     return this.factory.multiply(left, right, {name});
@@ -166,10 +167,10 @@ class Learn4js {
     return this.factory.reduceSum(base, dimension, {name});
   }
 
-  session(graph) {
-    let myGraph = graph || this.activeGraph;
-    return new Session(myGraph);
-  }
+  // session(graph) {
+  //   let myGraph = graph || this.activeGraph;
+  //   return new Session(myGraph);
+  // }
 
   sigmoid(base, {name} = {}) {
     return this.factory.sigmoid(base, {name});
@@ -208,6 +209,5 @@ class Learn4js {
   }
 
 }
-
 
 export default new Learn4js();

@@ -12,6 +12,7 @@ import Variable from "../node/core/Variable";
 import Fill from "../node/Fill";
 import Group from "../node/Group";
 import ReduceSum from "../node/reduction/ReduceSum";
+import Tile from "../node/Tile";
 import Absolute from "../node/transform/Absolute";
 import Cosine from "../node/transform/Cosine";
 import Exponential from "../node/transform/Exponential";
@@ -30,7 +31,6 @@ import SquareRootGrad from "../node/transform/SquareRootGrad";
 import Step from "../node/transform/Step";
 import Tangent from "../node/transform/Tangent";
 import TangentGrad from "../node/transform/TangentGrad";
-import Tile from "../node/Tile";
 
 /**
  * Expression Factory create nodes and add it to the Graph.
@@ -58,71 +58,65 @@ export default class ExpressionFactory {
   }
 
   abs(base, {name} = {}) {
-    let result = this.graph.add(new Absolute(base, {name}));
+    let result = this.graph.add(new Absolute(base, {name, graph: this.graph}));
     base.addObserver(result);
     return result;
   }
 
   add(left, right, {name} = {}) {
-    let result = this.graph.add(new Add(left, right, {name}));
+    let result = this.graph.add(new Add(left, right, {name, graph: this.graph}));
     left.addObserver(result);
     right.addObserver(result);
     return result;
   }
 
   assign(target, newValue, {name} = {}) {
-    let result = this.graph.add(new Assign(target, newValue, {name}));
+    let result = this.graph.add(new Assign(target, newValue, {name, graph: this.graph}));
     newValue.addObserver(result);
     return result;
   }
 
   constant(value, {name} = {}) {
-    return this.graph.add(new Constant(value, {name}));
-  }
-
-  tile(base, scale, {name} = {}) {
-    let result = this.graph.add(new Tile(base, scale, {name}));
-    base.addObserver(result);
-    return result;
+    return this.graph.add(new Constant(value, {name, graph: this.graph}));
   }
 
   conv2d(image, kernel, {name} = {}) {
-    let result = this.graph.add(new Conv2d(image, kernel, {name}));
+    let result = this.graph.add(new Conv2d(image, kernel, {name, graph: this.graph}));
     image.addObserver(result);
     kernel.addObserver(result);
     return result;
   }
 
   conv2dImageGrad(image, kernel, grad, {name} = {}) {
-    let result = this.graph.add(new Conv2dImageGrad(image, kernel, grad, {name}));
+    let result = this.graph.add(new Conv2dImageGrad(image, kernel, grad, {name, graph: this.graph}));
     return result;
   }
 
   cos(base, {name} = {}) {
-    let result = this.graph.add(new Cosine(base, {name}));
+    let result = this.graph.add(new Cosine(base, {name, graph: this.graph}));
     base.addObserver(result);
     return result;
   }
 
   divide(left, right, {name} = {}) {
-    let result = this.graph.add(new Divide(left, right, {name}));
+    let result = this.graph.add(new Divide(left, right, {name, graph: this.graph}));
     left.addObserver(result);
     right.addObserver(result);
     return result;
   }
 
   exp(base, {name} = {}) {
-    let result = this.graph.add(new Exponential(base, {name}));
+    let result = this.graph.add(new Exponential(base, {name, graph: this.graph}));
     base.addObserver(result);
     return result;
   }
 
   fill(scalar, shape, {name} = {}) {
-    return this.graph.add(new Fill(scalar, shape, {name}));
+    return this.graph.add(new Fill(scalar, shape, {name, graph: this.graph}));
   }
 
   group(list, {name} = {}) {
-    let result = this.graph.add(new Group(list, {name}));
+    let result = this.graph.add(new Group(list, {name, graph: this.graph}));
     for (let item of list) {
       item.addObserver(result);
     }
@@ -130,13 +124,20 @@ export default class ExpressionFactory {
   }
 
   log(base, {name} = {}) {
-    let result = this.graph.add(new Logarithm(base, {name}));
+    let result = this.graph.add(new Logarithm(base, {name, graph: this.graph}));
     base.addObserver(result);
     return result;
   }
 
   matmul(left, right, transposeLeft, transposeRight, {name} = {}) {
-    let result = this.graph.add(new MatMul(left, right, transposeLeft, transposeRight, {name}));
+    let result = this.graph.add(new MatMul(left, right, transposeLeft, transposeRight, {name, graph: this.graph}));
+    left.addObserver(result);
+    right.addObserver(result);
+    return result;
+  }
+
+  multiply(left, right, {name} = {}) {
+    let result = this.graph.add(new Multiply(left, right, {name, graph: this.graph}));
     left.addObserver(result);
     right.addObserver(result);
     return result;
@@ -148,32 +149,25 @@ export default class ExpressionFactory {
   //   return node;
   // }
 
-  multiply(left, right, {name} = {}) {
-    let result = this.graph.add(new Multiply(left, right, {name}));
-    left.addObserver(result);
-    right.addObserver(result);
-    return result;
-  }
-
   negate(base, {name} = {}) {
-    let result = this.graph.add(new Negate(base, {name}));
+    let result = this.graph.add(new Negate(base, {name, graph: this.graph}));
     base.addObserver(result);
     return result;
   }
 
   parameter(value, {name} = {}) {
-    return this.graph.add(new Parameter(value, {name}));
+    return this.graph.add(new Parameter(value, {name, graph: this.graph}));
   }
 
   reciprocal(base, {name} = {}) {
-    let result = this.graph.add(new Reciprocal(base, {name}));
+    let result = this.graph.add(new Reciprocal(base, {name, graph: this.graph}));
     base.addObserver(result);
     return result;
   }
 
   reduceSum(base, dimension, {name} = {}) {
     if (dimension != null) {
-      let result = this.graph.add(new ReduceSum(base, dimension, {name}));
+      let result = this.graph.add(new ReduceSum(base, dimension, {name, graph: this.graph}));
       base.addObserver(result);
       return result;
     }
@@ -181,85 +175,91 @@ export default class ExpressionFactory {
   }
 
   sigmoid(base, {name} = {}) {
-    let result = this.graph.add(new Sigmoid(base, {name}));
+    let result = this.graph.add(new Sigmoid(base, {name, graph: this.graph}));
     base.addObserver(result);
     return result;
   }
 
   sigmoidGrad(base, {name} = {}) {
-    let result = this.graph.add(new SigmoidGrad(base, {name}));
+    let result = this.graph.add(new SigmoidGrad(base, {name, graph: this.graph}));
     base.addObserver(result);
     return result;
   }
 
   sign(base, {name} = {}) {
-    let result = this.graph.add(new Sign(base, {name}));
+    let result = this.graph.add(new Sign(base, {name, graph: this.graph}));
     base.addObserver(result);
     return result;
   }
 
   sin(base, {name} = {}) {
-    let result = this.graph.add(new Sine(base, {name}));
+    let result = this.graph.add(new Sine(base, {name, graph: this.graph}));
     base.addObserver(result);
     return result;
   }
 
   softmax(base, {name} = {}) {
-    let result = this.graph.add(new Softmax(base, {name}));
+    let result = this.graph.add(new Softmax(base, {name, graph: this.graph}));
     base.addObserver(result);
     return result;
   }
 
   softmaxGrad(base, grad, {name} = {}) {
-    let result = this.graph.add(new SoftmaxGrad(base, grad, {name}));
+    let result = this.graph.add(new SoftmaxGrad(base, grad, {name, graph: this.graph}));
     base.addObserver(result);
     return result;
   }
 
   sqrt(base, {name} = {}) {
-    let result = this.graph.add(new SquareRoot(base, {name}));
+    let result = this.graph.add(new SquareRoot(base, {name, graph: this.graph}));
     base.addObserver(result);
     return result;
   }
 
   sqrtGrad(base, {name} = {}) {
-    let result = this.graph.add(new SquareRootGrad(base, {name}));
+    let result = this.graph.add(new SquareRootGrad(base, {name, graph: this.graph}));
     base.addObserver(result);
     return result;
   }
 
   square(base, {name} = {}) {
-    let result = this.graph.add(new Square(base, {name}));
+    let result = this.graph.add(new Square(base, {name, graph: this.graph}));
     base.addObserver(result);
     return result;
   }
 
   step(base, {name} = {}) {
-    let result = this.graph.add(new Step(base, {name}));
+    let result = this.graph.add(new Step(base, {name, graph: this.graph}));
     base.addObserver(result);
     return result;
   }
 
   subtract(left, right, {name} = {}) {
-    let result = this.graph.add(new Subtract(left, right, {name}));
+    let result = this.graph.add(new Subtract(left, right, {name, graph: this.graph}));
     left.addObserver(result);
     right.addObserver(result);
     return result;
   }
 
   tan(base, {name} = {}) {
-    let result = this.graph.add(new Tangent(base, {name}));
+    let result = this.graph.add(new Tangent(base, {name, graph: this.graph}));
     base.addObserver(result);
     return result;
   }
 
   tanGrad(base, {name} = {}) {
-    let result = this.graph.add(new TangentGrad(base, {name}));
+    let result = this.graph.add(new TangentGrad(base, {name, graph: this.graph}));
+    base.addObserver(result);
+    return result;
+  }
+
+  tile(base, scale, {name} = {}) {
+    let result = this.graph.add(new Tile(base, scale, {name, graph: this.graph}));
     base.addObserver(result);
     return result;
   }
 
   variable(shape, {name} = {}) {
-    return this.graph.add(new Variable(shape, {name}));
+    return this.graph.add(new Variable(shape, {name, graph: this.graph}));
   }
 }

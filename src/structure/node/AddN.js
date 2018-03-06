@@ -7,8 +7,8 @@ import Expression from "../Expression";
  */
 export default class AddN extends Expression {
 
-  constructor(list, {name, scope} = {}) {
-    super({name, scope});
+  constructor(list, {name, graph, scope} = {}) {
+    super({name, graph, scope});
 
     this._list = list;
   }

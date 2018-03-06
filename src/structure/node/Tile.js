@@ -2,8 +2,8 @@ import Expression from "../Expression";
 
 export default class Tile extends Expression {
 
-  constructor(base, repeats, {name, scope} = {}) {
-    super({name, scope});
+  constructor(base, repeats, {name, graph, scope} = {}) {
+    super({name, graph, scope});
     this._base = base;
     this._repeats = repeats;
     this._shape = base.shape.slice();

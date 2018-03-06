@@ -2,8 +2,8 @@ import Expression from "../Expression";
 
 export default class SoftmaxCrossEntropy extends Expression {
 
-  constructor(labels, logits, {name, scope} = {}) {
-    super({name, scope});
+  constructor(labels, logits, {name, graph, scope} = {}) {
+    super({name, graph, scope});
 
     this._labels = labels;
     this._logits = logits;

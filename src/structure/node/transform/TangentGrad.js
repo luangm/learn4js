@@ -2,8 +2,8 @@ import TransformExpression from "./TransformExpression";
 
 export default class TangentGrad extends TransformExpression {
 
-  constructor(base, {name, scope} = {}) {
-    super(base, {name, scope});
+  constructor(base, {name, graph, scope} = {}) {
+    super(base, {name, graph, scope});
   }
 
   get type() {

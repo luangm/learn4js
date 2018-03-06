@@ -6,8 +6,8 @@ import Expression from "../Expression";
  */
 export default class Fill extends Expression {
 
-  constructor(scalar, shape, {name, scope} = {}) {
-    super({name, scope});
+  constructor(scalar, shape, {name, graph, scope} = {}) {
+    super({name, graph, scope});
 
     this._scalar = scalar;
     this._shape = shape;

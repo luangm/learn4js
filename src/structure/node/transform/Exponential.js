@@ -2,8 +2,8 @@ import TransformExpression from "./TransformExpression";
 
 export default class Exponential extends TransformExpression {
 
-  constructor(base, {name} = {}) {
-    super(base, {name});
+  constructor(base, {name, graph, scope} = {}) {
+    super(base, {name, graph, scope});
   }
 
   get type() {

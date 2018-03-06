@@ -2,8 +2,8 @@ import Expression from "../Expression";
 
 export default class Assign extends Expression {
 
-  constructor(target, newValue, {name, scope} = {}) {
-    super({name, scope});
+  constructor(target, newValue, {name, graph, scope} = {}) {
+    super({name, graph, scope});
 
     this._target = target;
     this._newValue = newValue;

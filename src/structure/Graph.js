@@ -3,7 +3,7 @@
  * - All Nodes (inc. intermediate)
  * - Gradient from a Node to another Node.
  */
-import Session from "../session/Session";
+import ExpressionFactory from "./factory/ExpressionFactory";
 
 export default class Graph {
 
@@ -11,7 +11,11 @@ export default class Graph {
     this._name = name;
     this._nodes = {}; // a map of all nodes, key = node.id
     this._nodeParams = {}; // a map of all node params, key = node.type, value = { id: param}
-    this._session = new Session();
+    this._expressionFactory = new ExpressionFactory(this);
+  }
+
+  get expressionFactory() {
+    return this._expressionFactory;
   }
 
   get name() {
@@ -24,6 +28,10 @@ export default class Graph {
 
   get session() {
     return this._session;
+  }
+
+  set session(value) {
+    this._session = value;
   }
 
   /**
@@ -41,7 +49,6 @@ export default class Graph {
 
     // node.state = ExpressionState.ATTACHED;
     this._nodes[node.id] = node;
-    node.attach(this);
 
     if (!this._nodeParams[node.type]) {
       this._nodeParams[node.type] = {};
@@ -78,5 +85,3 @@ export default class Graph {
   }
 
 }
-
-Graph.active = new Graph('DEFAULT');

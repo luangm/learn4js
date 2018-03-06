@@ -2,8 +2,8 @@ import TransformExpression from "./TransformExpression";
 
 export default class SoftmaxGrad extends TransformExpression {
 
-  constructor(base, grad, {name} = {}) {
-    super(base, {name});
+  constructor(base, grad, {name, graph, scope} = {}) {
+    super(base, {name, graph, scope});
     this._grad = grad;
   }
 
