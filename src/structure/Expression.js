@@ -103,6 +103,10 @@ export default class Expression {
     this.graph.session.setValue(this, val);
   }
 
+  abs() {
+    return this.factory.abs(this);
+  }
+
   /**
    * Standard visitor pattern, the visitor should be of a Visitor
    * the params depends on the visitor.
@@ -119,6 +123,10 @@ export default class Expression {
     this._observers.push(observer);
   }
 
+  cos() {
+    return this.factory.cos(this);
+  }
+
   divide(other) {
     return this.factory.divide(this, other);
   }
@@ -131,12 +139,36 @@ export default class Expression {
     return this.factory.exp(this);
   }
 
+  expm1() {
+    return this.factory.expm1(this);
+  }
+
   getGradient(target) {
     return this._gradients ? this._gradients[target.id] : null;
   }
 
+  log() {
+    return this.factory.log(this);
+  }
+
   multiply(other) {
     return this.factory.multiply(this, other);
+  }
+
+  negate() {
+    return this.factory.negate(this);
+  }
+
+  reciprocal() {
+    return this.factory.reciprocal(this);
+  }
+
+  round() {
+    return this.factory.round(this);
+  }
+
+  rsqrt() {
+    return this.factory.rsqrt(this);
   }
 
   setGradient(targetId, grad) {
@@ -146,8 +178,36 @@ export default class Expression {
     this._gradients[targetId] = grad;
   }
 
+  sign() {
+    return this.factory.sign(this);
+  }
+
+  sin() {
+    return this.factory.sin(this);
+  }
+
+  sqrt() {
+    return this.factory.sqrt(this);
+  }
+
+  square() {
+    return this.factory.square(this);
+  }
+
+  step() {
+    return this.factory.step(this);
+  }
+
   subtract(other) {
     return this.factory.subtract(this, other);
+  }
+
+  tan() {
+    return this.factory.tan(this);
+  }
+
+  tanh() {
+    return this.factory.tanh(this);
   }
 
   toString() {

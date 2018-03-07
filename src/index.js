@@ -1,4 +1,4 @@
-import ComputeGraph from "./structure/Graph";
+import Graph from "./structure/Graph";
 import Tensor from "./core/Tensor";
 import Session from "./session/Session";
 import Logger from "./util/Logger";
@@ -6,7 +6,7 @@ import Learn4js from "./Learn4js";
 import Expression from "./structure/Expression";
 
 export {
-  ComputeGraph,
+  Graph,
   Tensor,
   Session,
   Logger

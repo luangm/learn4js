@@ -93,6 +93,24 @@ export default class Visitor {
     node.base.accept(this, params);
   }
 
+  visitExpm1(node, params) {
+    this.logger.info("visitExpm1", node.name);
+    this.preVisit(node, params);
+    node.base.accept(this, params);
+  }
+
+  visitRound(node, params) {
+    this.logger.info("visitRound", node.name);
+    this.preVisit(node, params);
+    node.base.accept(this, params);
+  }
+
+  visitRSqrt(node, params) {
+    this.logger.info("visitRSqrt", node.name);
+    this.preVisit(node, params);
+    node.base.accept(this, params);
+  }
+
   visitFill(node, params) {
     this.logger.info("visitFill", node.name);
     this.preVisit(node, params);

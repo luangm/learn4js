@@ -100,6 +100,10 @@ class Learn4js {
     return this.factory.exp(base, {name});
   }
 
+  expm1(base, {name} = {}) {
+    return this.factory.expm1(base, {name});
+  }
+
   fill(scalar, shape, {name} = {}) {
     return this.factory.fill(scalar, shape, {name});
   }
@@ -141,15 +145,15 @@ class Learn4js {
     return this.factory.matmul(left, right, transposeLeft, transposeRight, {name});
   }
 
+  multiply(left, right, {name} = {}) {
+    return this.factory.multiply(left, right, {name});
+  }
+
   // maxPool({name, image, kernelShape, strideWidth, strideHeight}) {
   //   let node = new MaxPool({name, image, kernelShape, strideWidth, strideHeight});
   //   this.activeGraph.add(node);
   //   return node;
   // }
-
-  multiply(left, right, {name} = {}) {
-    return this.factory.multiply(left, right, {name});
-  }
 
   negate(base, {name} = {}) {
     return this.factory.negate(base, {name});
@@ -165,6 +169,14 @@ class Learn4js {
 
   reduceSum(base, dimension = -1, {name} = {}) {
     return this.factory.reduceSum(base, dimension, {name});
+  }
+
+  round(base, {name} = {}) {
+    return this.factory.round(base, {name});
+  }
+
+  rsqrt(base, {name} = {}) {
+    return this.factory.rsqrt(base, {name});
   }
 
   // session(graph) {
@@ -202,6 +214,10 @@ class Learn4js {
 
   tan(base, {name} = {}) {
     return this.factory.tan(base, {name});
+  }
+
+  tanh(base, {name} = {}) {
+    return this.factory.tanh(base, {name});
   }
 
   variable(shape, {name} = {}) {

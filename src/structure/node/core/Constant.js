@@ -16,7 +16,7 @@ export default class Constant extends Expression {
   }
 
   get shape() {
-    return this.value.shape;
+    return this._value.shape;
   }
 
   get type() {
@@ -27,8 +27,8 @@ export default class Constant extends Expression {
     return this._value;
   }
 
-  set value(val) {
-    this._value = val;
+  set value(value) {
+    throw new Error('Cannot set constant');
   }
 
   accept(visitor, params) {

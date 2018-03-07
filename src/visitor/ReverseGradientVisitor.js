@@ -19,12 +19,11 @@ export default class ReverseGradientVisitor extends Visitor {
   constructor(graph) {
     super();
     this._graph = graph;
-    this._factory = new ExpressionFactory(graph);
     this._gradMap = {}; // Key = target.id, value = list of grads
   }
 
   get factory() {
-    return this._factory;
+    return this.graph.expressionFactory;
   }
 
   get graph() {

@@ -19,6 +19,7 @@ import Exponential from "../node/transform/Exponential";
 import Logarithm from "../node/transform/Logarithm";
 import Negate from "../node/transform/Negate";
 import Reciprocal from "../node/transform/Reciprocal";
+import Round from "../node/transform/Round";
 import Sigmoid from "../node/transform/Sigmoid";
 import SigmoidGrad from "../node/transform/SigmoidGrad";
 import Sign from "../node/transform/Sign";
@@ -31,6 +32,9 @@ import SquareRootGrad from "../node/transform/SquareRootGrad";
 import Step from "../node/transform/Step";
 import Tangent from "../node/transform/Tangent";
 import TangentGrad from "../node/transform/TangentGrad";
+import Tanh from "../node/transform/Tanh";
+import RSqrt from "../node/transform/RSqrt";
+import Expm1 from "../node/transform/Expm1";
 
 /**
  * Expression Factory create nodes and add it to the Graph.
@@ -111,6 +115,12 @@ export default class ExpressionFactory {
     return result;
   }
 
+  expm1(base, {name} = {}) {
+    let result = this.graph.add(new Expm1(base, {name, graph: this.graph}));
+    base.addObserver(result);
+    return result;
+  }
+
   fill(scalar, shape, {name} = {}) {
     return this.graph.add(new Fill(scalar, shape, {name, graph: this.graph}));
   }
@@ -172,6 +182,18 @@ export default class ExpressionFactory {
       return result;
     }
     return base;
+  }
+
+  round(base, {name} = {}) {
+    let result = this.graph.add(new Round(base, {name, graph: this.graph}));
+    base.addObserver(result);
+    return result;
+  }
+
+  rsqrt(base, {name} = {}) {
+    let result = this.graph.add(new RSqrt(base, {name, graph: this.graph}));
+    base.addObserver(result);
+    return result;
   }
 
   sigmoid(base, {name} = {}) {
@@ -249,6 +271,12 @@ export default class ExpressionFactory {
 
   tanGrad(base, {name} = {}) {
     let result = this.graph.add(new TangentGrad(base, {name, graph: this.graph}));
+    base.addObserver(result);
+    return result;
+  }
+
+  tanh(base, {name} = {}) {
+    let result = this.graph.add(new Tanh(base, {name, graph: this.graph}));
     base.addObserver(result);
     return result;
   }

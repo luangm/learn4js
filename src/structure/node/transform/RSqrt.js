@@ -1,17 +1,17 @@
 import TransformExpression from "./TransformExpression";
 
-export default class Logarithm extends TransformExpression {
+export default class RSqrt extends TransformExpression {
 
   constructor(base, {name, graph, scope} = {}) {
     super(base, {name, graph, scope});
   }
 
   get type() {
-    return 'Logarithm';
+    return 'RSqrt';
   }
 
   accept(visitor, params) {
-    visitor.visitLog(this, params);
+    visitor.visitRSqrt(this, params);
   }
 
 }

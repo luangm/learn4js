@@ -9,12 +9,15 @@ import SumOp from "./op/reduction/SumOp";
 import MatMulOp from "./op/special/MatMulOp";
 import AbsOp from "./op/transform/AbsOp";
 import CosineOp from "./op/transform/CosineOp";
+import Expm1Op from "./op/transform/Expm1Op";
 import ExpOp from "./op/transform/ExpOp";
 import IndexSetOp from "./op/transform/IndexSetOp";
 import LogOp from "./op/transform/LogOp";
 import NegateOp from "./op/transform/NegateOp";
 import ReciprocalOp from "./op/transform/ReciprocalOp";
 import ReluOp from "./op/transform/ReluOp";
+import RoundOp from "./op/transform/RoundOp";
+import RSqrtOp from "./op/transform/RSqrtOp";
 import SetOp from "./op/transform/SetOp";
 import SigmoidGradOp from "./op/transform/SigmoidGradOp";
 import SigmoidOp from "./op/transform/SigmoidOp";
@@ -22,8 +25,8 @@ import SignOp from "./op/transform/SignOp";
 import SineOp from "./op/transform/SineOp";
 import SoftmaxOp from "./op/transform/SoftmaxOp";
 import SqrtGradOp from "./op/transform/SqrtGradOp";
-import SqrtOp from "./op/transform/SqrtOp";
 import SquareOp from "./op/transform/SquareOp";
+import SquareRootOp from "./op/transform/SquareRootOp";
 import StepOp from "./op/transform/StepOp";
 import TanGradOp from "./op/transform/TanGradOp";
 import TanhOp from "./op/transform/TanhOp";
@@ -49,6 +52,10 @@ export default class TensorMath {
     return result;
   }
 
+  static addN(items) {
+
+  }
+
   // TODO: Remove
   static add_OLD(left, right, result) {
     if (!result) {
@@ -63,10 +70,6 @@ export default class TensorMath {
 
     Executor.instance.exec(new AddOp(left, right, result));
     return result;
-  }
-
-  static addN(items) {
-
   }
 
   static addi(left, right) {
@@ -163,6 +166,12 @@ export default class TensorMath {
   static exp(base, result) {
     result = result || new Tensor({shape: base.shape});
     Executor.instance.exec(new ExpOp(base, null, result));
+    return result;
+  }
+
+  static expm1(base, result) {
+    result = result || new Tensor({shape: base.shape});
+    Executor.instance.exec(new Expm1Op(base, null, result));
     return result;
   }
 
@@ -305,6 +314,18 @@ export default class TensorMath {
     return result;
   }
 
+  static round(base) {
+    let result = new Tensor({shape: base.shape});
+    Executor.instance.exec(new RoundOp(base, null, result));
+    return result;
+  }
+
+  static rsqrt(base) {
+    let result = new Tensor({shape: base.shape});
+    Executor.instance.exec(new RSqrtOp(base, null, result));
+    return result;
+  }
+
   static set(base, scalar) {
     Executor.instance.exec(new SetOp(base, scalar, base));
     return base;
@@ -386,7 +407,7 @@ export default class TensorMath {
 
   static sqrt(base) {
     let result = new Tensor({shape: base.shape});
-    Executor.instance.exec(new SqrtOp(base, null, result));
+    Executor.instance.exec(new SquareRootOp(base, null, result));
     return result;
   }
 

@@ -227,7 +227,7 @@ export default class Executor {
 
         let resultPointer = i * resultStrides[0] + j * resultStrides[1];
 
-        result[resultPointer] = op.body(input[inputPointer] + other[otherPointer]);
+        result[resultPointer] = op.body(input[inputPointer], other[otherPointer]);
       }
     }
   }

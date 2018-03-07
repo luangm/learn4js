@@ -19,45 +19,42 @@ export default class EvaluationVisitor extends Visitor {
   }
 
   getValue(node) {
-    return this._valueMap[node.id];
+    return this.session.getValue(node);
   }
 
   setValue(node, value) {
-    this._valueMap[node.id] = value;
+    this.session.setValue(node, value);
   }
 
-  // DONE
+  // Done
   visitAbsolute(node, params) {
     logger.info("visitAbsolute", node.id);
-
-    if (node.base.isInvalid) {
-      node.base.accept(this, params);
+    if (this.session.isValid(node)) {
+      return;
     }
 
-    let base = node.base.value;
-    node.value = TensorMath.abs(base);
-    node.state = ExpressionState.EVALUATED;
+    node.base.accept(this, params);
+
+    let base = this.getValue(node.base);
+    let result = TensorMath.abs(base);
+    this.setValue(node, result);
   }
 
-  // DONE
+  // Done
   visitAdd(node, params) {
     logger.info("visitAdd", node.id);
-
-    if (node.left.isInvalid) {
-      node.left.accept(this, params);
+    if (this.session.isValid(node)) {
+      return;
     }
-
-    if (node.right.isInvalid) {
-      node.right.accept(this, params);
-    }
-
-    let left = node.left.value;
-    let right = node.right.value;
-    node.value = TensorMath.add(left, right);
-    node.state = ExpressionState.EVALUATED;
+    node.left.accept(this, params);
+    node.right.accept(this, params);
+    let left = this.getValue(node.left);
+    let right = this.getValue(node.right);
+    let result = TensorMath.add(left, right);
+    this.setValue(node, result);
   }
 
-  // DONE
+
   visitAddN(node, params) {
     logger.info("visitAddN", node.id);
 
@@ -72,7 +69,7 @@ export default class EvaluationVisitor extends Visitor {
     node.state = ExpressionState.EVALUATED;
   }
 
-  // DONE
+
   visitAssign(node, params) {
     logger.info("visitAssign", node.id);
 
@@ -84,11 +81,13 @@ export default class EvaluationVisitor extends Visitor {
     node.state = ExpressionState.EVALUATED;
   }
 
-  // DONE
+
   visitConstant(node, params) {
     logger.info("visitConstant", node.id);
-    this.session.setValue(node, node.value);
-    node.state = ExpressionState.EVALUATED;
+    if (this.session.isValid(node)) {
+      return;
+    }
+    this.setValue(node, node.value);
   }
 
   visitConv2d(node, params) {
@@ -114,51 +113,60 @@ export default class EvaluationVisitor extends Visitor {
     this.valueMap[node.id] = TensorMath.conv2dKernelGrad(image, kernel, grad);
   }
 
-  // DONE
+  // Done
   visitCosine(node, params) {
     logger.info("visitCosine", node.id);
-
-    if (node.base.isInvalid) {
-      node.base.accept(this, params);
+    if (this.session.isValid(node)) {
+      return;
     }
 
-    let base = node.base.value;
-    node.value = TensorMath.cos(base);
-    node.state = ExpressionState.EVALUATED;
+    node.base.accept(this, params);
+
+    let base = this.getValue(node.base);
+    let result = TensorMath.cos(base);
+    this.setValue(node, result);
   }
 
   // DONE
   visitDivide(node, params) {
     logger.info("visitDivide", node.id);
-
-    if (node.left.isInvalid) {
-      node.left.accept(this, params);
+    if (this.session.isValid(node)) {
+      return;
     }
 
-    if (node.right.isInvalid) {
-      node.right.accept(this, params);
-    }
+    node.left.accept(this, params);
+    node.right.accept(this, params);
 
-    let left = node.left.value;
-    let right = node.right.value;
-    node.value = TensorMath.divide(left, right);
-    node.state = ExpressionState.EVALUATED;
+    let left = this.getValue(node.left);
+    let right = this.getValue(node.right);
+    let result = TensorMath.divide(left, right);
+    this.setValue(node, result);
   }
 
   // DONE
   visitExp(node, params) {
     logger.info("visitExp", node.id);
-
-    if (node.base.isInvalid) {
-      node.base.accept(this, params);
+    if (this.session.isValid(node)) {
+      return;
     }
-
-    let base = node.base.value;
-    node.value = TensorMath.exp(base);
-    node.state = ExpressionState.EVALUATED;
+    node.base.accept(this, params);
+    let base = this.getValue(node.base);
+    let result = TensorMath.exp(base);
+    this.setValue(node, result);
   }
 
   // DONE
+  visitExpm1(node, params) {
+    logger.info("visitExpm1", node.id);
+    if (this.session.isValid(node)) {
+      return;
+    }
+    node.base.accept(this, params);
+    let base = this.getValue(node.base);
+    let result = TensorMath.expm1(base);
+    this.setValue(node, result);
+  }
+
   visitFill(node, params) {
     super.visitFill(node, params);
 
@@ -189,34 +197,30 @@ export default class EvaluationVisitor extends Visitor {
     this.valueMap[node.id] = TensorUtils.im2col(image, kernel);
   }
 
+  // DONE
   visitLog(node, params) {
     logger.info("visitLog", node.id);
-
-    if (node.base.isInvalid) {
-      node.base.accept(this, params);
+    if (this.session.isValid(node)) {
+      return;
     }
-
-    let base = node.base.value;
-    node.value = TensorMath.log(base);
-    node.state = ExpressionState.EVALUATED;
+    node.base.accept(this, params);
+    let base = this.getValue(node.base);
+    let result = TensorMath.log(base);
+    this.setValue(node, result);
   }
 
   // DONE
   visitMatMul(node, params) {
     logger.info("visitMatMul", node.id);
-
-    if (node.left.isInvalid) {
-      node.left.accept(this, params);
+    if (this.session.isValid(node)) {
+      return;
     }
-
-    if (node.right.isInvalid) {
-      node.right.accept(this, params);
-    }
-
-    let left = node.left.value;
-    let right = node.right.value;
-    node.value = TensorMath.matmul(left, right, node.transposeLeft, node.transposeRight);
-    node.state = ExpressionState.EVALUATED;
+    node.left.accept(this, params);
+    node.right.accept(this, params);
+    let left = this.getValue(node.left);
+    let right = this.getValue(node.right);
+    let result = TensorMath.matmul(left, right, node.transposeLeft, node.transposeRight);
+    this.setValue(node, result);
   }
 
   visitMaxPool(node, params) {
@@ -238,52 +242,64 @@ export default class EvaluationVisitor extends Visitor {
   // DONE
   visitMultiply(node, params) {
     logger.info("visitMultiply", node.id);
-
-    if (node.left.isInvalid) {
-      node.left.accept(this, params);
+    if (this.session.isValid(node)) {
+      return;
     }
-
-    if (node.right.isInvalid) {
-      node.right.accept(this, params);
-    }
-
-    let left = node.left.value;
-    let right = node.right.value;
-    node.value = TensorMath.multiply(left, right);
-    node.state = ExpressionState.EVALUATED;
-  }
-
-  visitNegate(node, params) {
-    logger.info("visitNegate", node.id);
-
-    if (node.base.isInvalid) {
-      node.base.accept(this, params);
-    }
-
-    let base = node.base.value;
-    node.value = TensorMath.negate(base);
-    node.state = ExpressionState.EVALUATED;
-  }
-
-  visitParameter(node, params) {
-    logger.info("visitParameter", node.id);
-    this.session.setValue(node, node.value);
-    node.state = ExpressionState.EVALUATED;
-  }
-
-  visitReciprocal(node, params) {
-    logger.info("visitReciprocal", node.id);
-
-    if (node.base.isInvalid) {
-      node.base.accept(this, params);
-    }
-
-    let base = node.base.value;
-    node.value = TensorMath.reciprocal(base);
-    node.state = ExpressionState.EVALUATED;
+    node.left.accept(this, params);
+    node.right.accept(this, params);
+    let left = this.getValue(node.left);
+    let right = this.getValue(node.right);
+    let result = TensorMath.multiply(left, right);
+    this.setValue(node, result);
   }
 
   // DONE
+  visitNegate(node, params) {
+    logger.info("visitNegate", node.id);
+    if (this.session.isValid(node)) {
+      return;
+    }
+    node.base.accept(this, params);
+    let base = this.getValue(node.base);
+    let result = TensorMath.negate(base);
+    this.setValue(node, result);
+  }
+
+  // DONE
+  visitParameter(node, params) {
+    logger.info("visitParameter", node.id);
+    if (this.session.isValid(node)) {
+      return;
+    }
+    this.setValue(node, node.initialValue);
+  }
+
+  // DONE
+  visitRSqrt(node, params) {
+    logger.info("visitRSqrt", node.id);
+    if (this.session.isValid(node)) {
+      return;
+    }
+    node.base.accept(this, params);
+    let base = this.getValue(node.base);
+    let result = TensorMath.rsqrt(base);
+    this.setValue(node, result);
+  }
+
+  // DONE
+  visitReciprocal(node, params) {
+    logger.info("visitReciprocal", node.id);
+    if (this.session.isValid(node)) {
+      return;
+    }
+
+    node.base.accept(this, params);
+
+    let base = this.getValue(node.base);
+    let result = TensorMath.reciprocal(base);
+    this.setValue(node, result);
+  }
+
   visitReduceSum(node, params) {
     logger.info("visitReduceSum", node.id);
 
@@ -297,98 +313,102 @@ export default class EvaluationVisitor extends Visitor {
   }
 
   // DONE
-  visitTile(node, params) {
-    logger.info("visitTile", node.id);
-
-    if (node.base.isInvalid) {
-      node.base.accept(this, params);
-    }
-
-    let base = node.base.value;
-    node.value = TensorMath.tile(base, node.repeats);
-    node.state = ExpressionState.EVALUATED;
-  }
-
-
-  // DONE
   visitRelu(node, params) {
     logger.info("visitRelu", node.id);
-
-    if (node.base.isInvalid) {
-      node.base.accept(this, params);
+    if (this.session.isValid(node)) {
+      return;
     }
 
-    let base = node.base.value;
-    node.value = TensorMath.relu(base);
-    node.state = ExpressionState.EVALUATED;
+    node.base.accept(this, params);
+
+    let base = this.getValue(node.base);
+    let result = TensorMath.relu(base);
+    this.setValue(node, result);
+  }
+
+  // DONE
+  visitRound(node, params) {
+    logger.info("visitRound", node.id);
+    if (this.session.isValid(node)) {
+      return;
+    }
+    node.base.accept(this, params);
+    let base = this.getValue(node.base);
+    let result = TensorMath.round(base);
+    this.setValue(node, result);
   }
 
   // DONE
   visitSigmoid(node, params) {
     logger.info("visitSigmoid", node.id);
-
-    if (node.base.isInvalid) {
-      node.base.accept(this, params);
+    if (this.session.isValid(node)) {
+      return;
     }
 
-    let base = node.base.value;
-    node.value = TensorMath.sigmoid(base);
-    node.state = ExpressionState.EVALUATED;
+    node.base.accept(this, params);
+
+    let base = this.getValue(node.base);
+    let result = TensorMath.sigmoid(base);
+    this.setValue(node, result);
   }
 
   // DONE
   visitSigmoidGrad(node, params) {
     logger.info("visitSigmoidGrad", node.id);
-
-    if (node.base.isInvalid) {
-      node.base.accept(this, params);
+    if (this.session.isValid(node)) {
+      return;
     }
 
-    let base = node.base.value;
-    node.value = TensorMath.sigmoidGrad(base);
-    node.state = ExpressionState.EVALUATED;
+    node.base.accept(this, params);
+
+    let base = this.getValue(node.base);
+    let result = TensorMath.sigmoidGrad(base);
+    this.setValue(node, result);
   }
 
   // DONE
   visitSign(node, params) {
     logger.info("visitSign", node.id);
-
-    if (node.base.isInvalid) {
-      node.base.accept(this, params);
+    if (this.session.isValid(node)) {
+      return;
     }
 
-    let base = node.base.value;
-    node.value = TensorMath.sign(base);
-    node.state = ExpressionState.EVALUATED;
+    node.base.accept(this, params);
+
+    let base = this.getValue(node.base);
+    let result = TensorMath.sign(base);
+    this.setValue(node, result);
   }
 
   // DONE
   visitSine(node, params) {
     logger.info("visitSine", node.id);
-
-    if (node.base.isInvalid) {
-      node.base.accept(this, params);
+    if (this.session.isValid(node)) {
+      return;
     }
 
-    let base = node.base.value;
-    node.value = TensorMath.sin(base);
-    node.state = ExpressionState.EVALUATED;
+    node.base.accept(this, params);
+
+    let base = this.getValue(node.base);
+    let result = TensorMath.sin(base);
+    this.setValue(node, result);
   }
 
   // DONE
   visitSoftmax(node, params) {
     logger.info("visitSoftmax", node.id);
-
-    if (node.base.isInvalid) {
-      node.base.accept(this, params);
+    if (this.session.isValid(node)) {
+      return;
     }
 
-    let base = node.base.value;
-    node.value = TensorMath.softmax2(base);
-    node.state = ExpressionState.EVALUATED;
+    node.base.accept(this, params);
+
+    let base = this.getValue(node.base);
+    let result = TensorMath.softmax2(base);
+    this.setValue(node, result);
   }
 
-  // DONE
+
   visitSoftmaxCrossEntropy(node, params) {
     logger.info("visitSoftmaxCrossEntropy", node.id);
 
@@ -402,7 +422,7 @@ export default class EvaluationVisitor extends Visitor {
     node.state = ExpressionState.EVALUATED;
   }
 
-  // DONE
+
   visitSoftmaxGrad(node, params) {
     logger.info("visitSoftmaxGrad", node.id);
 
@@ -419,109 +439,111 @@ export default class EvaluationVisitor extends Visitor {
   // DONE
   visitSqrt(node, params) {
     logger.info("visitSqrt", node.id);
-
-    if (node.base.isInvalid) {
-      node.base.accept(this, params);
+    if (this.session.isValid(node)) {
+      return;
     }
-
-    let base = node.base.value;
-    node.value = TensorMath.sqrt(base);
-    node.state = ExpressionState.EVALUATED;
+    node.base.accept(this, params);
+    let base = this.getValue(node.base);
+    let result = TensorMath.sqrt(base);
+    this.setValue(node, result);
   }
 
   // DONE
   visitSqrtGrad(node, params) {
     logger.info("visitSqrtGrad", node.id);
-
-    if (node.base.isInvalid) {
-      node.base.accept(this, params);
+    if (this.session.isValid(node)) {
+      return;
     }
-
-    let base = node.base.value;
-    node.value = TensorMath.sqrtGrad(base);
-    node.state = ExpressionState.EVALUATED;
+    node.base.accept(this, params);
+    let base = this.getValue(node.base);
+    let result = TensorMath.sqrtGrad(base);
+    this.setValue(node, result);
   }
 
   // DONE
   visitSquare(node, params) {
     logger.info("visitSquare", node.id);
-
-    if (node.base.isInvalid) {
-      node.base.accept(this, params);
+    if (this.session.isValid(node)) {
+      return;
     }
-
-    let base = node.base.value;
-    node.value = TensorMath.square(base);
-    node.state = ExpressionState.EVALUATED;
+    node.base.accept(this, params);
+    let base = this.getValue(node.base);
+    let result = TensorMath.square(base);
+    this.setValue(node, result);
   }
 
   // DONE
   visitStep(node, params) {
     logger.info("visitStep", node.id);
-
-    if (node.base.isInvalid) {
-      node.base.accept(this, params);
+    if (this.session.isValid(node)) {
+      return;
     }
-
-    let base = node.base.value;
-    node.value = TensorMath.step(base);
-    node.state = ExpressionState.EVALUATED;
+    node.base.accept(this, params);
+    let base = this.getValue(node.base);
+    let result = TensorMath.step(base);
+    this.setValue(node, result);
   }
 
   // DONE
   visitSubtract(node, params) {
     logger.info("visitSubtract", node.id);
-
-    if (node.left.isInvalid) {
-      node.left.accept(this, params);
+    if (this.session.isValid(node)) {
+      return;
     }
-
-    if (node.right.isInvalid) {
-      node.right.accept(this, params);
-    }
-
-    let left = node.left.value;
-    let right = node.right.value;
-    node.value = TensorMath.subtract(left, right);
-    node.state = ExpressionState.EVALUATED;
+    node.left.accept(this, params);
+    node.right.accept(this, params);
+    let left = this.getValue(node.left);
+    let right = this.getValue(node.right);
+    let result = TensorMath.subtract(left, right);
+    this.setValue(node, result);
   }
 
   // DONE
   visitTangent(node, params) {
     logger.info("visitTangent", node.id);
-
-    if (node.base.isInvalid) {
-      node.base.accept(this, params);
+    if (this.session.isValid(node)) {
+      return;
     }
-
-    let base = node.base.value;
-    node.value = TensorMath.tan(base);
-    node.state = ExpressionState.EVALUATED;
+    node.base.accept(this, params);
+    let base = this.getValue(node.base);
+    let result = TensorMath.tan(base);
+    this.setValue(node, result);
   }
 
   // DONE
   visitTangentGrad(node, params) {
     logger.info("visitTangentGrad", node.id);
-
-    if (node.base.isInvalid) {
-      node.base.accept(this, params);
+    if (this.session.isValid(node)) {
+      return;
     }
-
-    let base = node.base.value;
-    node.value = TensorMath.tanGrad(base);
-    node.state = ExpressionState.EVALUATED;
+    node.base.accept(this, params);
+    let base = this.getValue(node.base);
+    let result = TensorMath.tanGrad(base);
+    this.setValue(node, result);
   }
 
   // DONE
   visitTanh(node, params) {
     logger.info("visitTanh", node.id);
+    if (this.session.isValid(node)) {
+      return;
+    }
+    node.base.accept(this, params);
+    let base = this.getValue(node.base);
+    let result = TensorMath.tanh(base);
+    this.setValue(node, result);
+  }
+
+
+  visitTile(node, params) {
+    logger.info("visitTile", node.id);
 
     if (node.base.isInvalid) {
       node.base.accept(this, params);
     }
 
     let base = node.base.value;
-    node.value = TensorMath.tanh(base);
+    node.value = TensorMath.tile(base, node.repeats);
     node.state = ExpressionState.EVALUATED;
   }
 

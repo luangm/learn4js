@@ -10,9 +10,17 @@ export default class Parameter extends Expression {
   /**
    * Value can be a tensor or an array
    */
-  constructor(value, {name, graph, scope} = {}) {
+  constructor(initialValue, {name, graph, scope} = {}) {
     super({name, graph, scope});
-    this._value = Tensor.create(value);
+    this._initialValue = Tensor.create(initialValue);
+  }
+
+  get initialValue() {
+    return this._initialValue;
+  }
+
+  set initialValue(val) {
+    this._initialValue = val;
   }
 
   get params() {
@@ -27,15 +35,6 @@ export default class Parameter extends Expression {
 
   get type() {
     return 'Parameter';
-  }
-
-  get value() {
-    return this._value;
-  }
-
-  set value(val) {
-    super.value = val;
-    this._value = val;
   }
 
   accept(visitor, params) {
