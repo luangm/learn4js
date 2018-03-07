@@ -149,6 +149,35 @@ export default class Executor {
   }
 
   /**
+   * Executes an accumulation with a 2D input
+   * @param op {Operation}
+   * @param accumDims {boolean[]}
+   * @private
+   */
+  _execAccum2D(op, accumDims) {
+    let input = op.input.data;
+    let result = op.result.data;
+
+    let inputStrides = op.input.strides;
+    let resultStrides = op.result.strides;
+
+    let shape = op.input.shape; // accumulate around input, not the result
+
+    for (let i = 0; i < shape[0]; i++) {
+      for (let j = 0; j < shape[1]; j++) {
+        let inputPointer = i * inputStrides[0] + j * inputStrides[1];
+
+        let resultPointer = accumDims[0] ? 0 : i * resultStrides[0];
+        resultPointer += accumDims[1] ? 0 : j * resultStrides[1];
+
+        result[resultPointer] = op.update(result[resultPointer], input[inputPointer]);
+
+        // console.log(inputPointer, resultPointer);
+      }
+    }
+  }
+
+  /**
    * Starts the execution from a certain dimension
    */
   _execAtDim(op, dim, indices) {
@@ -216,19 +245,42 @@ export default class Executor {
     let inputBroadDims = ShapeUtils.getBroadcastedDimensions(inputShape, shape);
     let otherBroadDims = ShapeUtils.getBroadcastedDimensions(otherShape, shape);
 
+    let inputS0 = (inputBroadDims[0] ? 0 : inputStrides[0]) | 0;
+    let inputS1 = (inputBroadDims[1] ? 0 : inputStrides[1]) | 0;
+    let otherS0 = (otherBroadDims[0] ? 0 : otherStrides[0]) | 0;
+    let otherS1 = (otherBroadDims[1] ? 0 : otherStrides[1]) | 0;
+    let resultS0 = resultStrides[0] | 0;
+    let resultS1 = resultStrides[1] | 0;
+    let s0 = shape[0] | 0;
+    let s1 = shape[1] | 0;
 
-    for (let i = 0; i < shape[0]; i++) {
-      for (let j = 0; j < shape[1]; j++) {
-        let inputPointer = inputBroadDims[0] ? 0 : i * inputStrides[0];
-        inputPointer += inputBroadDims[1] ? 0 : j * inputStrides[1];
+    let iPtr = 0 | 0;
+    let oPtr = 0 | 0;
+    let rPtr = 0 | 0;
 
-        let otherPointer = otherBroadDims[0] ? 0 : i * otherStrides[0];
-        otherPointer += otherBroadDims[1] ? 0 : j * otherStrides[1];
+    let inputD0 = (inputS0 - inputS1 * s1) | 0;
+    let otherD0 = (otherS0 - otherS1 * s1) | 0;
+    let resultD0 = (resultS0 - resultS1 * s1) | 0;
 
-        let resultPointer = i * resultStrides[0] + j * resultStrides[1];
+    for (let i = 0; i < s0; i++) {
 
-        result[resultPointer] = op.body(input[inputPointer], other[otherPointer]);
+      for (let j = 0; j < s1; j++) {
+        result[rPtr] = op.body(input[iPtr], other[oPtr]);
+        iPtr = (iPtr + inputS1) | 0;
+        oPtr = (oPtr + otherS1) | 0;
+        rPtr = (rPtr + resultS1) | 0;
+        // result[(rPtr + resultS1) | 0] = op.body(input[(iPtr + inputS1) | 0], other[(oPtr + otherS1) | 0]);
+        // result[(rPtr + resultS1 * 2) | 0] = op.body(input[(iPtr + inputS1 * 2) | 0], other[(oPtr + otherS1 * 2) | 0]);
+        // result[(rPtr + resultS1 * 3) | 0] = op.body(input[(iPtr + inputS1 * 3) | 0], other[(oPtr + otherS1 * 3) | 0]);
+
+        // iPtr = (iPtr + inputS1 * 4) | 0;
+        // oPtr = (oPtr + otherS1 * 4) | 0;
+        // rPtr = (rPtr + resultS1 * 4) | 0;
       }
+
+      iPtr = (iPtr + inputD0) | 0;
+      oPtr = (oPtr + otherD0) | 0;
+      rPtr = (rPtr + resultD0) | 0;
     }
   }
 
@@ -260,13 +312,24 @@ export default class Executor {
     let rank = shape.length;
     let slots = new Array(rank).fill(0);
 
-    while (true) {
+    let iS = new Array(rank).fill(0);
+    let oS = new Array(rank).fill(0);
+    let rS = new Array(rank).fill(0);
+    for (let i = 0; i < rank; i++) {
+      iS[i] = inputBroadDims[i] ? 0 : inputStrides[i];
+      oS[i] = otherBroadDims[i] ? 0 : otherStrides[i];
+      rS[i] = resultStrides[i];
+    }
+
+    let r = rank - 1 | 0;
+    while (r >= 0) {
+
+      // console.log(r, inputPointer, otherPointer, resultPointer);
 
       // Calc
       result[resultPointer] = op.body(input[inputPointer], other[otherPointer]);
 
-      let r = rank - 1;
-      for (; r >= 0; r--) {
+      for (r = rank - 1; r >= 0; r--) {
         slots[r]++;
 
         if (!inputBroadDims[r]) {
@@ -296,10 +359,10 @@ export default class Executor {
         resultPointer -= resultStrides[r] * shape[r];
       }
 
-      // Overflown
-      if (r < 0) {
-        break;
-      }
+      // // Overflown
+      // if (r < 0) {
+      //   break;
+      // }
     }
   }
 

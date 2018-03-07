@@ -48,4 +48,12 @@ export default class Operation {
     throw new Error('should not call base class\'s exec');
   }
 
+  body(a, b) {
+
+  }
+
+  update(accum, a) {
+
+  }
+
 }

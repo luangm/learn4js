@@ -6,14 +6,13 @@ import ShapeUtils from "../../src/core/util/ShapeUtils";
 test('add', function() {
   let a = new Tensor({data: [1, 2, 3, 4, 5, 6], shape: [2, 1, 3]});
   let ab = a.broadcast([2, 2, 3]);
-  println(ab);
   let b = new Tensor({data: [2, 3, 4, 5, 6, 7], shape: [1, 2, 3]});
   let bb = b.broadcast([2, 2, 3]);
-  println(bb);
   let result = TensorMath.add(a, b);
+  // let result2 = TensorMath.add(ab, bb);
+
+  // expect(result).toEqual(result2);
   println(result);
-  let result2 = TensorMath.add(ab, bb);
-  println(result2);
 });
 
 

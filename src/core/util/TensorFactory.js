@@ -11,9 +11,13 @@ export default class TensorFactory {
    * The length of the tensor is array.length * array[0].length * .... array[0]...[0].length
    * If any array's dimension does not match, an error is thrown.
    *
+   * 1: shape = [], data = [1]
    * [1,2,3]: shape = [3], data = [1,2,3]
    * [[1,2,3],[4,5,6]]: shape = [2, 3], data = [1,2,3,4,5,6]
    * [[[1,2],[3,4],[5,6]], [[7,8],[9,10],[11,12]]], shape = [2, 3, 2], data = [1..12]
+   *
+   * @param array {number[]|number}
+   * @return {Tensor}
    */
   static create(array) {
     let shape = new Shape({shape: findShape(array)});

@@ -295,16 +295,47 @@ export default class TensorMath {
     return result.reshape(resultShape);
   }
 
-  static reduceSum(base, dim) {
-    if (dim === -1) {
-      return base.sum();
-    }
+  /**
+   *
+   * @param base {Tensor}
+   * @param dims {int|int[]} [dims = -1]
+   * @param keepDims {boolean} [keepDims = true]
+   * @returns {Tensor}
+   */
+  static reduceSum(base, dims = -1, keepDims = true) {
 
     let resultShape = base.shape.slice();
-    resultShape[dim] = 1;
+    let accumDims = new Array(base.shape.length).fill(false);
+
+    if (dims === -1) {
+      resultShape.fill(1);
+      accumDims.fill(true);
+    } else if (Number.isInteger(dims)) {
+      if (dims < 0 || dims >= resultShape.length) {
+        throw new Error('Dimensions must be [0 rank-1]');
+      }
+      resultShape[dims] = 1;
+      accumDims[dims] = true;
+    } else if (Array.isArray(dims)) {
+      for (let dim of dims) {
+        if (!Number.isInteger(dim)) {
+          throw new Error('Dimensions must be integers');
+        }
+        if (dim < 0 || dim >= resultShape.length) {
+          throw new Error('Dimensions must be [0 rank-1]');
+        }
+        resultShape[dim] = 1;
+        accumDims[dim] = true;
+      }
+    } else {
+      throw new Error('Dims must be int or [int]');
+    }
+
+    // console.log("Shape: ", resultShape);
+
     let result = new Tensor({shape: resultShape});
     let op = new SumOp(base, null, result);
-    Executor.instance.execAtDim(op, dim);
+    Executor.instance._execAccum2D(op, accumDims);
     return result;
   }
 

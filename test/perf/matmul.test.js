@@ -3,7 +3,6 @@ import TensorMath from "../../src/core/TensorMath";
 
 test('test matmul', function() {
 
-  let now = new Date();
   let EPOCH = 10;
   let SIZE = 512 * 512;
   let a = [];
@@ -22,11 +21,7 @@ test('test matmul', function() {
   let tensorB = Tensor.create(b).reshape([ROWS, COLS]);
   let tensorX = Tensor.create(x).reshape([ROWS, COLS]);
 
-  let then = new Date();
-
-  console.log(">>> Set Up", then - now, "ms");
-
-  now = new Date();
+  let now = new Date();
 
   for (let i = 0; i < EPOCH; i++) {
     for (let r = 0; r < ROWS; r++) {
@@ -42,16 +37,12 @@ test('test matmul', function() {
     }
   }
 
-  then = new Date();
-  console.log(">>> base js benchmark: ", then - now, "ms");
-
-
+  console.log(">>> base js benchmark: ", new Date() - now, "ms");
   now = new Date();
 
   for (let i = 0; i < EPOCH; i++) {
     TensorMath.matmul(tensorA, tensorB, false, true, tensorX);
   }
 
-  then = new Date();
-  console.log(">>> TensorMath", then - now, "ms");
+  console.log(">>> TensorMath.matmul", new Date() - now, "ms");
 });
