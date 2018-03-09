@@ -222,11 +222,11 @@ export default class Executor {
 
   _execPairwise(op) {
     let shape = op.result.shape;
-    if (shape.length === 2) {
-      this._execPairwise2D(op);
-    } else {
-      this._execPairwiseGeneral(op);
-    }
+    // if (shape.length === 2) {
+    //   this._execPairwise2D(op);
+    // } else {
+    this._execPairwiseGeneral(op);
+    // }
   }
 
   _execPairwise2D(op) {
@@ -258,24 +258,34 @@ export default class Executor {
     let oPtr = 0 | 0;
     let rPtr = 0 | 0;
 
+    let inputD1 = inputS1 | 0;
+    let otherD1 = otherS1 | 0;
+    let resultD1 = resultS1 | 0;
+
     let inputD0 = (inputS0 - inputS1 * s1) | 0;
     let otherD0 = (otherS0 - otherS1 * s1) | 0;
     let resultD0 = (resultS0 - resultS1 * s1) | 0;
+
+
+    // console.log(inputS0, otherS0, resultS0);
+    // console.log(inputS1, otherS1, resultS1);
+    // console.log(inputD0, otherD0, resultD0);
 
     for (let i = 0; i < s0; i++) {
 
       for (let j = 0; j < s1; j++) {
         result[rPtr] = op.body(input[iPtr], other[oPtr]);
-        iPtr = (iPtr + inputS1) | 0;
-        oPtr = (oPtr + otherS1) | 0;
-        rPtr = (rPtr + resultS1) | 0;
-        // result[(rPtr + resultS1) | 0] = op.body(input[(iPtr + inputS1) | 0], other[(oPtr + otherS1) | 0]);
-        // result[(rPtr + resultS1 * 2) | 0] = op.body(input[(iPtr + inputS1 * 2) | 0], other[(oPtr + otherS1 * 2) | 0]);
-        // result[(rPtr + resultS1 * 3) | 0] = op.body(input[(iPtr + inputS1 * 3) | 0], other[(oPtr + otherS1 * 3) | 0]);
+        iPtr = (iPtr + inputD1) | 0;
+        oPtr = (oPtr + otherD1) | 0;
+        rPtr = (rPtr + resultD1) | 0;
 
-        // iPtr = (iPtr + inputS1 * 4) | 0;
-        // oPtr = (oPtr + otherS1 * 4) | 0;
-        // rPtr = (rPtr + resultS1 * 4) | 0;
+        // result[(rPtr + resultD1) | 0] = op.body(input[(iPtr + inputD1) | 0], other[(oPtr + otherD1) | 0]);
+        // result[(rPtr + resultD1 * 2) | 0] = op.body(input[(iPtr + inputD1 * 2) | 0], other[(oPtr + otherD1 * 2) | 0]);
+        // result[(rPtr + resultD1 * 3) | 0] = op.body(input[(iPtr + inputD1 * 3) | 0], other[(oPtr + otherD1 * 3) | 0]);
+
+        // iPtr = (iPtr + inputD1 * 4) | 0;
+        // oPtr = (oPtr + otherD1 * 4) | 0;
+        // rPtr = (rPtr + resultD1 * 4) | 0;
       }
 
       iPtr = (iPtr + inputD0) | 0;
@@ -309,60 +319,48 @@ export default class Executor {
     let otherPointer = 0;
     let resultPointer = 0;
 
-    let rank = shape.length;
-    let slots = new Array(rank).fill(0);
+    let rank = shape.length | 0;
 
+    let MEM = []; // [ RevSlots(rank), shape, is, os, rs, ...]
     let iS = new Array(rank).fill(0);
     let oS = new Array(rank).fill(0);
     let rS = new Array(rank).fill(0);
+
     for (let i = 0; i < rank; i++) {
-      iS[i] = inputBroadDims[i] ? 0 : inputStrides[i];
-      oS[i] = otherBroadDims[i] ? 0 : otherStrides[i];
-      rS[i] = resultStrides[i];
+      MEM.push(0);
+    }
+    for (let i = 0; i < rank; i++) {
+      let r = rank - 1 - i;
+      MEM.push(shape[r]);
+      iS[i] = (inputBroadDims[r] ? 0 : inputStrides[r]) | 0;
+      oS[i] = (otherBroadDims[r] ? 0 : otherStrides[r]) | 0;
+      rS[i] = resultStrides[r] | 0;
+      MEM.push(iS[i] - (i > 0 ? iS[i - 1] * shape[rank - i] : 0));
+      MEM.push(oS[i] - (i > 0 ? oS[i - 1] * shape[rank - i] : 0));
+      MEM.push(rS[i] - (i > 0 ? rS[i - 1] * shape[rank - i] : 0));
     }
 
-    let r = rank - 1 | 0;
-    while (r >= 0) {
-
-      // console.log(r, inputPointer, otherPointer, resultPointer);
-
-      // Calc
+    let index = 0;
+    let ptr = 0;
+    for (let i = 0; i < result.length; i++) {
       result[resultPointer] = op.body(input[inputPointer], other[otherPointer]);
 
-      for (r = rank - 1; r >= 0; r--) {
-        slots[r]++;
+      MEM[0]++;
+      ptr = rank | 0;
+      inputPointer = (inputPointer + MEM[ptr + 1]) | 0;
+      otherPointer = (otherPointer + MEM[ptr + 2]) | 0;
+      resultPointer = (resultPointer + MEM[ptr + 3]) | 0;
 
-        if (!inputBroadDims[r]) {
-          inputPointer += inputStrides[r];
-        }
-
-        if (!otherBroadDims[r]) {
-          otherPointer += otherStrides[r];
-        }
-
-        resultPointer += resultStrides[r];
-
-        if (slots[r] < shape[r]) {
-          break;
-        }
-
-        slots[r] = 0;
-
-        if (!inputBroadDims[r]) {
-          inputPointer -= inputStrides[r] * shape[r];
-        }
-
-        if (!otherBroadDims[r]) {
-          otherPointer -= otherStrides[r] * shape[r];
-        }
-
-        resultPointer -= resultStrides[r] * shape[r];
+      while (MEM[index] === MEM[ptr] && index < rank - 1) {
+        MEM[index++] = 0;
+        MEM[index]++;
+        ptr = (ptr + 4) | 0;
+        inputPointer = (inputPointer + MEM[ptr + 1]) | 0;
+        otherPointer = (otherPointer + MEM[ptr + 2]) | 0;
+        resultPointer = (resultPointer + MEM[ptr + 3]) | 0;
       }
 
-      // // Overflown
-      // if (r < 0) {
-      //   break;
-      // }
+      index = 0;
     }
   }
 

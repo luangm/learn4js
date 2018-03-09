@@ -1,5 +1,7 @@
 import Tensor from "../../src/core/Tensor";
 import TensorMath from "../../src/core/TensorMath";
+import Executor from "../../src/core/executor/Executor";
+import AddOp from "../../src/core/op/pairwise/AddOp";
 
 test('test add', function() {
 
