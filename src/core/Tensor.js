@@ -1,5 +1,3 @@
-import Executor from "./executor/Executor";
-import SumOp from "./op/reduction/SumOp";
 import Shape from "./Shape";
 import TensorMath from "./TensorMath";
 import ArrayUtils from "./util/ArrayUtils";
@@ -163,11 +161,11 @@ export default class Tensor {
     return TensorMath.subtract(this, other);
   }
 
-  sum() {
-    let result = new Tensor({shape: [1, 1]});
-    Executor.instance.exec(new SumOp(this, null, result));
-    return result;
-  }
+  // sum() {
+  //   let result = new Tensor({shape: [1, 1]});
+  //   Executor.instance.exec(new SumOp(this, null, result));
+  //   return result;
+  // }
 
   toString() {
     return new TensorFormatter().format(this);

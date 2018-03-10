@@ -1,13 +1,13 @@
 import ReductionOp from "./ReductionOp";
 
-export default class MaxOp extends ReductionOp {
+export default class ReduceMaxOp extends ReductionOp {
 
   constructor(input, other, result) {
     super(input, other, result);
   }
 
   get type() {
-    return 'max';
+    return 'reduceMax';
   }
 
   body(a, b) {

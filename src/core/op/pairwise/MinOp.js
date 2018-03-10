@@ -1,17 +1,16 @@
 import PairwiseOp from "./PairwiseOp";
 
-export default class SubtractOp extends PairwiseOp {
+export default class MinOp extends PairwiseOp {
 
   constructor(input, other, result) {
     super(input, other, result);
   }
 
   get type() {
-    return 'subtract';
+    return 'min';
   }
 
   body(a, b) {
-    return a - b;
+    return a > b ? b : a;
   }
-
 }

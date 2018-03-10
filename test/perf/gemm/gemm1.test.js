@@ -1,9 +1,9 @@
 test('1 - gemm 1x4', function() {
 
 
-  let EPOCH = 10000;
-  let ROWS = 64;
-  let COLS = 64;
+  let EPOCH = 1;
+  let ROWS = 1024;
+  let COLS = 1024;
   let SIZE = ROWS * COLS;
   let LDA = COLS;
   let LDB = COLS;
@@ -43,7 +43,6 @@ test('1 - gemm 1x4', function() {
           sum1 += ap * b[offsetB + 1];
           sum2 += ap * b[offsetB + 2];
           sum3 += ap * b[offsetB + 3];
-
         }
 
         c[i * LDC + j] = sum0;

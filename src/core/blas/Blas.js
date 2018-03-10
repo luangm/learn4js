@@ -98,41 +98,41 @@ function gemm00(m, n, k, alpha, A, B, beta, C) {
     }
   }
 
-  // for (let i = 0; i < floorM; i++) {
-  //   for (let j = floorN; j < n; j++) {
-  //
-  //     let sum = 0;
-  //     for (let p = 0; p < k; p++) {
-  //       sum += A[i * k + p] * B[p * n + j];
-  //     }
-  //     C[i * n + j] += sum;
-  //
-  //   }
-  // }
-  //
-  // for (let i = floorM; i < m; i++) {
-  //   for (let j = 0; j < floorN; j++) {
-  //
-  //     let sum = 0;
-  //     for (let p = 0; p < k; p++) {
-  //       sum += A[i * k + p] * B[p * n + j];
-  //     }
-  //     C[i * n + j] += sum;
-  //
-  //   }
-  // }
-  //
-  // for (let i = floorM; i < m; i++) {
-  //   for (let j = floorN; j < n; j++) {
-  //
-  //     let sum = 0;
-  //     for (let p = 0; p < k; p++) {
-  //       sum += A[i * k + p] * B[p * n + j];
-  //     }
-  //     C[i * n + j] += sum;
-  //
-  //   }
-  // }
+  for (let i = 0; i < floorM; i++) {
+    for (let j = floorN; j < n; j++) {
+
+      let sum = 0;
+      for (let p = 0; p < k; p++) {
+        sum += A[i * k + p] * B[p * n + j];
+      }
+      C[i * n + j] += sum;
+
+    }
+  }
+
+  for (let i = floorM; i < m; i++) {
+    for (let j = 0; j < floorN; j++) {
+
+      let sum = 0;
+      for (let p = 0; p < k; p++) {
+        sum += A[i * k + p] * B[p * n + j];
+      }
+      C[i * n + j] += sum;
+
+    }
+  }
+
+  for (let i = floorM; i < m; i++) {
+    for (let j = floorN; j < n; j++) {
+
+      let sum = 0;
+      for (let p = 0; p < k; p++) {
+        sum += A[i * k + p] * B[p * n + j];
+      }
+      C[i * n + j] += sum;
+
+    }
+  }
 }
 
 // Trans A, Not Trans B

@@ -1,17 +1,17 @@
 import TransformOp from "./TransformOp";
 
-export default class SineOp extends TransformOp {
+export default class AtanOp extends TransformOp {
 
   constructor(input, other, result) {
     super(input, other, result);
   }
 
   get type() {
-    return 'sin';
+    return 'atan';
   }
 
   body(a, b) {
-    return Math.sin(a);
+    return Math.atan(a);
   }
 
 }

@@ -151,8 +151,24 @@ export default class Expression {
     return this.factory.log(this);
   }
 
+  max(other) {
+    return this.factory.max(this, other);
+  }
+
+  min(other) {
+    return this.factory.min(this, other);
+  }
+
+  mod(other) {
+    return this.factory.mod(this, other);
+  }
+
   multiply(other) {
     return this.factory.multiply(this, other);
+  }
+
+  matmul(other) {
+    return this.factory.matmul(this, other);
   }
 
   negate() {
@@ -161,6 +177,10 @@ export default class Expression {
 
   reciprocal() {
     return this.factory.reciprocal(this);
+  }
+
+  relu() {
+    return this.factory.relu(this);
   }
 
   round() {

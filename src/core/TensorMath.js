@@ -2,16 +2,27 @@ import Executor from "./executor/Executor";
 import MaxIndexOp from "./op/index/MaxIndexOp";
 import AddOp from "./op/pairwise/AddOp";
 import DivideOp from "./op/pairwise/DivideOp";
+import MaxOp from "./op/pairwise/MaxOp";
+import MinOp from "./op/pairwise/MinOp";
+import ModOp from "./op/pairwise/ModOp";
 import MultiplyOp from "./op/pairwise/MultiplyOp";
 import SubtractOp from "./op/pairwise/SubtractOp";
-import MaxOp from "./op/reduction/MaxOp";
-import SumOp from "./op/reduction/SumOp";
+import ReduceMaxOp from "./op/reduction/ReduceMaxOp";
+import ReduceSumOp from "./op/reduction/ReduceSumOp";
 import MatMulOp from "./op/special/MatMulOp";
 import AbsOp from "./op/transform/AbsOp";
-import CosineOp from "./op/transform/CosineOp";
+import AcoshOp from "./op/transform/AcoshOp";
+import AcosOp from "./op/transform/AcosOp";
+import AsinhOp from "./op/transform/AsinhOp";
+import AsinOp from "./op/transform/AsinOp";
+import AtanhOp from "./op/transform/AtanhOp";
+import AtanOp from "./op/transform/AtanOp";
+import CoshOp from "./op/transform/CoshOp";
+import CosOp from "./op/transform/CosOp";
 import Expm1Op from "./op/transform/Expm1Op";
 import ExpOp from "./op/transform/ExpOp";
 import IndexSetOp from "./op/transform/IndexSetOp";
+import Log1pOp from "./op/transform/Log1pOp";
 import LogOp from "./op/transform/LogOp";
 import NegateOp from "./op/transform/NegateOp";
 import ReciprocalOp from "./op/transform/ReciprocalOp";
@@ -22,7 +33,8 @@ import SetOp from "./op/transform/SetOp";
 import SigmoidGradOp from "./op/transform/SigmoidGradOp";
 import SigmoidOp from "./op/transform/SigmoidOp";
 import SignOp from "./op/transform/SignOp";
-import SineOp from "./op/transform/SineOp";
+import SinhOp from "./op/transform/SinhOp";
+import SinOp from "./op/transform/SinOp";
 import SoftmaxOp from "./op/transform/SoftmaxOp";
 import SqrtGradOp from "./op/transform/SqrtGradOp";
 import SquareOp from "./op/transform/SquareOp";
@@ -42,34 +54,26 @@ export default class TensorMath {
     return result;
   }
 
-  static add(left, right, result) {
-    if (!result) {
-      let resultShape = TensorUtils.broadcastShapes(left.shape, right.shape);
-      result = new Tensor({shape: resultShape});
-    }
+  static acos(base) {
+    let result = new Tensor({shape: base.shape});
+    Executor.instance.exec(new AcosOp(base, null, result));
+    return result;
+  }
 
+  static acosh(base) {
+    let result = new Tensor({shape: base.shape});
+    Executor.instance.exec(new AcoshOp(base, null, result));
+    return result;
+  }
+
+  static add(left, right, result) {
+    result = result || new Tensor({shape: TensorUtils.broadcastShapes(left.shape, right.shape)});
     Executor.instance.exec(new AddOp(left, right, result));
     return result;
   }
 
   static addN(items) {
 
-  }
-
-  // TODO: Remove
-  static add_OLD(left, right, result) {
-    if (!result) {
-      let resultShape = TensorUtils.broadcastShapes(left.shape, right.shape);
-      result = new Tensor({shape: resultShape});
-      left = left.broadcast(resultShape);
-      right = right.broadcast(resultShape);
-    } else {
-      left = left.broadcast(result.shape);
-      right = right.broadcast(result.shape);
-    }
-
-    Executor.instance.exec(new AddOp(left, right, result));
-    return result;
   }
 
   static addi(left, right) {
@@ -98,6 +102,30 @@ export default class TensorMath {
     let result = new Tensor({shape: shape});
     let op = new IndexSetOp(source, args, result);
     Executor.instance.execAtDim(op, dim);
+    return result;
+  }
+
+  static asin(base) {
+    let result = new Tensor({shape: base.shape});
+    Executor.instance.exec(new AsinOp(base, null, result));
+    return result;
+  }
+
+  static asinh(base) {
+    let result = new Tensor({shape: base.shape});
+    Executor.instance.exec(new AsinhOp(base, null, result));
+    return result;
+  }
+
+  static atan(base) {
+    let result = new Tensor({shape: base.shape});
+    Executor.instance.exec(new AtanOp(base, null, result));
+    return result;
+  }
+
+  static atanh(base) {
+    let result = new Tensor({shape: base.shape});
+    Executor.instance.exec(new AtanhOp(base, null, result));
     return result;
   }
 
@@ -144,21 +172,18 @@ export default class TensorMath {
 
   static cos(base) {
     let result = new Tensor({shape: base.shape});
-    Executor.instance.exec(new CosineOp(base, null, result));
+    Executor.instance.exec(new CosOp(base, null, result));
+    return result;
+  }
+
+  static cosh(base) {
+    let result = new Tensor({shape: base.shape});
+    Executor.instance.exec(new CoshOp(base, null, result));
     return result;
   }
 
   static divide(left, right, result) {
-    if (!result) {
-      let resultShape = TensorUtils.broadcastShapes(left.shape, right.shape);
-      result = new Tensor({shape: resultShape});
-      left = left.broadcast(resultShape);
-      right = right.broadcast(resultShape);
-    } else {
-      left = left.broadcast(result.shape);
-      right = right.broadcast(result.shape);
-    }
-
+    result = result || new Tensor({shape: TensorUtils.broadcastShapes(left.shape, right.shape)});
     Executor.instance.exec(new DivideOp(left, right, result));
     return result;
   }
@@ -187,6 +212,12 @@ export default class TensorMath {
     return result;
   }
 
+  static log1p(base, result) {
+    result = result || new Tensor({shape: base.shape});
+    Executor.instance.exec(new Log1pOp(base, null, result));
+    return result;
+  }
+
   static logSumExp(base, dim = -1) {
     if (dim < 0) {
       dim += base.rank;
@@ -201,15 +232,20 @@ export default class TensorMath {
 
   static matmul(left, right, transposeA = false, transposeB = false, result) {
 
-    if (!result) {
-      let shape = [0, 0];
-      shape[0] = transposeA ? left.shape[1] : left.shape[0];
-      shape[1] = transposeB ? right.shape[0] : right.shape[1];
+    // TODO: Dimension Checks
 
-      result = new Tensor({shape});
-    }
+    let shape = [0, 0];
+    shape[0] = transposeA ? left.shape[1] : left.shape[0];
+    shape[1] = transposeB ? right.shape[0] : right.shape[1];
+    result = result || new Tensor({shape});
 
     Executor.instance.exec(new MatMulOp(left, right, result, transposeA, transposeB));
+    return result;
+  }
+
+  static max(left, right, result) {
+    result = result || new Tensor({shape: TensorUtils.broadcastShapes(left.shape, right.shape)});
+    Executor.instance.exec(new MaxOp(left, right, result));
     return result;
   }
 
@@ -243,28 +279,23 @@ export default class TensorMath {
     return result;
   }
 
-  static multiply(left, right, result) {
-    if (!result) {
-      let resultShape = TensorUtils.broadcastShapes(left.shape, right.shape);
-      result = new Tensor({shape: resultShape});
-      left = left.broadcast(resultShape);
-      right = right.broadcast(resultShape);
-    } else {
-      left = left.broadcast(result.shape);
-      right = right.broadcast(result.shape);
-    }
-
-    Executor.instance.exec(new MultiplyOp(left, right, result));
+  static min(left, right, result) {
+    result = result || new Tensor({shape: TensorUtils.broadcastShapes(left.shape, right.shape)});
+    Executor.instance.exec(new MinOp(left, right, result));
     return result;
   }
 
-  // static multiply(left, right, result) {
-  //   let newLeft = left.broadcast(resultShape);
-  //   let newRight = right.broadcast(resultShape);
-  // Executor.instance.exec(new MultiplyOp(left, right, result));
-  // return result;
-  // }
+  static mod(left, right, result) {
+    result = result || new Tensor({shape: TensorUtils.broadcastShapes(left.shape, right.shape)});
+    Executor.instance.exec(new ModOp(left, right, result));
+    return result;
+  }
 
+  static multiply(left, right, result) {
+    result = result || new Tensor({shape: TensorUtils.broadcastShapes(left.shape, right.shape)});
+    Executor.instance.exec(new MultiplyOp(left, right, result));
+    return result;
+  }
 
   static negate(base) {
     let result = new Tensor({shape: base.shape});
@@ -278,6 +309,13 @@ export default class TensorMath {
     return result;
   }
 
+  // static multiply(left, right, result) {
+  //   let newLeft = left.broadcast(resultShape);
+  //   let newRight = right.broadcast(resultShape);
+  // Executor.instance.exec(new MultiplyOp(left, right, result));
+  // return result;
+  // }
+
   static reduceMax(base, dim) {
     if (dim === -1) {
       return base.sum();
@@ -286,7 +324,7 @@ export default class TensorMath {
     let resultShape = base.shape.slice();
     resultShape[dim] = 1;
     let result = new Tensor({shape: resultShape});
-    let op = new MaxOp(base, null, result);
+    let op = new ReduceMaxOp(base, null, result);
     Executor.instance.execAtDim(op, dim);
 
     // resultShape = base.shape.slice();
@@ -334,7 +372,7 @@ export default class TensorMath {
     // console.log("Shape: ", resultShape);
 
     let result = new Tensor({shape: resultShape});
-    let op = new SumOp(base, null, result);
+    let op = new ReduceSumOp(base, null, result);
     Executor.instance._execAccum2D(op, accumDims);
     return result;
   }
@@ -382,7 +420,13 @@ export default class TensorMath {
 
   static sin(base) {
     let result = new Tensor({shape: base.shape});
-    Executor.instance.exec(new SineOp(base, null, result));
+    Executor.instance.exec(new SinOp(base, null, result));
+    return result;
+  }
+
+  static sinh(base) {
+    let result = new Tensor({shape: base.shape});
+    Executor.instance.exec(new SinhOp(base, null, result));
     return result;
   }
 
@@ -461,16 +505,7 @@ export default class TensorMath {
   }
 
   static subtract(left, right, result) {
-    if (!result) {
-      let resultShape = TensorUtils.broadcastShapes(left.shape, right.shape);
-      result = new Tensor({shape: resultShape});
-      left = left.broadcast(resultShape);
-      right = right.broadcast(resultShape);
-    } else {
-      left = left.broadcast(result.shape);
-      right = right.broadcast(result.shape);
-    }
-
+    result = result || new Tensor({shape: TensorUtils.broadcastShapes(left.shape, right.shape)});
     Executor.instance.exec(new SubtractOp(left, right, result));
     return result;
   }

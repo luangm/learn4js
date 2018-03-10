@@ -125,7 +125,7 @@ export default class WebGLProgram {
   exec() {
     this.activate();
     let gl = this.context.context;
-    console.log(">>> exec", this.type, gl.drawingBufferWidth, gl.drawingBufferHeight);
+    // console.log(">>> exec", this.type, gl.drawingBufferWidth, gl.drawingBufferHeight);
     gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
   }
 

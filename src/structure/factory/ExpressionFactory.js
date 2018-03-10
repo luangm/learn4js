@@ -2,6 +2,9 @@ import Assign from "../node/Assign";
 import Add from "../node/binary/Add";
 import Divide from "../node/binary/Divide";
 import MatMul from "../node/binary/MatMul";
+import Maximum from "../node/binary/Maximum";
+import Minimum from "../node/binary/Minimum";
+import Modulo from "../node/binary/Modulo";
 import Multiply from "../node/binary/Multiply";
 import Subtract from "../node/binary/Subtract";
 import Conv2d from "../node/cnn/Conv2d";
@@ -15,11 +18,14 @@ import ReduceSum from "../node/reduction/ReduceSum";
 import Tile from "../node/Tile";
 import Absolute from "../node/transform/Absolute";
 import Cosine from "../node/transform/Cosine";
+import Expm1 from "../node/transform/Expm1";
 import Exponential from "../node/transform/Exponential";
 import Logarithm from "../node/transform/Logarithm";
 import Negate from "../node/transform/Negate";
 import Reciprocal from "../node/transform/Reciprocal";
+import Relu from "../node/transform/Relu";
 import Round from "../node/transform/Round";
+import RSqrt from "../node/transform/RSqrt";
 import Sigmoid from "../node/transform/Sigmoid";
 import SigmoidGrad from "../node/transform/SigmoidGrad";
 import Sign from "../node/transform/Sign";
@@ -33,8 +39,6 @@ import Step from "../node/transform/Step";
 import Tangent from "../node/transform/Tangent";
 import TangentGrad from "../node/transform/TangentGrad";
 import Tanh from "../node/transform/Tanh";
-import RSqrt from "../node/transform/RSqrt";
-import Expm1 from "../node/transform/Expm1";
 
 /**
  * Expression Factory create nodes and add it to the Graph.
@@ -146,6 +150,27 @@ export default class ExpressionFactory {
     return result;
   }
 
+  max(left, right, {name} = {}) {
+    let result = this.graph.add(new Maximum(left, right, {name, graph: this.graph}));
+    left.addObserver(result);
+    right.addObserver(result);
+    return result;
+  }
+
+  min(left, right, {name} = {}) {
+    let result = this.graph.add(new Minimum(left, right, {name, graph: this.graph}));
+    left.addObserver(result);
+    right.addObserver(result);
+    return result;
+  }
+
+  mod(left, right, {name} = {}) {
+    let result = this.graph.add(new Modulo(left, right, {name, graph: this.graph}));
+    left.addObserver(result);
+    right.addObserver(result);
+    return result;
+  }
+
   multiply(left, right, {name} = {}) {
     let result = this.graph.add(new Multiply(left, right, {name, graph: this.graph}));
     left.addObserver(result);
@@ -182,6 +207,12 @@ export default class ExpressionFactory {
       return result;
     }
     return base;
+  }
+
+  relu(base, {name} = {}) {
+    let result = this.graph.add(new Relu(base, {name, graph: this.graph}));
+    base.addObserver(result);
+    return result;
   }
 
   round(base, {name} = {}) {

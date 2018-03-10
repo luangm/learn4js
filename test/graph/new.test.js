@@ -1,62 +1,40 @@
-import Learn4js, {println, Tensor} from '../../src/index';
+import {add, matmul, parameter, println, Tensor, variable} from '../../src/index';
 
 test('graph', function() {
 
-  Learn4js.interactive = true;
+  let W = parameter([[.1, .2, .3], [.4, .5, .6]], {name: 'W'});
+  let b = parameter([[.6], [.5]], {name: 'b'});
+  let x = variable([3, 1], {name: 'x'});
+  x.value = Tensor.create([[1], [2], [3]]);
 
-  let graph = Learn4js.activeGraph;
+  let z = W.matmul(x).add(b);
+  let z2 = add(matmul(W, x), b);
 
-  let W1 = Learn4js.parameter([[.1, .2, .3], [.4, .5, .6]], {name: 'W1'});
-  let b1 = Learn4js.parameter([[.6], [.5]], {name: 'b1'});
-  let x = Learn4js.variable([3, 1], {name: 'x'});
-  let y = Learn4js.variable([2, 1], {name: 'y'});
-  let c = Learn4js.constant([[2, 3, 4], [5, 6, 7]], {name: 'c'});
+  println(z);
+  println(z2.value);
 
-  let optimizer = Learn4js.optimizer.gradientDescent({learnRate: 0.1});
-
-  for (let i = 0; i < 100; i++) {
-    x.value = Tensor.create([[1], [2], [3]]);
-    y.value = Tensor.create([[0.5], [0.5]]);
-    let mm = Learn4js.matmul(W1, x);
-    let z = Learn4js.add(mm, b1);
-    let yHat = Learn4js.sigmoid(z);
-
-    let loss = Learn4js.loss.sumSquaredError(y, yHat);
-
-    println(loss.value.data[0]);
-
-    let trainStep = optimizer.minimize(loss);
-    trainStep.eval();
-  }
-
-  println(W1);
-  println(b1);
-
-
-  // let add = Learn4js.add(W1, b1, {name: 'add'});
-  // let sigmoid = Learn4js.sigmoid(add);
-
-  // let x = Learn4js.variable({name: 'x', data: [0.2, 0.3, 0.3, 0.4, 0.1, 0.1], shape: [3, 2]});
-  // let y = Learn4js.variable({name: 'Y', data: [.3, .4, .4, .5], shape: [2, 2]});
   //
-  // let matmul = Learn4js.matmul({name: 'matmul', left: W1, right: x});
-  // let add = Learn4js.add({name: 'add', left: matmul, right: b1});
-  // let sigmoid = Learn4js.sigmoid({name: 'sigmoid', base: add});
-  // let sub = Learn4js.subtract({name: 'sub', left: y, right: sigmoid});
-  // let square = Learn4js.square({name: 'square', base: sub});
-  // let loss = Learn4js.reduceSum({name: 'loss', base: square});
+  // let y = Learn4js.variable([2, 1], {name: 'y'});
+  // let c = Learn4js.constant([[2, 3, 4], [5, 6, 7]], {name: 'c'});
   //
-  // let optimizer = new GradientDescentOptimizer({learnRate: 0.1});
-  // let trainStep = optimizer.minimize(loss);
+  // let optimizer = Learn4js.optimizer.gradientDescent({learnRate: 0.1});
   //
-  // let sess = new Session(Learn4js.activeGraph);
+  // for (let i = 0; i < 100; i++) {
+  //   x.value =
+  //   y.value = Tensor.create([[0.5], [0.5]]);
+  //   let mm = Learn4js.matmul(W1, x);
+  //   let z = Learn4js.add(mm, b1);
+  //   let yHat = Learn4js.sigmoid(z);
   //
-  // for (let i = 0; i < 10000; i++) {
-  //   sess.run(trainStep);
+  //   let loss = Learn4js.loss.sumSquaredError(y, yHat);
+  //
+  //   println(loss.value.data[0]);
+  //
+  //   let trainStep = optimizer.minimize(loss);
+  //   trainStep.eval();
   // }
   //
-  // println("Loss", sess.run(loss));
-  // println("W1", sess.run(W1));
-  // println("b1", sess.run(b1));
+  // println(W1);
+  // println(b1);
 
 });

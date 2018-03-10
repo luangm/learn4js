@@ -301,3 +301,22 @@ test('round', function() {
   expect(resultVal).toEqual(zVal);
   // println(resultVal);
 });
+
+test('relu', function() {
+
+  // Logger.LogLevel = Logger.Level.ERROR;
+
+  let xVal = Tensor.create([[-1.1, -2.2, 3.1], [0.01, -1.1, 1.009]]);
+  let x = Learn4js.constant(xVal);
+
+  let zVal = Tensor.create(
+    [[0, 0, 3.1],
+      [0.01, 0, 1.009]]
+  );
+
+  let result = x.relu();
+  let resultVal = result.value;
+
+  expect(resultVal).toEqual(zVal);
+  // println(resultVal);
+});

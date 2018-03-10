@@ -3,7 +3,7 @@ import TensorMath from "../../src/core/TensorMath";
 import Executor from "../../src/core/executor/Executor";
 import AddOp from "../../src/core/op/pairwise/AddOp";
 
-test('test add', function() {
+test('test mul', function() {
 
   let EPOCH = 100;
   let SIZE = 1024 * 1024;
@@ -29,28 +29,6 @@ test('test add', function() {
 
   let now = new Date();
 
-  for (let k = 0; k < 1000; k++) {
-
-    for (let i = 0; i < SIZE; i+=10) {
-        x[i] = 1;
-      x[i+1] = 1;
-      x[i+2] = 1;
-      x[i+3] = 1;
-      x[i+4] = 1;
-      x[i+5] = 1;
-      x[i+6] = 1;
-      x[i+7] = 1;
-      x[i+8] = 1;
-      x[i+9] = 1;
-    }
-  }
-  let diff = new Date() - now;
-  let flops = SIZE * 1000 / diff / 1e6;
-
-  console.log(">>> JS Bench For Loop:", new Date() - now, "ms", flops);
-
-  now = new Date();
-
   for (let k = 0; k < EPOCH; k++) {
     let iPtr = 0;
     let oPtr = 0;
@@ -58,7 +36,7 @@ test('test add', function() {
 
     for (let i = 0; i < ROWS; i++) {
       for (let j = 0; j < COLS; j++) {
-        x[rPtr] = a[iPtr] + b[oPtr];
+        x[rPtr] = a[iPtr] * b[oPtr];
 
         iPtr += 1;
         oPtr += 1;
@@ -82,7 +60,7 @@ test('test add', function() {
 
     for (let i = 0; i < ROWS; i++) {
       for (let j = 0; j < COLS; j++) {
-        arrayX[rPtr] = arrayA[iPtr] + arrayB[oPtr];
+        arrayX[rPtr] = arrayA[iPtr] * arrayB[oPtr];
 
         iPtr = (iPtr + 1) | 0;
         oPtr = (oPtr + 1) | 0;
@@ -95,13 +73,13 @@ test('test add', function() {
 
   now = new Date();
   for (let i = 0; i < EPOCH; i++) {
-    TensorMath.add(tensorA, tensorB, tensorX);
+    TensorMath.multiply(tensorA, tensorB, tensorX);
   }
-  console.log(">>> TensorMath AddOp", new Date() - now, "ms");
+  console.log(">>> TensorMath Multiply", new Date() - now, "ms");
 
   now = new Date();
   for (let i = 0; i < EPOCH; i++) {
-    TensorMath.add(tensorA3D, tensorB3D, tensorX3D);
+    TensorMath.multiply(tensorA3D, tensorB3D, tensorX3D);
   }
-  console.log(">>> TensorMath AddOp on 3D", new Date() - now, "ms");
+  console.log(">>> TensorMath Multiply on 3D", new Date() - now, "ms");
 });

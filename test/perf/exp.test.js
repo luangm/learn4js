@@ -3,12 +3,12 @@ import TensorMath from "../../src/core/TensorMath";
 
 test('test exp', function() {
 
-  let EPOCH = 1000;
-  let SIZE = 10000;
+  let EPOCH = 10;
+  let SIZE = 1024 * 1024;
   let a = [];
   let x = [];
 
-  let COLS = 100;
+  let COLS = 1024;
   let ROWS = SIZE / COLS;
 
   for (let i = 0; i < SIZE; i++) {

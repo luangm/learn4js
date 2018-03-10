@@ -14,12 +14,12 @@ function testWebgl() {
   let a = 2.0;
   let x = new Float32Array([1, -2, 3, -4, 5, -6, 7, -8, 9, -10, 11, -12, 13, -14, 15, -16]);
   let y = new Float32Array([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]);
-  let zeros = new Float32Array(10000);
-  let zeros2 = new Float32Array(10000);
-  let out = new Float32Array(10000);
-  let M = 4;
-  let N = 4;
-  let EPOCH = 1;
+  let zeros = new Float32Array(1024 * 1024);
+  let zeros2 = new Float32Array(1024 * 1024);
+  let out = new Float32Array(1024 * 1024);
+  let M = 1024;
+  let N = 1024;
+  let EPOCH = 1000;
 
   let now = new Date();
 
@@ -31,62 +31,66 @@ function testWebgl() {
     }
   }
 
-  let then = new Date();
-
-  console.log("JS Run:", then - now);
+  console.log("JS Run:", new Date() - now);
+  now = new Date();
 
   let webgl = new WebGL();
 
-  let tensor0 = new WebGLTensor(x, [M, N], webgl);
-  let tensor1 = new WebGLTensor(y, [M, N], webgl);
+  let tensor0 = new WebGLTensor(zeros, [M, N], webgl);
+  let tensor1 = new WebGLTensor(zeros2, [M, N], webgl);
   let output = new WebGLTensor(null, [M, N], webgl);
-  let output2 = new WebGLTensor(null, [M, N], webgl);
-  let output3 = new WebGLTensor(null, [M, N], webgl);
-  let absOut = new WebGLTensor(null, [M, N], webgl);
-  let expOut = new WebGLTensor(null, [M, N], webgl);
+  // let output2 = new WebGLTensor(null, [M, N], webgl);
+  // let output3 = new WebGLTensor(null, [M, N], webgl);
+  // let absOut = new WebGLTensor(null, [M, N], webgl);
+  // let expOut = new WebGLTensor(null, [M, N], webgl);
 
   let add = new AddProgram(webgl);
-  add.X = tensor0;
-  add.Y = tensor1;
-  add.Z = output3;
-  add.exec();
 
-  let exp = new ExpProgram(webgl);
-  exp.X = tensor0;
-  exp.Z = expOut;
-  exp.exec();
 
-  let abs = new AbsProgram(webgl);
-  abs.X = tensor0;
-  abs.Z = absOut;
-  abs.exec();
-  let absResult = absOut.transfer();
-  console.log(absResult);
+  for (let i = 0; i < EPOCH; i++) {
+    add.X = tensor0;
+    add.Y = tensor1;
+    add.Z = output;
+    add.exec();
+  }
 
-  let axpy = new Axpy(webgl);
-  axpy.X = tensor0;
-  axpy.Y = tensor1;
-  axpy.Z = output;
-  axpy.a = a;
-  axpy.exec();
-
-  ////--------------------/////
-
-  let scal = new Scal(webgl);
-  scal.X = output;
-  scal.Z = output2;
-  scal.a = a;
-  scal.exec();
-
-  let result = output.transfer();
-  console.log(result);
-  let result2 = output2.transfer();
-  console.log(result2);
-  let result3 = output3.transfer();
-  console.log(result3);
-
-  let expResult = expOut.transfer();
-  console.log(expResult);
+  console.log("WebGL Run:", new Date() - now);
+  // let exp = new ExpProgram(webgl);
+  // exp.X = tensor0;
+  // exp.Z = expOut;
+  // exp.exec();
+  //
+  // let abs = new AbsProgram(webgl);
+  // abs.X = tensor0;
+  // abs.Z = absOut;
+  // abs.exec();
+  // let absResult = absOut.transfer();
+  // console.log(absResult);
+  //
+  // let axpy = new Axpy(webgl);
+  // axpy.X = tensor0;
+  // axpy.Y = tensor1;
+  // axpy.Z = output;
+  // axpy.a = a;
+  // axpy.exec();
+  //
+  // ////--------------------/////
+  //
+  // let scal = new Scal(webgl);
+  // scal.X = output;
+  // scal.Z = output2;
+  // scal.a = a;
+  // scal.exec();
+  //
+  // let result = output.transfer();
+  // console.log(result);
+  // let result2 = output2.transfer();
+  // console.log(result2);
+  // let result3 = output3.transfer();
+  // console.log(result3);
+  //
+  // let expResult = expOut.transfer();
+  // console.log(expResult);
 }
 
 // testWebgl();

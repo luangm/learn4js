@@ -1,13 +1,13 @@
 import ReductionOp from "./ReductionOp";
 
-export default class SumOp extends ReductionOp {
+export default class ReduceSumOp extends ReductionOp {
 
   constructor(input, other, result) {
     super(input, other, result);
   }
 
   get type() {
-    return 'sum';
+    return 'reduceSum';
   }
 
   body(a, b) {

@@ -54,7 +54,6 @@ export default class EvaluationVisitor extends Visitor {
     this.setValue(node, result);
   }
 
-
   visitAddN(node, params) {
     logger.info("visitAddN", node.id);
 
@@ -69,7 +68,6 @@ export default class EvaluationVisitor extends Visitor {
     node.state = ExpressionState.EVALUATED;
   }
 
-
   visitAssign(node, params) {
     logger.info("visitAssign", node.id);
 
@@ -80,7 +78,6 @@ export default class EvaluationVisitor extends Visitor {
     node.target.value = node.newValue.value;
     node.state = ExpressionState.EVALUATED;
   }
-
 
   visitConstant(node, params) {
     logger.info("visitConstant", node.id);
@@ -210,6 +207,18 @@ export default class EvaluationVisitor extends Visitor {
   }
 
   // DONE
+  visitLog1p(node, params) {
+    logger.info("visitLog1p", node.id);
+    if (this.session.isValid(node)) {
+      return;
+    }
+    node.base.accept(this, params);
+    let base = this.getValue(node.base);
+    let result = TensorMath.log1p(base);
+    this.setValue(node, result);
+  }
+
+  // DONE
   visitMatMul(node, params) {
     logger.info("visitMatMul", node.id);
     if (this.session.isValid(node)) {
@@ -237,6 +246,50 @@ export default class EvaluationVisitor extends Visitor {
     let kernelShape = node.kernelShape;
     let kernel = new Tensor({shape: kernelShape});
     this.valueMap[node.id] = TensorMath.maxPoolGrad(image, kernel, grad, {strideWidth: 2, strideHeight: 2});
+  }
+
+  // Done
+  visitMaximum(node, params) {
+    logger.info("visitMaximum", node.id);
+    if (this.session.isValid(node)) {
+      return;
+    }
+    node.left.accept(this, params);
+    node.right.accept(this, params);
+    let left = this.getValue(node.left);
+    let right = this.getValue(node.right);
+    let result = TensorMath.max(left, right);
+    this.setValue(node, result);
+  }
+
+  // Done
+  visitMinimum(node, params) {
+    logger.info("visitMinimum", node.id);
+    if (this.session.isValid(node)) {
+      return;
+    }
+    node.left.accept(this, params);
+    node.right.accept(this, params);
+    let left = this.getValue(node.left);
+    let right = this.getValue(node.right);
+    let result = TensorMath.min(left, right);
+    this.setValue(node, result);
+  }
+
+  // DONE
+  visitModulo(node, params) {
+    logger.info("visitModulo", node.id);
+    if (this.session.isValid(node)) {
+      return;
+    }
+
+    node.left.accept(this, params);
+    node.right.accept(this, params);
+
+    let left = this.getValue(node.left);
+    let right = this.getValue(node.right);
+    let result = TensorMath.mod(left, right);
+    this.setValue(node, result);
   }
 
   // DONE

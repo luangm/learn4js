@@ -68,46 +68,6 @@ class Learn4js {
     return this._optimizer;
   }
 
-  abs(base, {name} = {}) {
-    return this.factory.abs(base, {name});
-  }
-
-  add(left, right, {name} = {}) {
-    return this.factory.add(left, right, {name});
-  }
-
-  assign(target, value, {name} = {}) {
-    return this.factory.assign(target, value, {name});
-  }
-
-  constant(value, {name} = {}) {
-    return this.factory.constant(value, {name});
-  }
-
-  conv2d(image, kernel, {name} = {}) {
-    return this.factory.conv2d(image, kernel, {name});
-  }
-
-  cos(base, {name} = {}) {
-    return this.factory.cos(base, {name});
-  }
-
-  divide(left, right, {name} = {}) {
-    return this.factory.divide(left, right, {name});
-  }
-
-  exp(base, {name} = {}) {
-    return this.factory.exp(base, {name});
-  }
-
-  expm1(base, {name} = {}) {
-    return this.factory.expm1(base, {name});
-  }
-
-  fill(scalar, shape, {name} = {}) {
-    return this.factory.fill(scalar, shape, {name});
-  }
-
   getNode(id) {
     return this.activeGraph.get(id);
   }
@@ -137,17 +97,9 @@ class Learn4js {
     func();
   }
 
-  log(base, {name} = {}) {
-    return this.factory.log(base, {name});
-  }
 
-  matmul(left, right, transposeLeft, transposeRight, {name} = {}) {
-    return this.factory.matmul(left, right, transposeLeft, transposeRight, {name});
-  }
 
-  multiply(left, right, {name} = {}) {
-    return this.factory.multiply(left, right, {name});
-  }
+
 
   // maxPool({name, image, kernelShape, strideWidth, strideHeight}) {
   //   let node = new MaxPool({name, image, kernelShape, strideWidth, strideHeight});
@@ -155,75 +107,20 @@ class Learn4js {
   //   return node;
   // }
 
-  negate(base, {name} = {}) {
-    return this.factory.negate(base, {name});
-  }
 
-  parameter(value, {name} = {}) {
-    return this.factory.parameter(value, {name});
-  }
 
-  reciprocal(base, {name} = {}) {
-    return this.factory.reciprocal(base, {name});
-  }
 
-  reduceSum(base, dimension = -1, {name} = {}) {
-    return this.factory.reduceSum(base, dimension, {name});
-  }
-
-  round(base, {name} = {}) {
-    return this.factory.round(base, {name});
-  }
-
-  rsqrt(base, {name} = {}) {
-    return this.factory.rsqrt(base, {name});
-  }
 
   // session(graph) {
   //   let myGraph = graph || this.activeGraph;
   //   return new Session(myGraph);
   // }
 
-  sigmoid(base, {name} = {}) {
-    return this.factory.sigmoid(base, {name});
-  }
 
-  sign(base, {name} = {}) {
-    return this.factory.sign(base, {name});
-  }
 
-  sin(base, {name} = {}) {
-    return this.factory.sin(base, {name});
-  }
 
-  softmax(base, {name} = {}) {
-    return this.factory.softmax(base, {name});
-  }
-
-  sqrt(base, {name} = {}) {
-    return this.factory.sqrt(base, {name});
-  }
-
-  square(base, {name} = {}) {
-    return this.factory.square(base, {name});
-  }
-
-  subtract(left, right, {name} = {}) {
-    return this.factory.subtract(left, right, {name});
-  }
-
-  tan(base, {name} = {}) {
-    return this.factory.tan(base, {name});
-  }
-
-  tanh(base, {name} = {}) {
-    return this.factory.tanh(base, {name});
-  }
-
-  variable(shape, {name} = {}) {
-    return this.factory.variable(shape, {name});
-  }
 
 }
 
 export default new Learn4js();
+

@@ -222,54 +222,42 @@ export default class Executor {
 
   _execPairwise(op) {
     let shape = op.result.shape;
-    // if (shape.length === 2) {
-    //   this._execPairwise2D(op);
-    // } else {
-    this._execPairwiseGeneral(op);
-    // }
+    if (shape.length === 2) {
+      this._execPairwise2D(op);
+    } else {
+      this._execPairwiseGeneral(op);
+    }
   }
 
   _execPairwise2D(op) {
     let input = op.input.data;
     let other = op.other.data;
     let result = op.result.data;
-
-    let inputStrides = op.input.strides;
-    let otherStrides = op.other.strides;
-    let resultStrides = op.result.strides;
-
-    let inputShape = op.input.shape;
-    let otherShape = op.other.shape;
     let shape = op.result.shape;
 
-    let inputBroadDims = ShapeUtils.getBroadcastedDimensions(inputShape, shape);
-    let otherBroadDims = ShapeUtils.getBroadcastedDimensions(otherShape, shape);
+    let inputBroadDims = ShapeUtils.getBroadcastedDimensions(op.input.shape, shape);
+    let otherBroadDims = ShapeUtils.getBroadcastedDimensions(op.other.shape, shape);
 
-    let inputS0 = (inputBroadDims[0] ? 0 : inputStrides[0]) | 0;
-    let inputS1 = (inputBroadDims[1] ? 0 : inputStrides[1]) | 0;
-    let otherS0 = (otherBroadDims[0] ? 0 : otherStrides[0]) | 0;
-    let otherS1 = (otherBroadDims[1] ? 0 : otherStrides[1]) | 0;
-    let resultS0 = resultStrides[0] | 0;
-    let resultS1 = resultStrides[1] | 0;
+    let inputS0 = (inputBroadDims[0] ? 0 : op.input.strides[0]) | 0;
+    let inputS1 = (inputBroadDims[1] ? 0 : op.input.strides[1]) | 0;
+    let otherS0 = (otherBroadDims[0] ? 0 : op.other.strides[0]) | 0;
+    let otherS1 = (otherBroadDims[1] ? 0 : op.other.strides[1]) | 0;
+    let resultS0 = op.result.strides[0] | 0;
+    let resultS1 = op.result.strides[1] | 0;
     let s0 = shape[0] | 0;
     let s1 = shape[1] | 0;
 
-    let iPtr = 0 | 0;
-    let oPtr = 0 | 0;
-    let rPtr = 0 | 0;
-
-    let inputD1 = inputS1 | 0;
-    let otherD1 = otherS1 | 0;
-    let resultD1 = resultS1 | 0;
+    let iPtr = 0;
+    let oPtr = 0;
+    let rPtr = 0;
 
     let inputD0 = (inputS0 - inputS1 * s1) | 0;
     let otherD0 = (otherS0 - otherS1 * s1) | 0;
     let resultD0 = (resultS0 - resultS1 * s1) | 0;
 
-
-    // console.log(inputS0, otherS0, resultS0);
-    // console.log(inputS1, otherS1, resultS1);
-    // console.log(inputD0, otherD0, resultD0);
+    let inputD1 = inputS1 | 0;
+    let otherD1 = otherS1 | 0;
+    let resultD1 = resultS1 | 0;
 
     for (let i = 0; i < s0; i++) {
 
@@ -278,14 +266,6 @@ export default class Executor {
         iPtr = (iPtr + inputD1) | 0;
         oPtr = (oPtr + otherD1) | 0;
         rPtr = (rPtr + resultD1) | 0;
-
-        // result[(rPtr + resultD1) | 0] = op.body(input[(iPtr + inputD1) | 0], other[(oPtr + otherD1) | 0]);
-        // result[(rPtr + resultD1 * 2) | 0] = op.body(input[(iPtr + inputD1 * 2) | 0], other[(oPtr + otherD1 * 2) | 0]);
-        // result[(rPtr + resultD1 * 3) | 0] = op.body(input[(iPtr + inputD1 * 3) | 0], other[(oPtr + otherD1 * 3) | 0]);
-
-        // iPtr = (iPtr + inputD1 * 4) | 0;
-        // oPtr = (oPtr + otherD1 * 4) | 0;
-        // rPtr = (rPtr + resultD1 * 4) | 0;
       }
 
       iPtr = (iPtr + inputD0) | 0;
@@ -303,17 +283,10 @@ export default class Executor {
     let input = op.input.data;
     let other = op.other.data;
     let result = op.result.data;
-
-    let inputStrides = op.input.strides;
-    let otherStrides = op.other.strides;
-    let resultStrides = op.result.strides;
-
-    let inputShape = op.input.shape;
-    let otherShape = op.other.shape;
     let shape = op.result.shape;
 
-    let inputBroadDims = ShapeUtils.getBroadcastedDimensions(inputShape, shape);
-    let otherBroadDims = ShapeUtils.getBroadcastedDimensions(otherShape, shape);
+    let inputBroadDims = ShapeUtils.getBroadcastedDimensions(op.input.shape, shape);
+    let otherBroadDims = ShapeUtils.getBroadcastedDimensions(op.other.shape, shape);
 
     let inputPointer = 0;
     let otherPointer = 0;
@@ -332,9 +305,9 @@ export default class Executor {
     for (let i = 0; i < rank; i++) {
       let r = rank - 1 - i;
       MEM.push(shape[r]);
-      iS[i] = (inputBroadDims[r] ? 0 : inputStrides[r]) | 0;
-      oS[i] = (otherBroadDims[r] ? 0 : otherStrides[r]) | 0;
-      rS[i] = resultStrides[r] | 0;
+      iS[i] = (inputBroadDims[r] ? 0 : op.input.strides[r]) | 0;
+      oS[i] = (otherBroadDims[r] ? 0 : op.other.strides[r]) | 0;
+      rS[i] = op.result.strides[r] | 0;
       MEM.push(iS[i] - (i > 0 ? iS[i - 1] * shape[rank - i] : 0));
       MEM.push(oS[i] - (i > 0 ? oS[i - 1] * shape[rank - i] : 0));
       MEM.push(rS[i] - (i > 0 ? rS[i - 1] * shape[rank - i] : 0));
@@ -343,24 +316,24 @@ export default class Executor {
     let index = 0;
     let ptr = 0;
     for (let i = 0; i < result.length; i++) {
-      result[resultPointer] = op.body(input[inputPointer], other[otherPointer]);
-
-      MEM[0]++;
       ptr = rank | 0;
+      index = 0;
+      MEM[0] = (MEM[0] + 1) | 0;
+
+      result[resultPointer] = op.body(input[inputPointer], other[otherPointer]);
       inputPointer = (inputPointer + MEM[ptr + 1]) | 0;
       otherPointer = (otherPointer + MEM[ptr + 2]) | 0;
       resultPointer = (resultPointer + MEM[ptr + 3]) | 0;
 
       while (MEM[index] === MEM[ptr] && index < rank - 1) {
-        MEM[index++] = 0;
-        MEM[index]++;
+        MEM[index] = 0;
+        index = (index + 1) | 0;
+        MEM[index] = (MEM[index] + 1) | 0;
         ptr = (ptr + 4) | 0;
         inputPointer = (inputPointer + MEM[ptr + 1]) | 0;
         otherPointer = (otherPointer + MEM[ptr + 2]) | 0;
         resultPointer = (resultPointer + MEM[ptr + 3]) | 0;
       }
-
-      index = 0;
     }
   }
 

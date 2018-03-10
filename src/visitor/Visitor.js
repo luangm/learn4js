@@ -32,6 +32,20 @@ export default class Visitor {
     node.right.accept(this, params);
   }
 
+  visitMaximum(node, params) {
+    this.logger.info("visitMaximum", node.name);
+    this.preVisit(node, params);
+    node.left.accept(this, params);
+    node.right.accept(this, params);
+  }
+
+  visitMinimum(node, params) {
+    this.logger.info("visitMinimum", node.name);
+    this.preVisit(node, params);
+    node.left.accept(this, params);
+    node.right.accept(this, params);
+  }
+
   visitAddN(node, params) {
     this.logger.info("visitAddN", node.name);
     this.preVisit(node, params);
@@ -87,6 +101,13 @@ export default class Visitor {
     node.right.accept(this, params);
   }
 
+  visitModulo(node, params) {
+    this.logger.info("visitModulo", node.name);
+    this.preVisit(node, params);
+    node.left.accept(this, params);
+    node.right.accept(this, params);
+  }
+
   visitExp(node, params) {
     this.logger.info("visitExp", node.name);
     this.preVisit(node, params);
@@ -95,6 +116,12 @@ export default class Visitor {
 
   visitExpm1(node, params) {
     this.logger.info("visitExpm1", node.name);
+    this.preVisit(node, params);
+    node.base.accept(this, params);
+  }
+
+  visitLog1p(node, params) {
+    this.logger.info("visitLog1p", node.name);
     this.preVisit(node, params);
     node.base.accept(this, params);
   }

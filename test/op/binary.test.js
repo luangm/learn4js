@@ -1,4 +1,4 @@
-import Learn4js, {Logger, println, Tensor} from "../../src/index";
+import Learn4js, {Logger, Tensor} from "../../src/index";
 
 test('add with broadcast', function() {
 
@@ -67,9 +67,71 @@ test('divide with broadcast', function() {
   let yVal = Tensor.create([2, 3]).reshape([2, 1]);
   let y = Learn4js.constant(yVal);
 
-  let zVal = Tensor.create([[1/2, 2/2, 3/2], [1/3, 2/3, 3/3]]);
+  let zVal = Tensor.create([[1 / 2, 2 / 2, 3 / 2], [1 / 3, 2 / 3, 3 / 3]]);
 
   let result = x.divide(y);
+  let resultVal = result.value;
+
+  expect(resultVal).toEqual(zVal);
+  // println(resultVal);
+
+});
+
+test('mod with broadcast', function() {
+
+  Logger.LogLevel = Logger.Level.ERROR;
+
+  let xVal = Tensor.create([1, 2, 3]).reshape([1, 3]);
+  let x = Learn4js.constant(xVal);
+
+  let yVal = Tensor.create([2, 3]).reshape([2, 1]);
+  let y = Learn4js.constant(yVal);
+
+  let zVal = Tensor.create([[1 % 2, 2 % 2, 3 % 2], [1 % 3, 2 % 3, 3 % 3]]);
+
+  let result = x.mod(y);
+  let resultVal = result.value;
+
+  expect(resultVal).toEqual(zVal);
+  // println(resultVal);
+
+});
+
+test('max with broadcast', function() {
+
+  Logger.LogLevel = Logger.Level.ERROR;
+
+  let xVal = Tensor.create([1, 2, 3]).reshape([1, 3]);
+  let x = Learn4js.constant(xVal);
+
+  let yVal = Tensor.create([2, 3]).reshape([2, 1]);
+  let y = Learn4js.constant(yVal);
+
+  let zVal = Tensor.create([[Math.max(1, 2), Math.max(2, 2), Math.max(3, 2)],
+    [Math.max(1, 3), Math.max(2, 3), Math.max(3, 3)]]);
+
+  let result = x.max(y);
+  let resultVal = result.value;
+
+  expect(resultVal).toEqual(zVal);
+  // println(resultVal);
+
+});
+
+test('min with broadcast', function() {
+
+  Logger.LogLevel = Logger.Level.ERROR;
+
+  let xVal = Tensor.create([1, 2, 3]).reshape([1, 3]);
+  let x = Learn4js.constant(xVal);
+
+  let yVal = Tensor.create([2, 3]).reshape([2, 1]);
+  let y = Learn4js.constant(yVal);
+
+  let zVal = Tensor.create([[Math.min(1, 2), Math.min(2, 2), Math.min(3, 2)],
+    [Math.min(1, 3), Math.min(2, 3), Math.min(3, 3)]]);
+
+  let result = x.min(y);
   let resultVal = result.value;
 
   expect(resultVal).toEqual(zVal);

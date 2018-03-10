@@ -9,6 +9,10 @@ export default class MatMulOp extends SpecialOp {
     this._transposeB = transposeB;
   }
 
+  get isSpecial() {
+    return true;
+  }
+
   get type() {
     return 'matmul';
   }
