@@ -1,4 +1,4 @@
-import Tensor from "./core/Tensor";
+import Tensor from "tensor4js";
 import Learn4js from "./Learn4js";
 import Session from "./session/Session";
 import Expression from "./structure/Expression";
@@ -7,9 +7,9 @@ import Logger from "./util/Logger";
 
 export {
   Graph,
-  Tensor,
   Session,
-  Logger
+  Logger,
+  Tensor
 }
 
 export function abs(base, {name} = {}) {

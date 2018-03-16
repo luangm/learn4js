@@ -1,5 +1,5 @@
 import Expression from "../../Expression";
-import TensorUtils from "../../../core/util/TensorUtils";
+import {ShapeUtils} from "tensor4js";
 
 export default class Conv2d extends Expression {
 

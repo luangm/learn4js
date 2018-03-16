@@ -1,12 +1,12 @@
 import BinaryExpression from "./BinaryExpression";
-import TensorUtils from "../../../core/util/TensorUtils";
+import {ShapeUtils} from "tensor4js";
 
 export default class Modulo extends BinaryExpression {
 
   constructor(left, right, {name, graph, scope} = {}) {
     super(left, right, {name, graph, scope});
 
-    this._shape = TensorUtils.broadcastShapes(left.shape, right.shape);
+    this._shape = ShapeUtils.broadcastShapes(left.shape, right.shape);
   }
 
   get shape() {

@@ -1,14 +1,15 @@
-import Learn4js, {Logger, Tensor} from "../../src/index";
+import {Tensor, println} from "tensor4js";
+import {Logger, constant} from "../../src/index";
 
 test('add with broadcast', function() {
 
   Logger.LogLevel = Logger.Level.ERROR;
 
   let xVal = Tensor.create([1, 2, 3]).reshape([1, 3]);
-  let x = Learn4js.constant(xVal);
+  let x = constant(xVal);
 
   let yVal = Tensor.create([2, 3]).reshape([2, 1]);
-  let y = Learn4js.constant(yVal);
+  let y = constant(yVal);
 
   let zVal = Tensor.create([[3, 4, 5], [4, 5, 6]]);
 
@@ -16,7 +17,7 @@ test('add with broadcast', function() {
   let resultVal = result.value;
 
   expect(resultVal).toEqual(zVal);
-  // println(resultVal);
+  println(resultVal);
 });
 
 test('subtract with broadcast', function() {
@@ -115,6 +116,18 @@ test('max with broadcast', function() {
 
   expect(resultVal).toEqual(zVal);
   // println(resultVal);
+
+
+
+  let X = Learn4js.variable({name: 'X'});
+  let Y = Learn4js.variable({name: 'Y'});
+  let Z = Learn4js.variable({name: 'Z'});
+  let add1 = Learn4js.add(X, Y);
+  let add2 = Learn4js.add(X, Y);
+  let mul = Learn4js.multiply(add2, Z);
+
+  assert(add1 === add2);
+  assert(mul.left === add1)
 
 });
 

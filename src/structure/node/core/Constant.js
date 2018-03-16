@@ -1,4 +1,4 @@
-import Tensor from "../../../core/Tensor";
+import {Tensor} from "tensor4js";
 import Expression from "../../Expression";
 
 export default class Constant extends Expression {

@@ -1,5 +1,5 @@
 import Expression from "../../Expression";
-import ShapeUtils from "../../../core/util/ShapeUtils";
+import {ShapeUtils} from "tensor4js";
 
 /**
  * Base class of all Reduction operations.

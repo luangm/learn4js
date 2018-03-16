@@ -1,6 +1,5 @@
-import Tensor from "../core/Tensor";
-import TensorMath from "../core/TensorMath";
-import TensorUtils from "../core/util/TensorUtils";
+import {Tensor, TensorMath} from "tensor4js";
+// import TensorUtils from "../core/util/TensorUtils";
 import ExpressionState from "../structure/constant/ExpressionState";
 import Logger from "../util/Logger";
 import Visitor from "./Visitor";

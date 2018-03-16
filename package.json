@@ -19,8 +19,8 @@
   "license": "MIT",
   "devDependencies": {
     "babel-core": "^6.26.0",
-    "babel-jest": "^22.0.4",
-    "babel-loader": "^7.1.2",
+    "babel-jest": "^22.4.1",
+    "babel-loader": "^7.1.4",
     "babel-plugin-add-module-exports": "^0.2.1",
     "babel-plugin-external-helpers": "^6.22.0",
     "babel-plugin-transform-class-properties": "^6.24.1",
@@ -31,20 +31,21 @@
     "babel-preset-env": "^1.6.1",
     "babel-register": "^6.26.0",
     "glslify-loader": "^1.0.2",
-    "jest": "^22.0.4",
+    "jest": "^22.4.2",
     "raw-loader": "^0.5.1",
     "rollup": "^0.50.0",
     "rollup-plugin-babel": "^3.0.3",
-    "rollup-plugin-commonjs": "^8.2.6",
-    "rollup-plugin-node-resolve": "^3.0.0",
+    "rollup-plugin-commonjs": "^8.4.1",
+    "rollup-plugin-node-resolve": "^3.2.0",
     "rollup-plugin-uglify": "^2.0.1",
-    "uglifyjs-webpack-plugin": "^1.1.4",
-    "webpack": "^3.8.1",
-    "webpack-bundle-analyzer": "^2.9.1",
-    "webpack-dev-server": "^2.9.4"
+    "uglifyjs-webpack-plugin": "^1.2.3",
+    "webpack": "^3.11.0",
+    "webpack-bundle-analyzer": "^2.11.1",
+    "webpack-dev-server": "^2.11.2"
   },
   "dependencies": {
     "node-fetch": "^1.7.3",
-    "pako": "^1.0.6"
+    "pako": "^1.0.6",
+    "tensor4js": "0.0.4"
   }
 }
