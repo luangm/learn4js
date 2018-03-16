@@ -1,8 +1,5 @@
-import Tensor from "../core/Tensor";
-import ShapeUtils from "../core/util/ShapeUtils";
-import TensorUtils from "../core/util/TensorUtils";
+import {ShapeUtils, Tensor} from "tensor4js";
 import ExpressionFactory from "../structure/factory/ExpressionFactory";
-import Fill from "../structure/node/Fill";
 import Logger from "../util/Logger";
 import Visitor from "./Visitor";
 
@@ -34,7 +31,7 @@ export default class ReverseGradientVisitor extends Visitor {
    * Called before each method
    */
   preVisit(node, params) {
-    let grad = params || new Fill(1, node.shape);
+    let grad = params || this.factory.fill(1, node.shape);
     grad = this.graph.add(grad);
     this._addGradient(node, grad);
     return grad;
@@ -63,7 +60,7 @@ export default class ReverseGradientVisitor extends Visitor {
   visitAdd(node, params) {
     logger.info("visitAdd", node.id);
     let grad = this.preVisit(node, params);
-    let pair = TensorUtils.getReductionIndices(node.left.shape, node.right.shape);
+    let pair = ShapeUtils.getReductionIndices(node.left.shape, node.right.shape);
     let leftGrad = this.factory.reduceSum(grad, pair.left);
     let rightGrad = this.factory.reduceSum(grad, pair.right);
     node.left.accept(this, leftGrad);
@@ -92,22 +89,22 @@ export default class ReverseGradientVisitor extends Visitor {
     let imageGradName = node.name + "/grad_" + node.image.name;
     let kernelGradName = node.name + "/grad_" + node.kernel.name;
 
-    let imageGrad = ExpressionFactory.createConv2dImageGrad({
-      name: imageGradName,
-      image: node.image,
-      kernel: node.kernel,
-      grad
-    });
+    // let imageGrad = ExpressionFactory.createConv2dImageGrad({
+    //   name: imageGradName,
+    //   image: node.image,
+    //   kernel: node.kernel,
+    //   grad
+    // });
+    //
+    // let kernelGrad = ExpressionFactory.createConv2dKernelGrad({
+    //   name: kernelGradName,
+    //   image: node.image,
+    //   kernel: node.kernel,
+    //   grad
+    // });
 
-    let kernelGrad = ExpressionFactory.createConv2dKernelGrad({
-      name: kernelGradName,
-      image: node.image,
-      kernel: node.kernel,
-      grad
-    });
-
-    node.image.accept(this, imageGrad);
-    node.kernel.accept(this, kernelGrad);
+    // node.image.accept(this, imageGrad);
+    // node.kernel.accept(this, kernelGrad);
   }
 
   // DONE
@@ -124,7 +121,7 @@ export default class ReverseGradientVisitor extends Visitor {
   visitDivide(node, params) {
     logger.info("visitDivide", node.id);
     let grad = this.preVisit(node, params);
-    let pair = TensorUtils.getReductionIndices(node.left.shape, node.right.shape);
+    let pair = ShapeUtils.getReductionIndices(node.left.shape, node.right.shape);
 
     // left = grad / right
     // right = -grad * left / right^2

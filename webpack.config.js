@@ -2,6 +2,7 @@ var webpack = require('webpack');
 var path = require('path');
 var UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 var BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const WebpackBabelExternalsPlugin = require('webpack-babel-external-helpers-2');
 
 module.exports = {
   entry: {
@@ -26,16 +27,13 @@ module.exports = {
         test: /\.js|jsx$/,
         exclude: /node_modules/,
         use: ["babel-loader"]
-      },
-      {
-        test: /\.(glsl|frag|vert)$/,
-        exclude: /node_modules/,
-        use: ['raw-loader', 'glslify-loader']
       }
     ]
   },
 
   plugins: [
+    new webpack.optimize.ModuleConcatenationPlugin(),
+    new WebpackBabelExternalsPlugin(),
     // new UglifyJsPlugin(),
     // new BundleAnalyzerPlugin()
   ]

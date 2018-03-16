@@ -1,19 +1,27 @@
 {
   "presets": [
     [
-      "env"
+      "env",
+      {
+        "modules": false
+      }
     ]
   ],
+  "env": {
+    "test": {
+      "presets": [["env"]]
+    }
+  },
   "plugins": [
-    "add-module-exports",
-    "transform-object-rest-spread",
-    "transform-decorators-legacy",
-    "transform-class-properties",
-    [
-      "transform-runtime", {
-      "polyfill": false,
-      "regenerator": true
-    }]
-  ],
-  "retainLines": true
+//    "add-module-exports",
+//    "transform-object-rest-spread",
+//    "transform-decorators-legacy",
+//    "transform-class-properties",
+//    [
+//      "transform-runtime", {
+//      "polyfill": false,
+//      "regenerator": true
+//    }]
+  ]
+//  "retainLines": true
 }

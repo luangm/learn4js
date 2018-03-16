@@ -31,9 +31,7 @@ export default class EvaluationVisitor extends Visitor {
     if (this.session.isValid(node)) {
       return;
     }
-
     node.base.accept(this, params);
-
     let base = this.getValue(node.base);
     let result = TensorMath.abs(base);
     this.setValue(node, result);

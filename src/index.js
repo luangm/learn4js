@@ -1,4 +1,4 @@
-import Tensor from "tensor4js";
+import {Tensor} from "tensor4js";
 import Learn4js from "./Learn4js";
 import Session from "./session/Session";
 import Expression from "./structure/Expression";
@@ -134,6 +134,10 @@ export function assign(target, value, {name} = {}) {
 
 export function conv2d(image, kernel, {name} = {}) {
   return Learn4js.factory.conv2d(image, kernel, {name});
+}
+
+export function gradients(target, nodes) {
+  return Learn4js.gradients(target, nodes);
 }
 
 export function println(...array) {

@@ -1,14 +1,14 @@
-import Learn4js, {println} from '../../src/index';
+import {println, parameter, gradients} from '../../src/index';
 
 test('divideGrad', function() {
-  Learn4js.interactive = true;
 
-  let x = Learn4js.parameter([[1, 2, 3], [4, 5, 6]]);
-  let y = Learn4js.parameter([[2, 3, 4], [5, 6, 7]]);
-  let result = Learn4js.divide(x, y);
-  println(result);
+  // Learn4js.interactive = true;
 
-  let grads = Learn4js.gradients(result, [x, y]);
+  let x = parameter([[1, 2, 3], [4, 5, 6]]);
+  let y = parameter([[2, 3, 4], [5, 6, 7]]);
+  let result = x.divide(y);
+
+  let grads = gradients(result, [x, y]);
 
   let x_grad = grads[0];
   let y_grad = grads[1];

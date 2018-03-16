@@ -2,8 +2,9 @@
 // import OptimizerFactory from "./OptimizerFactory";
 import Session from "./session/Session";
 import Graph from "./structure/Graph";
+import ReverseGradientVisitor from "./visitor/ReverseGradientVisitor";
+
 // import MaxPool from "./structure/node/cnn/MaxPool";
-// import ReverseGradientVisitor from "./visitor/ReverseGradientVisitor";
 
 /**
  * This is main Utility class for this library.
@@ -77,29 +78,25 @@ class Learn4js {
    * This is only a graph building step, does not do any computation.
    * The result is the gradients wrt each of the nodes.
    */
-  // gradients(target, nodes) {
-  //
-  //   let visitor = new ReverseGradientVisitor(this.activeGraph);
-  //   visitor.visit(target);
-  //
-  //   let gradients = [];
-  //   for (let node of nodes) {
-  //     let grad = target.getGradient(node);
-  //     if (this.interactive) {
-  //       grad.eval();
-  //     }
-  //     gradients.push(grad);
-  //   }
-  //   return gradients;
-  // }
+  gradients(target, nodes) {
+
+    let visitor = new ReverseGradientVisitor(this.activeGraph);
+    visitor.visit(target);
+
+    let gradients = [];
+    for (let node of nodes) {
+      let grad = target.getGradient(node);
+      if (this.interactive) {
+        grad.eval();
+      }
+      gradients.push(grad);
+    }
+    return gradients;
+  }
 
   graph(func) {
     func();
   }
-
-
-
-
 
   // maxPool({name, image, kernelShape, strideWidth, strideHeight}) {
   //   let node = new MaxPool({name, image, kernelShape, strideWidth, strideHeight});
@@ -107,18 +104,10 @@ class Learn4js {
   //   return node;
   // }
 
-
-
-
-
   // session(graph) {
   //   let myGraph = graph || this.activeGraph;
   //   return new Session(myGraph);
   // }
-
-
-
-
 
 }
 
