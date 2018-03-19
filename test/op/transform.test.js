@@ -1,38 +1,30 @@
-import Learn4js, {Logger, Tensor} from "../../src/index";
+import {constant, create, Logger} from "../../src/index";
 
 test('abs', function() {
 
   Logger.LogLevel = Logger.Level.ERROR;
 
-  let xVal = Tensor.create([[-1, 2, -3], [-4, -5, 6]]);
-  let x = Learn4js.constant(xVal);
+  let x = constant([[-1, 2, -3], [-4, -5, 6]]);
+  let z = x.abs();
+  let expected = create([[1, 2, 3], [4, 5, 6]]);
 
-  let zVal = Tensor.create([[1, 2, 3], [4, 5, 6]]);
+  expect(z.value).toEqual(expected);
 
-  let result = x.abs();
-  let resultVal = result.value;
-
-  expect(resultVal).toEqual(zVal);
-  // println(resultVal);
 });
 
 test('sin', function() {
 
   Logger.LogLevel = Logger.Level.ERROR;
 
-  let xVal = Tensor.create([[1, 2, 3], [0, 9, 8]]);
-  let x = Learn4js.constant(xVal);
-
-  let zVal = Tensor.create(
+  let x = constant([[1, 2, 3], [0, 9, 8]]);
+  let z = x.sin();
+  let expected = create(
     [[Math.sin(1), Math.sin(2), Math.sin(3)],
-      [Math.sin(0), Math.sin(9), Math.sin(8)]]
+    [Math.sin(0), Math.sin(9), Math.sin(8)]]
   );
 
-  let result = x.sin();
-  let resultVal = result.value;
+  expect(z.value).toEqual(expected);
 
-  expect(resultVal).toEqual(zVal);
-  // println(resultVal);
 });
 
 test('cos', function() {
@@ -130,7 +122,6 @@ test('expm1', function() {
   // println(resultVal);
 });
 
-
 test('log', function() {
 
   // Logger.LogLevel = Logger.Level.ERROR;
@@ -158,8 +149,8 @@ test('square', function() {
   let x = Learn4js.constant(xVal);
 
   let zVal = Tensor.create(
-    [[1*1, 2*2, 3*3],
-      [0*0, 9*9, 8*8]]
+    [[1 * 1, 2 * 2, 3 * 3],
+      [0 * 0, 9 * 9, 8 * 8]]
   );
 
   let result = x.square();
@@ -197,7 +188,7 @@ test('rsqrt', function() {
 
   let zVal = Tensor.create(
     [[1 / Math.sqrt(1), 1 / Math.sqrt(2), 1 / Math.sqrt(3)],
-      [1 /Math.sqrt(0.01),1 / Math.sqrt(9), 1 / Math.sqrt(8)]]
+      [1 / Math.sqrt(0.01), 1 / Math.sqrt(9), 1 / Math.sqrt(8)]]
   );
 
   let result = x.rsqrt();
@@ -272,8 +263,8 @@ test('reciprocal', function() {
   let x = Learn4js.constant(xVal);
 
   let zVal = Tensor.create(
-    [[1/-1, 1/-2, 1/3],
-      [1/0, 1/-1, 1]]
+    [[1 / -1, 1 / -2, 1 / 3],
+      [1 / 0, 1 / -1, 1]]
   );
 
   let result = x.reciprocal();
@@ -292,7 +283,7 @@ test('round', function() {
 
   let zVal = Tensor.create(
     [[-1, -2, 3],
-    [0, -1, 1]]
+      [0, -1, 1]]
   );
 
   let result = x.round();

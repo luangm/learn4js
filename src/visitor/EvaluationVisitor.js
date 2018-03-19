@@ -1,6 +1,4 @@
 import {Tensor, TensorMath} from "tensor4js";
-// import TensorUtils from "../core/util/TensorUtils";
-import ExpressionState from "../structure/constant/ExpressionState";
 import Logger from "../util/Logger";
 import Visitor from "./Visitor";
 
@@ -62,7 +60,7 @@ export default class EvaluationVisitor extends Visitor {
 
     let items = node.list.map(x => x.value);
     node.value = TensorMath.addN(items);
-    node.state = ExpressionState.EVALUATED;
+    // node.state = ExpressionState.EVALUATED;
   }
 
   visitAssign(node, params) {
@@ -73,7 +71,7 @@ export default class EvaluationVisitor extends Visitor {
     }
 
     node.target.value = node.newValue.value;
-    node.state = ExpressionState.EVALUATED;
+    // node.state = ExpressionState.EVALUATED;
   }
 
   visitConstant(node, params) {
@@ -170,7 +168,7 @@ export default class EvaluationVisitor extends Visitor {
       this.session.setValue(node, tensor);
     }
 
-    node.state = ExpressionState.EVALUATED;
+    // node.state = ExpressionState.EVALUATED;
   }
 
   visitGradientDescentStep(node, params) {
@@ -359,7 +357,7 @@ export default class EvaluationVisitor extends Visitor {
 
     let base = node.base.value;
     node.value = TensorMath.reduceSum(base, node.dimension);
-    node.state = ExpressionState.EVALUATED;
+    // node.state = ExpressionState.EVALUATED;
   }
 
   // DONE
@@ -458,7 +456,6 @@ export default class EvaluationVisitor extends Visitor {
     this.setValue(node, result);
   }
 
-
   visitSoftmaxCrossEntropy(node, params) {
     logger.info("visitSoftmaxCrossEntropy", node.id);
 
@@ -469,9 +466,8 @@ export default class EvaluationVisitor extends Visitor {
     let labels = node.labels.value;
     let logits = node.logits.value;
     node.value = TensorMath.softmaxCrossEntropyWithLogits(labels, logits);
-    node.state = ExpressionState.EVALUATED;
+    // node.state = ExpressionState.EVALUATED;
   }
-
 
   visitSoftmaxGrad(node, params) {
     logger.info("visitSoftmaxGrad", node.id);
@@ -483,7 +479,7 @@ export default class EvaluationVisitor extends Visitor {
     let base = node.base.value;
     let grad = node.grad.value;
     node.value = TensorMath.softmaxGrad(base, grad);
-    node.state = ExpressionState.EVALUATED;
+    // node.state = ExpressionState.EVALUATED;
   }
 
   // DONE
@@ -584,7 +580,6 @@ export default class EvaluationVisitor extends Visitor {
     this.setValue(node, result);
   }
 
-
   visitTile(node, params) {
     logger.info("visitTile", node.id);
 
@@ -594,12 +589,12 @@ export default class EvaluationVisitor extends Visitor {
 
     let base = node.base.value;
     node.value = TensorMath.tile(base, node.repeats);
-    node.state = ExpressionState.EVALUATED;
+    // node.state = ExpressionState.EVALUATED;
   }
 
   visitVariable(node, params) {
     logger.info("visitVariable", node.id);
     // super.visitVariable(node, params);
-    node.state = ExpressionState.EVALUATED;
+    // node.state = ExpressionState.EVALUATED;
   }
 }

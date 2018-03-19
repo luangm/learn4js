@@ -140,6 +140,34 @@ export function gradients(target, nodes) {
   return Learn4js.gradients(target, nodes);
 }
 
+export function arange(stop, start = 0, step = 1) {
+  return Tensor.arange(stop, start, step);
+}
+
+export function create(array) {
+  return Tensor.create(array);
+}
+
+export function linspace(from, to, num) {
+  return Tensor.linspace(from, to, num);
+}
+
+export function ones(shape) {
+  return Tensor.ones(shape);
+}
+
+export function rand(shape) {
+  return Tensor.rand(shape);
+}
+
+export function scalar(scalar) {
+  return Tensor.scalar(scalar);
+}
+
+export function zeros(shape) {
+  return Tensor.zeros(shape);
+}
+
 export function println(...array) {
   let result = [];
   for (let obj of array) {

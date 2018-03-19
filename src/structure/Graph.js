@@ -1,10 +1,9 @@
+import ExpressionFactory from "./factory/ExpressionFactory";
+
 /**
  * Compute Graph contains:
  * - All Nodes (inc. intermediate)
- * - Gradient from a Node to another Node.
  */
-import ExpressionFactory from "./factory/ExpressionFactory";
-
 export default class Graph {
 
   constructor(name) {
